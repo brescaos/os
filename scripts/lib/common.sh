@@ -69,3 +69,12 @@ cache_opt() {
         *) fail "NO_CACHE must be 0 or 1 (got '$NO_CACHE')" ;;
     esac
 }
+
+require_local_image() {
+    engine image inspect "$LOCAL_IMAGE" >/dev/null 2>&1 \
+        || fail "image $LOCAL_IMAGE not found: run 'make image VERSION=$VERSION' first"
+}
+
+require_cmd() {
+    command -v "$1" >/dev/null 2>&1 || fail "$1 not found. $2"
+}

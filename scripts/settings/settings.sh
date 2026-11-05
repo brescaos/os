@@ -21,3 +21,10 @@ CONTAINER_ENGINE=${CONTAINER_ENGINE:-docker}
 # 1: make image builds without the layer cache, so packages come from today's
 # repositories.
 NO_CACHE=${NO_CACHE:-0}
+
+# Registry make publish pushes to: host[:port][/path], e.g. quay.io/<user>
+# (make publish-dev passes the local one). Required by publish, so no default.
+REGISTRY=${REGISTRY:-}
+
+# 1: REGISTRY speaks HTTPS; 0: plain HTTP. Required by publish, so no default.
+REGISTRY_TLS=${REGISTRY_TLS:-}
