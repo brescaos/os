@@ -8,7 +8,7 @@ set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
 require_engine
-if registry_running; then
+if is_registry_running; then
     :
 elif engine container inspect "$LOCAL_REGISTRY_CONTAINER_NAME" >/dev/null 2>&1; then
     engine start "$LOCAL_REGISTRY_CONTAINER_NAME" >/dev/null

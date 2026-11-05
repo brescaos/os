@@ -5,7 +5,7 @@ set -euo pipefail
 . "$(dirname "$0")/common.sh"
 
 require_engine
-if registry_running; then
+if is_registry_running; then
     engine stop "$LOCAL_REGISTRY_CONTAINER_NAME" >/dev/null
 fi
 ok "registry stopped"

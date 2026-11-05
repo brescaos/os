@@ -21,7 +21,7 @@ find_firmware() {
     fi
     local qemu_share candidates pair
     # QEMU's own firmware (e.g. Homebrew's), next to its binary.
-    qemu_share=$(cd "$(dirname "$(command -v "$(qemu_binary)")")/../share/qemu" 2>/dev/null && pwd || true)
+    qemu_share=$(cd "$(dirname "$(command -v "$(print_qemu_binary)")")/../share/qemu" 2>/dev/null && pwd || true)
     case $ARCH in
         x86_64) candidates="
             /usr/share/OVMF/OVMF_CODE_4M.fd|/usr/share/OVMF/OVMF_VARS_4M.fd
@@ -45,23 +45,23 @@ find_firmware() {
 }
 
 # Creates the VM's UEFI variables store, .vm/vars.fd, if it isn't there.
-prepare_vars() {
-    local code=$1 template=$2 size
+create_uefi_vars() {
+    local firmware_code=$1 firmware_vars_template=$2 size_bytes
     [ -f "$VARS" ] && return 0
-    if [ -n "$template" ] && [ -f "$template" ]; then
-        cp "$template" "$VARS"
+    if [ -n "$firmware_vars_template" ] && [ -f "$firmware_vars_template" ]; then
+        cp "$firmware_vars_template" "$VARS"
     elif [ "$ARCH" = aarch64 ]; then
         # ARM edk2 accepts an empty variable store of the same size as the code.
-        size=$(wc -c < "$code" | tr -d ' ')
-        qemu-img create -q -f raw "$VARS" "$size"
+        size_bytes=$(wc -c < "$firmware_code" | tr -d ' ')
+        qemu-img create -q -f raw "$VARS" "$size_bytes"
     else
-        fail "no UEFI variables template found next to $code (set QEMU_FIRMWARE_VARS)"
+        fail "no UEFI variables template found next to $firmware_code (set QEMU_FIRMWARE_VARS)"
     fi
     chmod u+w "$VARS"
 }
 
 # Prints QEMU's accelerator for ARCH on this host; tcg (emulation) without one.
-qemu_accel() {
+print_qemu_accelerator() {
     if [ "$ARCH" = "$HOST_ARCH" ]; then
         case $(uname -s) in
             Darwin) echo hvf; return ;;
@@ -73,8 +73,8 @@ qemu_accel() {
 
 require_qemu
 [ -f "$DISK" ] || fail "no VM disk: run 'make vm' first"
-accel=$(qemu_accel)
-if [ "$accel" = tcg ]; then
+accelerator=$(print_qemu_accelerator)
+if [ "$accelerator" = tcg ]; then
     cpu=max
     warn "no hardware acceleration for $ARCH on this host: the VM will be slow"
 else
@@ -84,18 +84,18 @@ case $ARCH in
     x86_64)  machine=q35 ;;
     aarch64) machine=virt ;;
 esac
-fw=$(find_firmware)
-code=${fw%%|*}
-prepare_vars "$code" "${fw#*|}"
+firmware=$(find_firmware)
+firmware_code=${firmware%%|*}
+create_uefi_vars "$firmware_code" "${firmware#*|}"
 
 step "Booting .vm/disk.qcow2 ($ARCH) in a QEMU window. Boot log: .vm/serial.log; close the window or Ctrl-C to quit."
 # usb-tablet: absolute pointer, the cursor follows the host's without a grab.
-"$(qemu_binary)" \
-    -machine "$machine,accel=$accel" \
+"$(print_qemu_binary)" \
+    -machine "$machine,accel=$accelerator" \
     -cpu "$cpu" \
     -smp "$VM_CPUS" \
     -m "$VM_MEMORY" \
-    -drive "if=pflash,format=raw,unit=0,readonly=on,file=$code" \
+    -drive "if=pflash,format=raw,unit=0,readonly=on,file=$firmware_code" \
     -drive "if=pflash,format=raw,unit=1,file=$VARS" \
     -drive "file=$DISK,if=virtio,format=qcow2" \
     -netdev user,id=net0 \

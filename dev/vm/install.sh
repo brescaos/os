@@ -8,7 +8,7 @@
 set -euo pipefail
 
 DISK=/var/tmp/disk.raw
-MNT=/var/tmp/target
+TARGET_ROOT=/var/tmp/target
 
 # The registry speaks plain HTTP. Only in this container; the disk gets
 # its own setting below.
@@ -35,7 +35,7 @@ bootc install to-disk \
 # --- Mount the new deployment ------------------------------------------------------
 loop=$(losetup -f --show -P "$DISK")
 cleanup() {
-    umount -R "$MNT" 2>/dev/null || true
+    umount -R "$TARGET_ROOT" 2>/dev/null || true
     losetup -d "$loop" 2>/dev/null || true
 }
 trap cleanup EXIT
@@ -49,19 +49,19 @@ until compgen -G "${loop}p*" >/dev/null; do
 done
 # bootc labels its root partition "root".
 root=""
-for p in "$loop"p*; do
-    if [ "$(blkid -o value -s LABEL "$p" 2>/dev/null)" = root ]; then root=$p; fi
+for partition in "$loop"p*; do
+    if [ "$(blkid -o value -s LABEL "$partition" 2>/dev/null)" = root ]; then root=$partition; fi
 done
 [ -n "$root" ] || { echo "error: no partition labelled root on $loop" >&2; exit 1; }
 
-mkdir -p "$MNT"
-mount "$root" "$MNT"
-deploys=("$MNT"/ostree/deploy/default/deploy/*.0)
+mkdir -p "$TARGET_ROOT"
+mount "$root" "$TARGET_ROOT"
+deploys=("$TARGET_ROOT"/ostree/deploy/default/deploy/*.0)
 [ "${#deploys[@]}" -eq 1 ] && [ -d "${deploys[0]}" ] \
     || { echo "error: expected one deployment, found: ${deploys[*]}" >&2; exit 1; }
 deploy=${deploys[0]}
 etc=$deploy/etc
-mount --bind "$MNT/ostree/deploy/default/var" "$deploy/var"
+mount --bind "$TARGET_ROOT/ostree/deploy/default/var" "$deploy/var"
 mount --bind /dev "$deploy/dev"
 mount --bind /proc "$deploy/proc"
 mount --bind /sys "$deploy/sys"
@@ -84,11 +84,11 @@ ln -sfn "../usr/share/zoneinfo/$VM_TIMEZONE" "$etc/localtime"
 
 # Only the locales the image's glibc-langpack-* packages bring, which live in
 # /usr/lib/locale as e.g. en_US.utf8.
-base=${VM_LANG%%.*}
-if [ -d "$deploy/usr/lib/locale/$base.utf8" ]; then
-    printf 'LANG=%s\n' "$base.UTF-8" > "$etc/locale.conf"
+locale_name=${VM_LANG%%.*}
+if [ -d "$deploy/usr/lib/locale/$locale_name.utf8" ]; then
+    printf 'LANG=%s\n' "$locale_name.UTF-8" > "$etc/locale.conf"
 else
-    echo "warning: the image has no $base locale: the VM keeps the image's language" >&2
+    echo "warning: the image has no $locale_name locale: the VM keeps the image's language" >&2
 fi
 
 # The console keymap is named like the xkb layout, plus -<variant> (es-cat).
@@ -98,16 +98,6 @@ if [ -n "$(find "$deploy/usr/lib/kbd/keymaps" -name "$keymap.map*" -print -quit 
 else
     echo "warning: no console keymap $keymap: the text console keeps the image's" >&2
 fi
-# The system-wide layout systemd-localed reports, for graphical sessions.
-mkdir -p "$etc/X11/xorg.conf.d"
-{
-    printf 'Section "InputClass"\n'
-    printf '    Identifier "system-keyboard"\n'
-    printf '    MatchIsKeyboard "on"\n'
-    printf '    Option "XkbLayout" "%s"\n' "$VM_KEYBOARD_LAYOUT"
-    [ -z "$VM_KEYBOARD_VARIANT" ] || printf '    Option "XkbVariant" "%s"\n' "$VM_KEYBOARD_VARIANT"
-    printf 'EndSection\n'
-} > "$etc/X11/xorg.conf.d/00-keyboard.conf"
 
 # --- Updates from the local registry ------------------------------------------------
 # The VM follows TARGET, in the host's local registry, which speaks plain

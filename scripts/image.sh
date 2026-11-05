@@ -20,11 +20,11 @@ cp "$REPO_ROOT/LICENSE" "$REPO_ROOT/image/LICENSE"
 # --pull always checks quay.io for a newer base image: when there is one,
 # every BrescaOS layer is rebuilt on top of it. NO_CACHE=1 also skips the
 # layer cache, so packages come from today's repositories.
-cache=$(cache_opt)
-[ -z "$cache" ] || step "NO_CACHE=1: building without the layer cache"
-# shellcheck disable=SC2086 # cache is empty or a single flag
+cache_option=$(print_cache_option)
+[ -z "$cache_option" ] || step "NO_CACHE=1: building without the layer cache"
+# shellcheck disable=SC2086 # cache_option is empty or a single flag
 engine build \
-    --pull $cache \
+    --pull $cache_option \
     --platform "$PLATFORM" \
     --build-arg "FEDORA_VERSION=$FEDORA_VERSION" \
     --build-arg "BRESCAOS_VERSION=$VERSION" \

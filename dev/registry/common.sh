@@ -10,6 +10,6 @@
 # `inspect`: the registry's data volume has the same name as its container,
 # and plain `inspect` would find the volume (e.g. after `docker system prune`,
 # which removes the container but not the volume).
-registry_running() {
+is_registry_running() {
     [ "$(engine container inspect -f '{{.State.Running}}' "$LOCAL_REGISTRY_CONTAINER_NAME" 2>/dev/null)" = true ]
 }

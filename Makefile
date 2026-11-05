@@ -43,10 +43,9 @@ clean: ## Delete the local registry's container and its data (local brescaos:* i
 # Development VM (dev/vm/): the image on a QEMU disk, without an installer.
 # Always built as VERSION 0.0.0 and pushed only to the local registry.
 vm: ## Build the image (0.0.0), push it to the local registry, install it on a new VM disk (.vm/) and boot it
-	@dev/registry/start.sh
-	@. dev/registry/settings.sh && \
-	    export VERSION=0.0.0 REGISTRY="$$LOCAL_REGISTRY" REGISTRY_TLS="$$LOCAL_REGISTRY_TLS" && \
-	    scripts/image.sh && scripts/publish.sh && dev/vm/create.sh
+	@$(MAKE) --no-print-directory image VERSION=0.0.0
+	@$(MAKE) --no-print-directory publish-dev VERSION=0.0.0
+	@VERSION=0.0.0 dev/vm/create.sh
 	@dev/vm/start.sh
 
 vm-start: ## Boot the VM disk again, as it was left

@@ -10,7 +10,7 @@
 DISK=$VM_DIR/disk.qcow2
 VARS=$VM_DIR/vars.fd
 
-qemu_binary() {
+print_qemu_binary() {
     case $ARCH in
         x86_64)  echo qemu-system-x86_64 ;;
         aarch64) echo qemu-system-aarch64 ;;
@@ -18,6 +18,6 @@ qemu_binary() {
 }
 
 require_qemu() {
-    require_cmd "$(qemu_binary)" "Install QEMU (macOS: brew install qemu; Debian/Ubuntu: apt install qemu-system; Fedora: dnf install qemu)."
+    require_cmd "$(print_qemu_binary)" "Install QEMU (macOS: brew install qemu; Debian/Ubuntu: apt install qemu-system; Fedora: dnf install qemu)."
     require_cmd qemu-img "Install QEMU's qemu-img."
 }

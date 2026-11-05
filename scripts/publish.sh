@@ -27,20 +27,20 @@ require_local_image
 
 remote=$REGISTRY/$IMAGE_NAME:$VERSION-$ARCH
 host=${REGISTRY%%/*}
-push_opts=""
+push_options=""
 case $CONTAINER_ENGINE:$REGISTRY_TLS:${host%:*} in
     # Docker trusts localhost registries over plain HTTP
     docker:0:localhost | docker:0:127.0.0.1) ;;
     docker:0:*) warn "Docker pushes over plain HTTP only to localhost, or to $host if it's in Docker's insecure-registries" ;;
     # Podman needs to be told
-    podman:0:*) push_opts="--tls-verify=false" ;;
+    podman:0:*) push_options="--tls-verify=false" ;;
 esac
 
 step "Publishing $LOCAL_IMAGE to $remote"
 engine tag "$LOCAL_IMAGE" "$remote"
 # rmi even if the push fails: the extra tag is only for the push.
-# shellcheck disable=SC2086 # push_opts is empty or a single flag
-if ! engine push $push_opts "$remote"; then
+# shellcheck disable=SC2086 # push_options is empty or a single flag
+if ! engine push $push_options "$remote"; then
     engine rmi "$remote" >/dev/null
     fail "push to $remote failed (logged in? run '$CONTAINER_ENGINE login $host')"
 fi

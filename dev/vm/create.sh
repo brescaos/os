@@ -18,13 +18,13 @@ require_version
 require_qemu
 require_engine
 require_local_image
-registry_running \
+is_registry_running \
     || fail "the local registry isn't running: use 'make vm', which starts it and pushes the image there"
 [ "$ARCH" = "$HOST_ARCH" ] \
     || warn "installing a $ARCH image on a $HOST_ARCH host runs under emulation: slow, and may fail"
 
 WORK=$VM_DIR/build
-engine_opts=""
+engine_options=""
 tag=$IMAGE_NAME:$VERSION-$ARCH
 rm -rf "$WORK"
 mkdir -p "$WORK"
@@ -34,7 +34,7 @@ case $ARCH in
     aarch64) serial=ttyAMA0 ;;
 esac
 # Podman with SELinux: let the container use the host's /dev.
-[ "$CONTAINER_ENGINE" = podman ] && engine_opts="--security-opt label=type:unconfined_t"
+[ "$CONTAINER_ENGINE" = podman ] && engine_options="--security-opt label=type:unconfined_t"
 
 step "Installing BrescaOS $VERSION ($ARCH) on a $DISK_SIZE disk: user $VM_USER, keyboard $VM_KEYBOARD_LAYOUT${VM_KEYBOARD_VARIANT:+ ($VM_KEYBOARD_VARIANT)}, time zone $VM_TIMEZONE, language $VM_LANG"
 cp "$REPO_ROOT/dev/vm/install.sh" "$WORK/install.sh"
@@ -46,8 +46,8 @@ cp "$REPO_ROOT/dev/vm/install.sh" "$WORK/install.sh"
 #             comes out.
 #   network   the registry container's, so the registry is localhost:5000
 #             and needs no other network or host port.
-# shellcheck disable=SC2086 # engine_opts is empty or one option pair
-engine run --rm --privileged $engine_opts \
+# shellcheck disable=SC2086 # engine_options is empty or one option pair
+engine run --rm --privileged $engine_options \
     --platform "$PLATFORM" \
     --network "container:$LOCAL_REGISTRY_CONTAINER_NAME" \
     -v /dev:/dev \
