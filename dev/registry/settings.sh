@@ -1,7 +1,7 @@
-# Settings of the local development registry (scripts/local_registry.sh) and
-# how make publish-dev connects to it.
+# Settings of the local development registry (dev/registry/) and how
+# make publish-dev and make vm connect to it.
 # shellcheck shell=bash
-# shellcheck disable=SC2034 # used by scripts/local_registry.sh and the Makefile's publish-dev
+# shellcheck disable=SC2034 # used by dev/registry/, dev/vm/ and the Makefile
 
 REGISTRY_PORT=${REGISTRY_PORT:-5050}
 # Docker's official registry image.

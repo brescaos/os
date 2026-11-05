@@ -25,7 +25,7 @@ Pass them on the command line, for example
 | `NO_CACHE` | `0` | `1` builds without the layer cache, so packages come from today's repositories |
 | `REGISTRY` | (required by `publish`) | Registry to push to: `host[:port][/path]`, e.g. `quay.io/<user>` |
 | `REGISTRY_TLS` | (required by `publish`) | `1` if `REGISTRY` speaks HTTPS, `0` for plain HTTP |
-| `REGISTRY_PORT` | `5050` | Port of the local registry (`publish-dev`, `registry-start`) |
+| `REGISTRY_PORT` | `5050` | Port of the local registry (`publish-dev`, `registry-start`, `vm`) |
 
 ## What the build does
 
@@ -45,6 +45,8 @@ make registry-stop               # stops it; the data is kept
 make registry-start              # starts it again
 make clean                       # deletes it and its data (local brescaos:* images are kept)
 ```
+
+To try the image in a QEMU virtual machine, see [Development VM](vm.md).
 
 ## Troubleshooting
 

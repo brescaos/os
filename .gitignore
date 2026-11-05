@@ -1,2 +1,4 @@
 # Copied from the LICENSE by scripts/image.sh before every build.
 /image/LICENSE
+# The development VM (make vm): disk, UEFI variables, boot log.
+/.vm/
