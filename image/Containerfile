@@ -1,0 +1,62 @@
+# check=skip=InvalidDefaultArgInFrom
+# (Docker's check for FEDORA_VERSION having no default, which is on purpose:
+# see its ARG below. Podman reads this line as a comment.)
+
+# BrescaOS system image.
+#
+# Build speed: every dnf step mounts dnf's cache (/var/cache/libdnf5) from the
+# container engine's build cache, with keepcache=True.
+
+# Fedora major version.
+# TODO: Should pin by digest?
+# Required, no default: scripts/image.sh passes it from
+# scripts/settings/settings.sh. Without it the FROM line fails (empty tag).
+ARG FEDORA_VERSION
+
+FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
+
+ARG FEDORA_VERSION
+
+# Fedora packages used by BrescaOS.
+# TODO: boot.automount: systemd-gpt-auto-generator stacks a boot.automount on top of
+# ostree's /boot bind mount; ostree-finalize-staged's remount of /boot then
+# fails with EINVAL and drops the staged update (bootc-dev/bootc#2402). The
+# mask in /etc wins over the generated unit. Remove once Fedora ships ostree
+# with ostreedev/ostree#3664.
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y upgrade --refresh --setopt=install_weak_deps=False --setopt=keepcache=True \
+    && dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
+        bash-completion \
+        glibc-langpack-en glibc-langpack-es glibc-langpack-ca \
+    && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
+        || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
+    && set -- /usr/lib/modules/* \
+    && { { [ "$#" -eq 1 ] && [ -f "$1/initramfs.img" ]; } \
+        || { echo "error: expected one kernel with its initramfs.img, got: $*" >&2; exit 1; }; } \
+    && systemctl mask boot.automount
+
+# Version-independent system setup
+COPY build/system.sh /tmp/brescaos-build-system.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    bash /tmp/brescaos-build-system.sh \
+    && rm -f /tmp/brescaos-build-system.sh
+
+COPY LICENSE /usr/share/licenses/brescaos/LICENSE
+
+# BrescaOS version of this build. Required, no default: scripts/image.sh
+# passes VERSION.
+ARG BRESCAOS_VERSION
+
+LABEL org.opencontainers.image.title="BrescaOS" \
+      org.opencontainers.image.description="BrescaOS, a versioned desktop OS based on Fedora" \
+      org.opencontainers.image.version="${BRESCAOS_VERSION}" \
+      containers.bootc="1"
+
+# Version stamp (build/identity.sh). No dnf: a new VERSION builds without the
+# network beyond the base image check.
+COPY build/identity.sh /tmp/brescaos-build-identity.sh
+RUN { [ -n "${BRESCAOS_VERSION}" ] || { echo "error: build argument BRESCAOS_VERSION is required" >&2; exit 1; }; } \
+    && bash /tmp/brescaos-build-identity.sh "${BRESCAOS_VERSION}" "${FEDORA_VERSION}" \
+    && rm -f /tmp/brescaos-build-identity.sh
+
+RUN bootc container lint
