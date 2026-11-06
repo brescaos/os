@@ -9,7 +9,8 @@
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
-if [ -t 1 ]; then
+# GitHub Actions logs show colors but are not a terminal.
+if [ -t 1 ] || [ "${GITHUB_ACTIONS:-}" = true ]; then
     C_ACCENT=$'\e[38;5;111m' C_WARN=$'\e[33m' C_ERR=$'\e[31m' C_OK=$'\e[32m' C_RESET=$'\e[0m'
 else
     C_ACCENT='' C_WARN='' C_ERR='' C_OK='' C_RESET=''

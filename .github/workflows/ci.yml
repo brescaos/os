@@ -43,5 +43,11 @@ jobs:
         run: make image VERSION=0.0.0 ARCH=${{ matrix.arch }}
       - name: Smoke test
         run: |
-          docker run --rm brescaos:0.0.0-${{ matrix.arch }} \
-              sh -c '. /usr/lib/os-release && test "$NAME" = BrescaOS && test "$VERSION_ID" = 0.0.0'
+          docker run --rm brescaos:0.0.0-${{ matrix.arch }} sh -c '
+              . /usr/lib/os-release
+              if [ "$NAME" = BrescaOS ] && [ "$VERSION_ID" = 0.0.0 ]; then
+                  printf "\033[32m ok\033[0m os-release: %s %s\n" "$NAME" "$VERSION_ID"
+              else
+                  printf "\033[31merror:\033[0m os-release: expected BrescaOS 0.0.0, got %s %s\n" "$NAME" "$VERSION_ID" >&2
+                  exit 1
+              fi'
