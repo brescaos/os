@@ -52,7 +52,7 @@ create_uefi_vars() {
         cp "$firmware_vars_template" "$VARS"
     elif [ "$ARCH" = aarch64 ]; then
         # ARM edk2 accepts an empty variable store of the same size as the code.
-        size_bytes=$(wc -c < "$firmware_code" | tr -d ' ')
+        size_bytes=$(wc -c <"$firmware_code" | tr -d ' ')
         qemu-img create -q -f raw "$VARS" "$size_bytes"
     else
         fail "no UEFI variables template found next to $firmware_code (set QEMU_FIRMWARE_VARS)"
@@ -64,8 +64,14 @@ create_uefi_vars() {
 print_qemu_accelerator() {
     if [ "$ARCH" = "$HOST_ARCH" ]; then
         case $(uname -s) in
-            Darwin) echo hvf; return ;;
-            Linux)  if [ -r /dev/kvm ] && [ -w /dev/kvm ]; then echo kvm; return; fi ;;
+            Darwin)
+                echo hvf
+                return
+                ;;
+            Linux) if [ -r /dev/kvm ] && [ -w /dev/kvm ]; then
+                echo kvm
+                return
+            fi ;;
         esac
     fi
     echo tcg
@@ -81,7 +87,7 @@ else
     cpu=host
 fi
 case $ARCH in
-    x86_64)  machine=q35 ;;
+    x86_64) machine=q35 ;;
     aarch64) machine=virt ;;
 esac
 firmware=$(find_firmware)
