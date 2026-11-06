@@ -10,9 +10,13 @@ _comp_cmd_bresca() {
     _comp_initialize -n = -- "$@" || return
 
     if ((cword == 1)); then
-        _comp_compgen -- -W 'version help --help'
+        _comp_compgen -- -W 'version updates help --help'
     elif [[ ${words[1]} == version && $cur == -* ]]; then
         _comp_compgen -- -W '--short --format=json --format=text --help'
+    elif [[ ${words[1]} == updates ]] && ((cword == 2)); then
+        _comp_compgen -- -W 'status help --help'
+    elif [[ ${words[1]} == updates && ${words[2]} == status && $cur == -* ]]; then
+        _comp_compgen -- -W '--format=json --format=text --help'
     fi
 } \
     && complete -F _comp_cmd_bresca bresca

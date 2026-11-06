@@ -9,6 +9,7 @@ Usage: bresca <command> [options]
 
 Commands:
   version     Print the running BrescaOS version
+  updates     Manage BrescaOS updates
   help        Show this help
 
 Options:
@@ -18,11 +19,36 @@ Run 'bresca <command> --help' for its options.
 EOF
 }
 
+print_updates_usage() {
+    cat <<EOF
+Usage: bresca updates <subcommand> [options]
+
+Subcommands:
+  status      Current, staged and rollback versions (root)
+  help        Show this help
+
+Options:
+  -h, --help  Show this help
+
+Run 'bresca updates <subcommand> --help' for its options.
+EOF
+}
+
 case ${1:-help} in
     version)
         command=$1
         shift
         exec "/usr/libexec/bresca/$command" "$@"
+        ;;
+    updates)
+        case ${2:-help} in
+            status) exec "/usr/libexec/bresca/updates/$2" "${@:3}" ;;
+            help | -h | --help) print_updates_usage ;;
+            *)
+                print_updates_usage >&2
+                exit 2
+                ;;
+        esac
         ;;
     help | -h | --help) print_usage ;;
     *)

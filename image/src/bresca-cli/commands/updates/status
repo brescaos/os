@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# bresca updates status: the current, staged and rollback versions, from
+# bootc status.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: sudo bresca updates status [--format=json|text]
+
+Shows the current version, the staged one (downloaded, booted next unless it
+was only downloaded) and the rollback one, and which boots next.
+
+Options:
+  --format=json  Print {current, staged, rollback, rollback_queued, boots_next}
+  -h, --help     Show this help
+EOF
+}
+
+format=text
+for argument in "$@"; do
+    case $argument in
+        --format=json) format=json ;;
+        --format=text) format=text ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ((EUID != 0)); then
+    printf "error: 'bresca updates status' needs root: run it with sudo\n" >&2
+    exit 1
+fi
+
+# A staged deployment that was only downloaded doesn't boot until installed.
+status=$(bootc status --format=json | jq -c '
+    def deployment(key):
+        .status[key]
+        | if . == null then null
+          else {version: (.image.version // "unknown"), image: (.image.image.image // ""),
+                download_only: (.downloadOnly // false)}
+          end;
+    {current: deployment("booted"), staged: deployment("staged"), rollback: deployment("rollback"),
+     rollback_queued: (.status.rollbackQueued // false),
+     boots_next: (if .status.rollbackQueued == true then "rollback"
+                  elif .status.staged != null and .status.staged.downloadOnly != true then "staged"
+                  else "current" end)}')
+
+if [[ $format == json ]]; then
+    printf '%s\n' "$status"
+    exit 0
+fi
+
+if [[ -t 1 ]]; then
+    bold=$'\e[1m' dim=$'\e[2m' accent=$'\e[38;5;111m' reset=$'\e[0m'
+else
+    bold='' dim='' accent='' reset=''
+fi
+
+printf '%sBrescaOS%s\n\n' "$bold$accent" "$reset"
+jq -r '
+    .boots_next as $next
+    | (["●", "Current", "current"], ["◐", "Staged", "staged"], ["○", "Rollback", "rollback"]) as [$symbol, $label, $key]
+    | [$symbol, $label,
+       (.[$key] | if . == null then "—"
+                  else "\(.version)  \(.image)" + (if .download_only then "  (downloaded, not installed)" else "" end)
+                  end),
+       ($key == $next)]
+    | @tsv' <<<"$status" \
+    | while IFS=$'\t' read -r symbol label deployment boots_next; do
+        if [[ $boots_next == true ]]; then
+            printf '  %s%s %-10s%s %s  %s← boots next%s\n' "$accent" "$symbol" "$label" "$reset" "$deployment" "$dim" "$reset"
+        else
+            printf '  %s%s %-10s%s %s\n' "$dim" "$symbol" "$label" "$reset" "$deployment"
+        fi
+    done
+printf '\n'
