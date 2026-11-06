@@ -25,6 +25,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y upgrade --refresh --setopt=install_weak_deps=False --setopt=keepcache=True \
     && dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         bash-completion \
+        jq \
         glibc-langpack-en glibc-langpack-es glibc-langpack-ca \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
@@ -38,6 +39,11 @@ COPY build/system.sh /tmp/brescaos-build-system.sh
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     bash /tmp/brescaos-build-system.sh \
     && rm -f /tmp/brescaos-build-system.sh
+
+# The bresca CLI (src/bresca-cli/README.md).
+COPY --chmod=0755 src/bresca-cli/bresca /usr/bin/bresca
+COPY --chmod=0755 src/bresca-cli/commands/ /usr/libexec/bresca/
+COPY src/bresca-cli/completion.bash /usr/share/bash-completion/completions/bresca
 
 COPY LICENSE /usr/share/licenses/brescaos/LICENSE
 

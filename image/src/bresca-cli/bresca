@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# bresca: the BrescaOS system CLI. Each command is its own script in
+# /usr/libexec/bresca/; this one only runs it.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: bresca <command> [options]
+
+Commands:
+  version     Print the running BrescaOS version
+  help        Show this help
+
+Options:
+  -h, --help  Show this help
+
+Run 'bresca <command> --help' for its options.
+EOF
+}
+
+case ${1:-help} in
+    version)
+        command=$1
+        shift
+        exec "/usr/libexec/bresca/$command" "$@"
+        ;;
+    help | -h | --help) print_usage ;;
+    *)
+        print_usage >&2
+        exit 2
+        ;;
+esac
