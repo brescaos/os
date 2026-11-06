@@ -84,3 +84,8 @@ left=$(rpm -qa 'fedora-release*' fedora-logos)
     [[ -z $support_end ]] || printf 'SUPPORT_END=%s\n' "$support_end"
     printf 'HOME_URL="https://www.brescaos.com"\n'
 } >/usr/lib/os-release
+
+# --- Kernel arguments --------------------------------------------------------------
+# quiet: without it, the kernel's messages on the console are too noisy.
+mkdir -p /usr/lib/bootc/kargs.d
+printf 'kargs = ["quiet"]\n' >/usr/lib/bootc/kargs.d/10-brescaos-quiet.toml
