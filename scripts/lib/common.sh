@@ -9,22 +9,26 @@
 
 REPO_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 
-if [ -t 1 ]; then
+# GitHub Actions logs show colors but are not a terminal.
+if [ -t 1 ] || [ "${GITHUB_ACTIONS:-}" = true ]; then
     C_ACCENT=$'\e[38;5;111m' C_WARN=$'\e[33m' C_ERR=$'\e[31m' C_OK=$'\e[32m' C_RESET=$'\e[0m'
 else
     C_ACCENT='' C_WARN='' C_ERR='' C_OK='' C_RESET=''
 fi
 step() { printf '%s==>%s %s\n' "$C_ACCENT" "$C_RESET" "$*"; }
-ok()   { printf '%s ok%s %s\n' "$C_OK" "$C_RESET" "$*"; }
+ok() { printf '%s ok%s %s\n' "$C_OK" "$C_RESET" "$*"; }
 warn() { printf '%swarning:%s %s\n' "$C_WARN" "$C_RESET" "$*" >&2; }
-fail() { printf '%serror:%s %s\n' "$C_ERR" "$C_RESET" "$*" >&2; exit 1; }
+fail() {
+    printf '%serror:%s %s\n' "$C_ERR" "$C_RESET" "$*" >&2
+    exit 1
+}
 
 # --- Architecture -------------------------------------------------------------
 # Normalised names: aarch64 | x86_64.
 host_arch() {
     case $(uname -m) in
-        arm64|aarch64) echo aarch64 ;;
-        x86_64|amd64)  echo x86_64 ;;
+        arm64 | aarch64) echo aarch64 ;;
+        x86_64 | amd64) echo x86_64 ;;
         *) fail "unsupported host architecture: $(uname -m)" ;;
     esac
 }
@@ -36,7 +40,7 @@ HOST_ARCH=$(host_arch)
 
 case $ARCH in
     aarch64) PLATFORM=linux/arm64 ;;
-    x86_64)  PLATFORM=linux/amd64 ;;
+    x86_64) PLATFORM=linux/amd64 ;;
     *) fail "ARCH must be aarch64 or x86_64 (got '$ARCH')" ;;
 esac
 
@@ -56,7 +60,7 @@ require_version() {
 
 # --- Container engine ---------------------------------------------------------
 case $CONTAINER_ENGINE in
-    docker|podman) ;;
+    docker | podman) ;;
     *) fail "CONTAINER_ENGINE must be docker or podman (got '$CONTAINER_ENGINE')" ;;
 esac
 

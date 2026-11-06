@@ -1,0 +1,53 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container: quay.io/fedora/fedora:44
+    timeout-minutes: 10
+    steps:
+      - name: Install dependencies
+        run: dnf -y install --setopt=install_weak_deps=False ShellCheck shfmt make findutils
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: make check
+        run: make check
+
+  image:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: make image
+        run: make image VERSION=0.0.0 ARCH=${{ matrix.arch }}
+      - name: Smoke test
+        run: |
+          docker run --rm brescaos:0.0.0-${{ matrix.arch }} sh -c '
+              . /usr/lib/os-release
+              if [ "$NAME" = BrescaOS ] && [ "$VERSION_ID" = 0.0.0 ]; then
+                  printf "\033[32m ok\033[0m os-release: %s %s\n" "$NAME" "$VERSION_ID"
+              else
+                  printf "\033[31merror:\033[0m os-release: expected BrescaOS 0.0.0, got %s %s\n" "$NAME" "$VERSION_ID" >&2
+                  exit 1
+              fi'

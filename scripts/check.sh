@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Checks (make check): shellcheck and bash syntax on every shell script.
+# Checks (make check): shellcheck, shfmt and bash syntax on every shell script.
 set -euo pipefail
 . "$(dirname "$0")/lib/common.sh"
 
-command -v shellcheck >/dev/null 2>&1 \
-    || fail "shellcheck not found: install it to run make check"
+for tool in shellcheck shfmt; do
+    command -v "$tool" >/dev/null 2>&1 \
+        || fail "$tool not found: install it to run make check"
+done
 
 cd "$REPO_ROOT"
 
@@ -17,8 +19,8 @@ files=$(
                 *.sh) printf '%s\n' "${f#./}" ;;
                 # if, not &&: a non-script as the last file must not fail the pipeline
                 *) if head -n 1 "$f" 2>/dev/null | grep -qE '^#!.*[/ ](ba)?sh$'; then
-                       printf '%s\n' "${f#./}"
-                   fi ;;
+                    printf '%s\n' "${f#./}"
+                fi ;;
             esac
         done
 )
@@ -30,6 +32,8 @@ for f in $files; do
 done
 # shellcheck disable=SC2086 # word splitting over the file list is intended
 shellcheck -x -S warning -s bash $files || status=1
+# shellcheck disable=SC2086 # word splitting over the file list is intended
+shfmt -d $files || status=1
 
 [ "$status" -eq 0 ] || fail "checks failed"
-ok "shellcheck and syntax clean"
+ok "shellcheck, shfmt and syntax clean"

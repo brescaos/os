@@ -13,9 +13,9 @@ die() {
 # Fedora's trademark guidelines: a system that combines Fedora with other
 # software must not ship fedora-logos, fedora-release or fedora-release-notes
 # (README, "Fedora trademarks"). Must use generic-release and generic-logos instead.
-# However, some configuration file are missing 
+# However, some configuration file are missing
 # from these packages. Copy Fedora presets and dnf defaults
-# under BrescaOS names before remove these packages. 
+# under BrescaOS names before remove these packages.
 # Presets are read in lexical order and the first match wins, so 90-brescaos-default.preset
 # comes before generic's 90-default.preset.
 fedora_pkgs=$(rpm -qa --qf '%{NAME}\n' 'fedora-release*' fedora-logos | sort -u)
@@ -24,18 +24,20 @@ while IFS= read -r f; do
     dir=${f%/*} name=${f##*/}
     case $f in
         */systemd/system-preset/[0-9][0-9]-*.preset | */systemd/user-preset/[0-9][0-9]-*.preset)
-            copy="$dir/${name:0:3}brescaos-${name:3}" ;;
+            copy="$dir/${name:0:3}brescaos-${name:3}"
+            ;;
         /usr/share/dnf5/libdnf.conf.d/*fedora*)
-            copy="$dir/${name/fedora/brescaos}" ;;
+            copy="$dir/${name/fedora/brescaos}"
+            ;;
         *) continue ;;
     esac
     cp "$f" "$copy"
     echo "build/system.sh: $f copied to $copy"
-done < <(xargs rpm -ql <<< "$fedora_pkgs")
+done < <(xargs rpm -ql <<<"$fedora_pkgs")
 for f in /usr/lib/systemd/system-preset/85-brescaos-display-manager.preset \
-         /usr/lib/systemd/system-preset/90-brescaos-default.preset \
-         /usr/lib/systemd/user-preset/90-brescaos-default-user.preset \
-         /usr/share/dnf5/libdnf.conf.d/20-brescaos-defaults.conf; do
+    /usr/lib/systemd/system-preset/90-brescaos-default.preset \
+    /usr/lib/systemd/user-preset/90-brescaos-default-user.preset \
+    /usr/share/dnf5/libdnf.conf.d/20-brescaos-defaults.conf; do
     [[ -f $f ]] || die "$f missing, check fedora-release-common's file list"
 done
 # MIT requires its notice to stay with those copies, and the package that has
@@ -81,4 +83,4 @@ left=$(rpm -qa 'fedora-release*' fedora-logos)
     printf 'IMAGE_ID=brescaos\n'
     [[ -z $support_end ]] || printf 'SUPPORT_END=%s\n' "$support_end"
     printf 'HOME_URL="https://www.brescaos.com"\n'
-} > /usr/lib/os-release
+} >/usr/lib/os-release

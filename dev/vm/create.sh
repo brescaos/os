@@ -30,7 +30,7 @@ rm -rf "$WORK"
 mkdir -p "$WORK"
 trap 'rm -rf "$WORK"' EXIT
 case $ARCH in
-    x86_64)  serial=ttyS0 ;;
+    x86_64) serial=ttyS0 ;;
     aarch64) serial=ttyAMA0 ;;
 esac
 # Podman with SELinux: let the container use the host's /dev.
@@ -74,5 +74,5 @@ qemu-img convert -f raw -O qcow2 "$WORK/disk.raw" "$DISK.new"
 mv "$DISK.new" "$DISK"
 # Fresh disk, fresh UEFI variables.
 rm -f "$VARS"
-printf '%s\n' "$ARCH" > "$VM_DIR/arch"
+printf '%s\n' "$ARCH" >"$VM_DIR/arch"
 ok "disk ready: .vm/disk.qcow2 (BrescaOS $VERSION, $ARCH)"

@@ -11,7 +11,7 @@ fedora_version=$2
     printf 'VERSION="%s"\n' "$version"
     printf 'VERSION_ID=%s\n' "$version"
     printf 'IMAGE_VERSION=%s\n' "$version"
-} >> /usr/lib/os-release
+} >>/usr/lib/os-release
 # Read through /etc/system-release and /etc/redhat-release.
-printf 'BrescaOS release %s (based on Fedora %s)\n' "$version" "$fedora_version" > /usr/lib/fedora-release
-printf 'cpe:/o:brescaos:brescaos:%s\n' "$version" > /usr/lib/system-release-cpe
+printf 'BrescaOS release %s (based on Fedora %s)\n' "$version" "$fedora_version" >/usr/lib/fedora-release
+printf 'cpe:/o:brescaos:brescaos:%s\n' "$version" >/usr/lib/system-release-cpe

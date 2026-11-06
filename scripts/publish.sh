@@ -19,7 +19,7 @@ case $REGISTRY in
     *://* | */) fail "REGISTRY is host[:port][/path], without a scheme or a trailing slash (got '$REGISTRY')" ;;
 esac
 case $REGISTRY_TLS in
-    0|1) ;;
+    0 | 1) ;;
     *) fail "set REGISTRY_TLS=1 (HTTPS) or REGISTRY_TLS=0 (plain HTTP) (got '$REGISTRY_TLS')" ;;
 esac
 require_engine

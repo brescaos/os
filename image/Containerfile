@@ -1,6 +1,4 @@
-# check=skip=InvalidDefaultArgInFrom
-# (Docker's check for FEDORA_VERSION having no default, which is on purpose:
-# see its ARG below. Podman reads this line as a comment.)
+# check=skip=InvalidDefaultArgInFrom;error=true
 
 # BrescaOS system image.
 #

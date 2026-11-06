@@ -12,7 +12,7 @@ VARS=$VM_DIR/vars.fd
 
 print_qemu_binary() {
     case $ARCH in
-        x86_64)  echo qemu-system-x86_64 ;;
+        x86_64) echo qemu-system-x86_64 ;;
         aarch64) echo qemu-system-aarch64 ;;
     esac
 }

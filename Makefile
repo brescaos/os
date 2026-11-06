@@ -12,13 +12,16 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help check image publish publish-dev registry-start registry-stop clean vm vm-start vm-clean
+.PHONY: help check format image publish publish-dev registry-start registry-stop clean vm vm-start vm-clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[38;5;111m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-check: ## shellcheck + syntax on every script
+check: ## shellcheck, shfmt and syntax on every script
 	@scripts/check.sh
+
+format: ## Fix the shfmt formatting of every script (style: .editorconfig)
+	@shfmt -w .
 
 image: ## Build the BrescaOS image (VERSION=X.Y.Z[-alpha|beta|rc.N]; NO_CACHE=1 skips the cache)
 	@scripts/image.sh

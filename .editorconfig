@@ -1,0 +1,6 @@
+# shfmt reads its style from here (make check runs shfmt -d).
+[*.sh]
+indent_style = space
+indent_size = 4
+switch_case_indent = true
+binary_next_line = true
