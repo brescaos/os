@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Runs as bresca-updates@rollback.service: makes the previous BrescaOS version
+# the one that boots next (bootc rollback), or, run again before the reboot,
+# the current one again. bootc deletes a staged version, if there's one. The
+# result goes to rollback.json.
+set -euo pipefail
+
+result_file=/run/bresca/updates/rollback.json
+rolled_back_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+# Atomically, so a reader never sees half a file.
+write_file() {
+    cat >"$1.tmp"
+    mv "$1.tmp" "$1"
+}
+
+rm -f "$result_file"
+
+if [[ $(bootc status --format=json | jq '.status.rollback != null') == true ]]; then
+    if ! bootc_output=$(bootc rollback 2>&1); then
+        printf '%s\n' "$bootc_output" >&2
+        jq -cn --arg rolled_back_at "$rolled_back_at" --arg error "$bootc_output" \
+            '{rolled_back_at: $rolled_back_at, error: $error}' | write_file "$result_file"
+        exit 1
+    fi
+    printf '%s\n' "$bootc_output"
+fi
+
+# boots_next_version is null when there was no previous version to go back to.
+bootc status --format=json | jq -c --arg rolled_back_at "$rolled_back_at" '
+    .status as $status
+    | {rolled_back_at: $rolled_back_at,
+       current_version: ($status.booted.image.version // "unknown"),
+       rollback_queued: ($status.rollbackQueued // false),
+       boots_next_version: (if $status.rollback == null then null
+                            elif $status.rollbackQueued == true then $status.rollback.image.version // "unknown"
+                            else $status.booted.image.version // "unknown" end)}' | write_file "$result_file"

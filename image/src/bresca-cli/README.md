@@ -60,5 +60,9 @@ that download (`download`, `install --download`) refuse it unless they're
 given `--no-tls`. That check is the client's (the CLI, later the KCM): the
 services don't make it, since `systemctl start` takes no parameters.
 
+`rollback` deletes a staged version (downloaded, or installed and not booted
+yet), as `bootc rollback` does, so it refuses unless it's given
+`--discard-staged`; that check is the client's too.
+
 To add an operation, add its script to `services/updates/`: the template unit
 doesn't change.

@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# bresca updates rollback: makes the previous BrescaOS version the one that
+# boots next, or, run again before the reboot, the current one again. It runs
+# as bresca-updates@rollback; this starts it and prints its result.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: sudo bresca updates rollback [--discard-staged] [--reboot]
+                                    [--format=json|text]
+
+Makes the previous BrescaOS version the one that boots next. Both stay on
+disk, so running it again before the reboot goes back to the current one.
+
+Options:
+  --discard-staged  Accept that a downloaded or installed version, not booted
+                    yet, is deleted
+  --reboot          Restart after it, when the previous version boots next
+  --format=json     Print {rolled_back_at, current_version, rollback_queued,
+                    boots_next_version}, or {rolled_back_at, error}
+  -h, --help        Show this help
+EOF
+}
+
+should_discard_staged=false
+should_reboot=false
+format=text
+for argument in "$@"; do
+    case $argument in
+        --discard-staged) should_discard_staged=true ;;
+        --reboot) should_reboot=true ;;
+        --format=json) format=json ;;
+        --format=text) format=text ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ((EUID != 0)); then
+    printf "error: 'bresca updates rollback' needs root: run it with sudo\n" >&2
+    exit 1
+fi
+
+# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
+. /usr/libexec/bresca/lib/registry-tls.sh
+warn_if_registry_without_tls
+
+# bootc rollback deletes a staged version: only once the user accepts it.
+# "<version> <downloaded|installed>", when there's one and something to roll
+# back to.
+staged=$(bootc status --format=json | jq -r '
+    .status
+    | if .staged != null and .rollback != null
+      then "\(.staged.image.version // "unknown") \(if .staged.downloadOnly then "downloaded" else "installed" end)"
+      else empty end')
+if [[ -n $staged ]] && ! $should_discard_staged; then
+    print_error "BrescaOS ${staged% *} is ${staged#* }: rolling back deletes it. Run it again with --discard-staged to accept it."
+    exit 1
+fi
+
+result_file=/run/bresca/updates/rollback.json
+
+# If one is already running, this waits for it. Its failure message only
+# points to systemctl status: the result has ours.
+systemctl start bresca-updates@rollback.service 2>/dev/null || true
+
+if [[ ! -f $result_file ]]; then
+    printf "error: the rollback didn't finish: see journalctl -u bresca-updates@rollback\n" >&2
+    exit 1
+fi
+rollback_result=$(<"$result_file")
+rollback_error=$(jq -r '.error // empty' <<<"$rollback_result")
+is_rollback_queued=$(jq -r '.rollback_queued // false' <<<"$rollback_result")
+
+if [[ $format == json ]]; then
+    printf '%s\n' "$rollback_result"
+elif [[ -n $rollback_error ]]; then
+    printf "error: couldn't roll back: %s\n" "$rollback_error" >&2
+elif [[ $is_rollback_queued == true ]]; then
+    if $should_reboot; then
+        jq -r '"BrescaOS \(.boots_next_version) boots next. Restarting..."' <<<"$rollback_result"
+    else
+        jq -r '"BrescaOS \(.boots_next_version) boots next. Restart to use it: sudo systemctl reboot"' <<<"$rollback_result"
+    fi
+else
+    jq -r 'if .boots_next_version == null
+           then "Nothing to roll back to: there'\''s no previous version."
+           else "BrescaOS \(.boots_next_version) (the current one) boots next again." end' <<<"$rollback_result"
+fi
+[[ -z $rollback_error ]] || exit 1
+
+if $should_reboot && [[ $is_rollback_queued == true ]]; then
+    systemctl reboot
+fi
