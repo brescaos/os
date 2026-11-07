@@ -27,6 +27,46 @@ print_copies() {
     }' "$SHARE/image/Containerfile"
 }
 
+# --- Desktop notification -------------------------------------------------------
+# After a pass that copied something, a notification says which projects of
+# image/src/ changed (e.g. bresca-cli) and how many files. It
+# goes to the logged-in user's session bus, as that user; with no one logged in
+# there's none, and the copy goes on. Each one replaces the last.
+
+# The last notification's id, for the next one to replace it.
+notification_id=0
+
+# Runs gdbus call with the arguments on the logged-in user's session bus; fails
+# without one. From uid 1000: the login screen has a session bus too.
+call_session_bus() {
+    local bus uid
+    for bus in /run/user/*/bus; do
+        [[ -S $bus ]] || continue
+        uid=${bus#/run/user/}
+        uid=${uid%/bus}
+        if ((uid >= 1000)); then
+            runuser -u "$(id -nu "$uid")" -- env DBUS_SESSION_BUS_ADDRESS="unix:path=$bus" \
+                gdbus call --session --timeout 5 "$@"
+            return
+        fi
+    done
+    return 1
+}
+
+# Shows the summary $1 and the body $2. desktop-entry: Plasma takes the name and
+# the icon from bresca-dev-hotreload.desktop.
+show_notification() {
+    local summary=$1 body=$2 reply
+    reply=$(call_session_bus --dest org.freedesktop.Notifications --object-path /org/freedesktop/Notifications \
+        --method org.freedesktop.Notifications.Notify 'Hot reload' "$notification_id" view-refresh \
+        "$summary" "$body" '[]' "{'desktop-entry': <'bresca-dev-hotreload'>}" 5000 2>/dev/null) || return 0
+    # "(uint32 42,)"
+    reply=${reply#*uint32 }
+    notification_id=${reply%%,*}
+}
+
+# --- Copying -------------------------------------------------------------------------
+
 # Copies $1 to $2 with the mode $3 (the source's when empty) unless it's
 # already there; succeeds only when it copied. A new file instead of written
 # over: a program running the old one keeps it whole.
@@ -45,28 +85,46 @@ copy_if_different() {
 }
 
 copy_changed_files() {
-    local mode source destination file
-    local is_unit_changed=false
+    local mode source destination file project count_before
+    local is_unit_changed=false copied_count=0 updated_projects=''
 
     while IFS='|' read -r mode source destination; do
+        # src/<project>/...
+        project=${source#src/}
+        project=${project%%/*}
+        count_before=$copied_count
         source=$SHARE/image/$source
         if [[ -d $source ]]; then
             while IFS= read -r -d '' file; do
-                if copy_if_different "$source/$file" "${destination%/}/$file" "$mode" && [[ $file == *.service ]]; then
-                    is_unit_changed=true
+                if copy_if_different "$source/$file" "${destination%/}/$file" "$mode"; then
+                    copied_count=$((copied_count + 1))
+                    if [[ $file == *.service ]]; then
+                        is_unit_changed=true
+                    fi
                 fi
             done < <(cd "$source" && find . -type f -printf '%P\0')
         elif [[ -f $source ]]; then
             [[ $destination != */ ]] || destination=$destination${source##*/}
-            if copy_if_different "$source" "$destination" "$mode" && [[ $destination == *.service ]]; then
-                is_unit_changed=true
+            if copy_if_different "$source" "$destination" "$mode"; then
+                copied_count=$((copied_count + 1))
+                if [[ $destination == *.service ]]; then
+                    is_unit_changed=true
+                fi
             fi
+        fi
+        if ((copied_count > count_before)) && [[ ", $updated_projects, " != *", $project, "* ]]; then
+            updated_projects="${updated_projects:+$updated_projects, }$project"
         fi
     done < <(print_copies)
 
     if $is_unit_changed; then
         systemctl daemon-reload
         echo "reloaded systemd's units"
+    fi
+    if ((copied_count == 1)); then
+        show_notification "Hot reload: $updated_projects" "Updated 1 file"
+    elif ((copied_count > 1)); then
+        show_notification "Hot reload: $updated_projects" "Updated $copied_count files"
     fi
 }
 

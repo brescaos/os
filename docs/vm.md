@@ -66,6 +66,8 @@ without rebuilding the image: today, the whole `bresca` CLI
 journalctl -fu bresca-dev-hotreload   # in the VM
 ```
 
+- After copying, a notification says which projects of `image/src/` it
+  updated (e.g. `bresca-cli`) and how many files.
 - What reloads is what `image/Containerfile` copies from `src/`, to the same
   places; a new `COPY` there reloads too.
 - A changed systemd unit is reloaded (`systemctl daemon-reload`); a service

@@ -18,6 +18,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 COPY --chmod=0755 hotreload.sh /usr/libexec/bresca-dev/hotreload
 COPY --chmod=0755 clipboard-bridge.sh /usr/libexec/bresca-dev/clipboard-bridge
 COPY bresca-dev-hotreload.service /usr/lib/systemd/system/
+COPY bresca-dev-hotreload.desktop /usr/share/applications/
 COPY bresca-dev-clipboard.desktop /etc/xdg/autostart/
 RUN systemctl enable bresca-dev-hotreload.service
 

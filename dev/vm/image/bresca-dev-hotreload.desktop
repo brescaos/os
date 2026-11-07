@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Hot reload
+Comment=Development VM: copies image/src/ onto the system (dev/vm/image/)
+Icon=view-refresh
+Exec=konsole -e journalctl -fu bresca-dev-hotreload
+NoDisplay=true
