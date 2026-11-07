@@ -65,6 +65,7 @@ COPY src/bresca-cli/lib/ /usr/libexec/bresca/lib/
 COPY src/bresca-cli/services/bresca-updates@.service /usr/lib/systemd/system/
 COPY src/bresca-cli/services/bresca-updates-check.timer /usr/lib/systemd/system/
 COPY src/bresca-cli/services/bresca-updates.tmpfiles /usr/lib/tmpfiles.d/bresca-updates.conf
+COPY src/bresca-cli/services/bresca-updates-check.rules /usr/share/polkit-1/rules.d/50-brescaos-updates-check.rules
 # The tray icon and notification for a new version (src/updates-applet/README.md).
 COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
 COPY src/updates-applet/brescaos-updates.notifyrc /usr/share/knotifications6/

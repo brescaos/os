@@ -21,6 +21,7 @@ load helpers
         /usr/lib/systemd/system/bresca-updates@.service \
         /usr/lib/systemd/system/bresca-updates-check.timer \
         /usr/lib/tmpfiles.d/bresca-updates.conf \
+        /usr/share/polkit-1/rules.d/50-brescaos-updates-check.rules \
         /usr/share/bash-completion/completions/bresca; do
         [[ -f $path ]] || {
             echo "missing: $path"

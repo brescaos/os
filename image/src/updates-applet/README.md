@@ -19,6 +19,8 @@ available.
 - `update_available`: the icon shows;
   A successful install removes `check.json`, so
   the icon goes.
+- With nothing to install, its popup has **Check for Updates**: it starts
+  `bresca-updates@check` (`systemctl start --no-block`).
 - The notification, event `updateAvailable` of `brescaos-updates.notifyrc`,
   comes when the applet sees a version for the first time in a session: when
   a check finds it, and at every login while it isn't installed, as a
