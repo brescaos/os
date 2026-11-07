@@ -14,8 +14,8 @@ _comp_cmd_bresca() {
     elif [[ ${words[1]} == version && $cur == -* ]]; then
         _comp_compgen -- -W '--short --format=json --format=text --help'
     elif [[ ${words[1]} == updates ]] && ((cword == 2)); then
-        _comp_compgen -- -W 'status check download install help --help'
-    elif [[ ${words[1]} == updates && ${words[2]} == @(status|check) && $cur == -* ]]; then
+        _comp_compgen -- -W 'status check download install registry help --help'
+    elif [[ ${words[1]} == updates && ${words[2]} == @(status|check|registry) && $cur == -* ]]; then
         _comp_compgen -- -W '--format=json --format=text --help'
     elif [[ ${words[1]} == updates && ${words[2]} == download && $cur == -* ]]; then
         _comp_compgen -- -W '--no-tls --format=json --format=text --help'

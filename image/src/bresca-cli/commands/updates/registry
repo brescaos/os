@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# bresca updates registry: where updates come from, the image this system
+# follows and whether its registry is allowed without TLS.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: sudo bresca updates registry [--format=json|text]
+
+Shows the image updates come from: its registry, repository and tag, and
+whether the registry is allowed without TLS.
+
+Options:
+  --format=json  Print {image, registry, repository, tag, tls}
+  -h, --help     Show this help
+EOF
+}
+
+format=text
+for argument in "$@"; do
+    case $argument in
+        --format=json) format=json ;;
+        --format=text) format=text ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ((EUID != 0)); then
+    printf "error: 'bresca updates registry' needs root: run it with sudo\n" >&2
+    exit 1
+fi
+
+# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
+. /usr/libexec/bresca/lib/registry-tls.sh
+warn_if_registry_without_tls
+
+image=$(find_followed_image)
+if [[ -z $image ]]; then
+    printf "error: bootc status shows no image this system follows\n" >&2
+    exit 1
+fi
+
+# The tag is after the last ":" that follows the last "/", so a registry's
+# port (10.0.2.2:5050) isn't taken for it. No tag means latest.
+last_component=${image##*/}
+if [[ $last_component == *:* ]]; then
+    tag=${last_component##*:}
+    image_name=${image%:*}
+else
+    tag=latest
+    image_name=$image
+fi
+registry=''
+repository=$image_name
+if [[ $image_name == */* ]]; then
+    registry=${image_name%%/*}
+    repository=${image_name#*/}
+fi
+has_tls=true
+if [[ -n $registry ]] && is_registry_allowed_without_tls "$registry"; then
+    has_tls=false
+fi
+
+if [[ $format == json ]]; then
+    jq -cn --arg image "$image" --arg registry "$registry" --arg repository "$repository" \
+        --arg tag "$tag" --argjson tls "$has_tls" \
+        '{image: $image, registry: (if $registry == "" then null else $registry end),
+          repository: $repository, tag: $tag, tls: $tls}'
+    exit 0
+fi
+
+if [[ -t 1 ]]; then
+    bold=$'\e[1m' dim=$'\e[2m' accent=$'\e[38;5;111m' yellow=$'\e[33m' reset=$'\e[0m'
+else
+    bold='' dim='' accent='' yellow='' reset=''
+fi
+
+printf '%sBrescaOS updates%s\n\n' "$bold$accent" "$reset"
+printf '  %s%-11s%s %s\n' "$dim" "Image" "$reset" "$image"
+printf '  %s%-11s%s %s' "$dim" "Registry" "$reset" "${registry:-—}"
+$has_tls || printf '  %s(without TLS)%s' "$yellow" "$reset"
+printf '\n'
+printf '  %s%-11s%s %s\n' "$dim" "Repository" "$reset" "$repository"
+printf '  %s%-11s%s %s\n\n' "$dim" "Tag" "$reset" "$tag"

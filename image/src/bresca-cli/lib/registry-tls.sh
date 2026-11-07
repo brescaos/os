@@ -1,21 +1,23 @@
 # shellcheck shell=bash
 # Sourced by the bresca updates commands. Needs root, for bootc status.
 
-# Prints the registry of the image this system follows if it's allowed
-# without TLS (insecure = true in containers' registries.conf), e.g. the
-# development VM's local registry; nothing otherwise.
-find_registry_without_tls() {
-    local image registry config_file
-    local config_files=()
+# The image this system follows (<registry>/<repository>:<tag>): the one
+# bootc's spec names, which changes before the reboot, else the booted one.
+find_followed_image() {
+    bootc status --format=json | jq -r '.spec.image.image // .status.booted.image.image.image // empty'
+}
 
-    image=$(bootc status --format=json | jq -r '.spec.image.image // .status.booted.image.image.image // empty')
-    [[ $image == */* ]] || return 0
-    registry=${image%%/*}
+# Whether containers' registries.conf allows <registry> without TLS
+# (insecure = true), e.g. the development VM's local registry.
+is_registry_allowed_without_tls() {
+    local registry=$1
+    local config_file
+    local config_files=()
 
     for config_file in /etc/containers/registries.conf /etc/containers/registries.conf.d/*.conf; do
         [[ -f $config_file ]] && config_files+=("$config_file")
     done
-    ((${#config_files[@]} > 0)) || return 0
+    ((${#config_files[@]} > 0)) || return 1
 
     # One [[registry]] table per block: its location and insecure flag are
     # checked when the next table, or the next file, starts.
@@ -33,8 +35,21 @@ find_registry_without_tls() {
             location = value
         }
         /^[[:space:]]*insecure[[:space:]]*=[[:space:]]*true/ { is_insecure = 1 }
-        END { check_table(); if (found) print registry }
+        END { check_table(); exit !found }
     ' "${config_files[@]}"
+}
+
+# Prints the registry of the followed image if it's allowed without TLS;
+# nothing otherwise.
+find_registry_without_tls() {
+    local image registry
+
+    image=$(find_followed_image)
+    [[ $image == */* ]] || return 0
+    registry=${image%%/*}
+    if is_registry_allowed_without_tls "$registry"; then
+        printf '%s\n' "$registry"
+    fi
 }
 
 # ⚠ and ✗ need a UTF-8 locale and a font that has them; the Linux text

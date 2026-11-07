@@ -28,6 +28,7 @@ Subcommands:
   check       Check whether an update is available (root)
   download    Download the newer version without installing it (root)
   install     Install the downloaded version (root)
+  registry    Where updates come from: image, registry, TLS (root)
   help        Show this help
 
 Options:
@@ -45,7 +46,7 @@ case ${1:-help} in
         ;;
     updates)
         case ${2:-help} in
-            status | check | download | install) exec "/usr/libexec/bresca/updates/$2" "${@:3}" ;;
+            status | check | download | install | registry) exec "/usr/libexec/bresca/updates/$2" "${@:3}" ;;
             help | -h | --help) print_updates_usage ;;
             *)
                 print_updates_usage >&2

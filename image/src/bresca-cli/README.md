@@ -51,7 +51,9 @@ still happens if whoever started it goes away after the download; their
 progress and results are the usual `download-progress.json`, `download.json`
 and `install.json`.
 
-Every `bresca updates` command warns on stderr when the registry updates come
+`bresca updates registry` shows where updates come from: the followed image,
+its registry, repository and tag, and whether the registry is allowed without
+TLS. Every `bresca updates` command warns on stderr when the registry updates come
 from is allowed without TLS (`insecure = true` in containers'
 `registries.conf`), e.g. the development VM's local registry. The commands
 that download (`download`, `install --download`) refuse it unless they're
