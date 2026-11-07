@@ -51,3 +51,5 @@ jobs:
                   printf "\033[31merror:\033[0m os-release: expected BrescaOS 0.0.0, got %s %s\n" "$NAME" "$VERSION_ID" >&2
                   exit 1
               fi'
+      - name: make test
+        run: make test ARCH=${{ matrix.arch }}

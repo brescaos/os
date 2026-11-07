@@ -66,3 +66,21 @@ yet), as `bootc rollback` does, so it refuses unless it's given
 
 To add an operation, add its script to `services/updates/`: the template unit
 doesn't change.
+
+## Tests
+
+`tests/` holds bats tests that run in the BrescaOS image, with the CLI where
+`image/Containerfile` installs it (`make test`, on the host; the CI runs them
+too). `tests/Containerfile` adds bats and two fakes ahead in `PATH`:
+
+- `fakes/bootc` keeps the system in a JSON file in `bootc status`'s shape,
+  which each test writes with `helpers.bash`, and changes it as bootc would
+  (`--check`, `--download-only`, `--from-downloaded`, `rollback`).
+- `fakes/systemctl` runs an operation's real script on `start`, as
+  `bresca-updates@.service` would, and records every call (so a test can
+  check that nothing started, or that `reboot` was asked).
+
+They cover where each file is installed, the dispatcher and the help, and
+every `updates` command with its results and refusals (`--no-tls`,
+`--discard-staged`). The fakes behave as these scripts expect bootc to: only
+the VM shows that the real one does.

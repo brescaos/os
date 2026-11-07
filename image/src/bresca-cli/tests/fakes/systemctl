@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Fake systemctl for the tests: records each call in $SYSTEMCTL_LOG. start
+# runs the operation's real script, as bresca-updates@.service would, with
+# the runtime folder systemd would create; reboot does nothing else.
+set -euo pipefail
+
+printf '%s\n' "$*" >>"${SYSTEMCTL_LOG:?}"
+
+case $1 in
+    start)
+        operation=${2#bresca-updates@}
+        operation=${operation%.service}
+        mkdir -p /run/bresca/updates
+        /usr/libexec/bresca/services/updates/"$operation" >/dev/null 2>&1
+        ;;
+    reboot) ;;
+    *)
+        echo "fake systemctl: unexpected command: $*" >&2
+        exit 2
+        ;;
+esac

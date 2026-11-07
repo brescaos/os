@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# Fake bootc for the tests. The system is $BOOTC_STATE, in bootc status
+# --format=json's shape (helpers.bash writes it), and each command changes it
+# as bootc would. The registry has BOOTC_REGISTRY_VERSION, if set.
+# BOOTC_FAILS=<check|download|install|rollback> makes that command fail.
+set -euo pipefail
+
+state=${BOOTC_STATE:?}
+registry_version=${BOOTC_REGISTRY_VERSION:-}
+
+update_state() {
+    jq "$@" "$state" >"$state.new"
+    mv "$state.new" "$state"
+}
+
+fail_if_asked() {
+    if [[ ${BOOTC_FAILS:-} == "$1" ]]; then
+        echo "error: $1: connection refused (fake)" >&2
+        exit 1
+    fi
+}
+
+# Whether the registry has a version that is neither booted nor staged.
+has_new_version() {
+    [[ -n $registry_version ]] \
+        && jq -e --arg version "$registry_version" \
+            '.status.booted.image.version != $version and .status.staged.image.version != $version' \
+            "$state" >/dev/null
+}
+
+# The registry's image, as bootc status shows one (an ImageStatus: what a
+# deployment's image and cachedUpdate hold).
+registry_image='{image: {image: .spec.image.image}, version: $version, imageDigest: ("sha256:" + $version)}'
+
+case "$*" in
+    "status --format=json")
+        cat "$state"
+        ;;
+    "upgrade --check")
+        fail_if_asked check
+        if [[ -n $registry_version ]]; then
+            update_state --arg version "$registry_version" ".status.booted.cachedUpdate = $registry_image"
+            echo "Update available for: $registry_version"
+        else
+            echo "No changes in: the booted image"
+        fi
+        ;;
+    "upgrade --download-only --progress-fd 3")
+        fail_if_asked download
+        if has_new_version; then
+            printf '{"type":"ProgressBytes","description":"Fetching layers","bytes":50,"bytesTotal":100}\n' >&3
+            printf '{"type":"ProgressSteps","description":"Staging","steps":1,"stepsTotal":2}\n' >&3
+            update_state --arg version "$registry_version" ".status.staged = {image: $registry_image, downloadOnly: true}"
+        else
+            echo "No update available."
+        fi
+        ;;
+    "upgrade --from-downloaded")
+        fail_if_asked install
+        update_state '.status.staged.downloadOnly = false'
+        ;;
+    rollback)
+        fail_if_asked rollback
+        update_state '.status.rollbackQueued = (.status.rollbackQueued | not) | .status.staged = null'
+        ;;
+    *)
+        echo "fake bootc: unexpected command: $*" >&2
+        exit 2
+        ;;
+esac

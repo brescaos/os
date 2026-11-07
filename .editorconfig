@@ -1,6 +1,6 @@
 # shfmt reads its style from here (make check runs shfmt -d). The bresca CLI's
 # scripts have no extension, so they are listed by path.
-[{**.sh,**.bash,image/src/bresca-cli/bresca,image/src/bresca-cli/commands/**,image/src/bresca-cli/services/updates/**}]
+[{**.sh,**.bash,image/src/bresca-cli/bresca,image/src/bresca-cli/commands/**,image/src/bresca-cli/services/updates/**,image/src/bresca-cli/tests/fakes/**,**.bats}]
 indent_style = space
 indent_size = 4
 switch_case_indent = true

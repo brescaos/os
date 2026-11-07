@@ -49,6 +49,20 @@ make clean                       # deletes it and its data (local brescaos:* ima
 
 To try the image in a QEMU virtual machine, see [Development VM](vm.md).
 
+## Tests
+
+```bash
+make test   # builds the image as 0.0.0 and runs every component's tests in it
+```
+
+A component of `image/src/` has tests when it has `tests/Containerfile`:
+[`scripts/test.sh`](../scripts/test.sh) builds that test image on top of
+`brescaos:0.0.0-<ARCH>`, from the component's `tests/` folder, and runs it;
+the image's command runs the tests and fails if one does. Each component's
+README says what they cover. The CI runs them on both architectures. The
+test images (`brescaos-tests-<component>:0.0.0-<ARCH>`) stay, like the
+`brescaos:*` ones.
+
 ## Troubleshooting
 
 | Symptom | Try |
