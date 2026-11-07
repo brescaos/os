@@ -89,3 +89,20 @@ left=$(rpm -qa 'fedora-release*' fedora-logos)
 # quiet: without it, the kernel's messages on the console are too noisy.
 mkdir -p /usr/lib/bootc/kargs.d
 printf 'kargs = ["quiet"]\n' >/usr/lib/bootc/kargs.d/10-brescaos-quiet.toml
+
+# --- Services ----------------------------------------------------------------------
+# Secure by default: nothing listening on the network, nothing a desktop doesn't
+# need.
+# The same list goes into a preset that comes before Fedora's (kept above as
+# 90-brescaos-default.preset, which enables them): systemd applies presets on a
+# system's first boot, and the first preset file that names a unit wins.
+disabled_units="sshd.service sssd.service mdmonitor.service raid-check.timer nfs-client.target rpm-ostree-countme.timer"
+systemctl mask bootc-fetch-apply-updates.timer
+# shellcheck disable=SC2086 # one unit per word
+systemctl disable $disabled_units
+printf 'disable %s\n' $disabled_units >/usr/lib/systemd/system-preset/10-brescaos-disable.preset
+
+# LLMNR: systemd-resolved answers Windows-style name queries on port 5355 of
+# every network, which anyone on it can spoof.
+mkdir -p /usr/lib/systemd/resolved.conf.d
+printf '[Resolve]\nLLMNR=no\n' >/usr/lib/systemd/resolved.conf.d/50-brescaos.conf
