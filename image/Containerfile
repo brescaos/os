@@ -34,9 +34,11 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         plasma-breeze breeze-icon-theme \
         kscreen kscreenlocker \
         plasma-nm NetworkManager-wifi \
-        pipewire pipewire-pulseaudio wireplumber plasma-pa \
+        pipewire pipewire-pulseaudio pipewire-alsa wireplumber plasma-pa \
         bluedevil \
         firewalld plasma-firewall plasma-firewall-firewalld \
+        upower tuned-ppd \
+        qt6-qttranslations qt6-qtimageformats \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
