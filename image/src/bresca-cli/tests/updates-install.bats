@@ -18,6 +18,16 @@ load helpers
     [[ $(staged_field downloadOnly) == false ]]
 }
 
+@test "installing removes the last check's result; nothing to install keeps it" {
+    mkdir -p /run/bresca/updates
+    echo '{"update_available": true, "available_version": "0.2.0"}' >/run/bresca/updates/check.json
+    run bresca updates install
+    [[ -e /run/bresca/updates/check.json ]]
+    stage_version 0.2.0 downloaded
+    run bresca updates install
+    [[ ! -e /run/bresca/updates/check.json ]]
+}
+
 @test "an already installed version is reported as installed" {
     stage_version 0.2.0 installed
     run bresca updates install

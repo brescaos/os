@@ -70,8 +70,9 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   updated (e.g. `bresca-cli`) and how many files.
 - What reloads is what `image/Containerfile` copies from `src/`, to the same
   places; a new `COPY` there reloads too.
-- A changed systemd unit is reloaded (`systemctl daemon-reload`); a service
-  that is already running keeps the old one until it restarts.
+- A changed systemd unit (a service, a timer…) is reloaded (`systemctl
+  daemon-reload`); a service that is already running keeps the old one until
+  it restarts. A changed Plasma applet restarts plasmashell.
 - `/usr` is only writable until the next boot (`bootc usr-overlay`): after a
   reboot the image's files come back and the changed ones are copied again.
   Files you delete on the host stay in the VM until then.

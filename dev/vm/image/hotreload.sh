@@ -36,9 +36,10 @@ print_copies() {
 # The last notification's id, for the next one to replace it.
 notification_id=0
 
-# Runs gdbus call with the arguments on the logged-in user's session bus; fails
-# without one. From uid 1000: the login screen has a session bus too.
-call_session_bus() {
+# Runs the command $@ as the logged-in user, in their session (its bus and
+# its systemd); fails with no one logged in. From uid 1000: the login screen
+# has a session bus too.
+run_in_user_session() {
     local bus uid
     for bus in /run/user/*/bus; do
         [[ -S $bus ]] || continue
@@ -46,7 +47,7 @@ call_session_bus() {
         uid=${uid%/bus}
         if ((uid >= 1000)); then
             runuser -u "$(id -nu "$uid")" -- env DBUS_SESSION_BUS_ADDRESS="unix:path=$bus" \
-                gdbus call --session --timeout 5 "$@"
+                XDG_RUNTIME_DIR="/run/user/$uid" "$@"
             return
         fi
     done
@@ -57,7 +58,8 @@ call_session_bus() {
 # the icon from bresca-dev-hotreload.desktop.
 show_notification() {
     local summary=$1 body=$2 reply
-    reply=$(call_session_bus --dest org.freedesktop.Notifications --object-path /org/freedesktop/Notifications \
+    reply=$(run_in_user_session gdbus call --session --timeout 5 \
+        --dest org.freedesktop.Notifications --object-path /org/freedesktop/Notifications \
         --method org.freedesktop.Notifications.Notify 'Hot reload' "$notification_id" view-refresh \
         "$summary" "$body" '[]' "{'desktop-entry': <'bresca-dev-hotreload'>}" 5000 2>/dev/null) || return 0
     # "(uint32 42,)"
@@ -84,9 +86,20 @@ copy_if_different() {
     echo "updated $destination"
 }
 
+# Counts the copy of $1 and notes what it needs to take effect: a systemd unit,
+# systemd's reload; a Plasma applet, plasmashell's restart (it loads applets
+# once). For copy_changed_files, whose variables it sets.
+note_copied_file() {
+    copied_count=$((copied_count + 1))
+    case $1 in
+        /usr/lib/systemd/system/* | /usr/lib/systemd/user/*) is_unit_changed=true ;;
+        /usr/share/plasma/*) is_plasma_changed=true ;;
+    esac
+}
+
 copy_changed_files() {
     local mode source destination file project count_before
-    local is_unit_changed=false copied_count=0 updated_projects=''
+    local is_unit_changed=false is_plasma_changed=false copied_count=0 updated_projects=''
 
     while IFS='|' read -r mode source destination; do
         # src/<project>/...
@@ -97,19 +110,13 @@ copy_changed_files() {
         if [[ -d $source ]]; then
             while IFS= read -r -d '' file; do
                 if copy_if_different "$source/$file" "${destination%/}/$file" "$mode"; then
-                    copied_count=$((copied_count + 1))
-                    if [[ $file == *.service ]]; then
-                        is_unit_changed=true
-                    fi
+                    note_copied_file "${destination%/}/$file"
                 fi
             done < <(cd "$source" && find . -type f -printf '%P\0')
         elif [[ -f $source ]]; then
             [[ $destination != */ ]] || destination=$destination${source##*/}
             if copy_if_different "$source" "$destination" "$mode"; then
-                copied_count=$((copied_count + 1))
-                if [[ $destination == *.service ]]; then
-                    is_unit_changed=true
-                fi
+                note_copied_file "$destination"
             fi
         fi
         if ((copied_count > count_before)) && [[ ", $updated_projects, " != *", $project, "* ]]; then
@@ -120,6 +127,9 @@ copy_changed_files() {
     if $is_unit_changed; then
         systemctl daemon-reload
         echo "reloaded systemd's units"
+    fi
+    if $is_plasma_changed && run_in_user_session systemctl --user restart plasma-plasmashell.service; then
+        echo "restarted plasmashell"
     fi
     if ((copied_count == 1)); then
         show_notification "Hot reload: $updated_projects" "Updated 1 file"

@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Tells when a new BrescaOS version is available",
+        "EnabledByDefault": true,
+        "Icon": "system-software-update",
+        "Id": "com.brescaos.updates",
+        "License": "GPL-3.0-or-later",
+        "Name": "BrescaOS Updates",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-NotificationArea": "true",
+    "X-Plasma-NotificationAreaCategory": "SystemServices"
+}

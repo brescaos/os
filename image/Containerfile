@@ -39,6 +39,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         firewalld plasma-firewall plasma-firewall-firewalld \
         upower tuned-ppd \
         qt6-qttranslations qt6-qtimageformats \
+        inotify-tools \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
@@ -61,6 +62,12 @@ COPY src/bresca-cli/completion.bash /usr/share/bash-completion/completions/bresc
 COPY --chmod=0755 src/bresca-cli/services/updates/ /usr/libexec/bresca/services/updates/
 COPY src/bresca-cli/lib/ /usr/libexec/bresca/lib/
 COPY src/bresca-cli/services/bresca-updates@.service /usr/lib/systemd/system/
+COPY src/bresca-cli/services/bresca-updates-check.timer /usr/lib/systemd/system/
+COPY src/bresca-cli/services/bresca-updates.tmpfiles /usr/lib/tmpfiles.d/bresca-updates.conf
+# The tray icon and notification for a new version (src/updates-applet/README.md).
+COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
+COPY src/updates-applet/brescaos-updates.notifyrc /usr/share/knotifications6/
+RUN systemctl enable bresca-updates-check.timer
 
 COPY LICENSE /usr/share/licenses/brescaos/LICENSE
 

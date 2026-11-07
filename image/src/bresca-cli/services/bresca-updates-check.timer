@@ -1,0 +1,14 @@
+# Checks for a new BrescaOS version 5 minutes after boot and then every 6 hours
+# (bresca-updates@check: it only checks, never downloads, installs or reboots).
+# The tray applet (image/src/updates-applet/) shows what it finds.
+[Unit]
+Description=Check for BrescaOS updates periodically
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=6h
+RandomizedDelaySec=15min
+Unit=bresca-updates@check.service
+
+[Install]
+WantedBy=timers.target

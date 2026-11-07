@@ -1,0 +1,9 @@
+[Global]
+IconName=system-software-update
+Name=BrescaOS Updates
+Comment=New BrescaOS versions
+
+[Event/updateAvailable]
+Name=A new BrescaOS version is available
+Comment=When a check finds a newer version, and at every login until it's installed
+Action=Popup

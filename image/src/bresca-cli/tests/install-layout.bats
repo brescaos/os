@@ -15,16 +15,22 @@ load helpers
     done
 }
 
-@test "libraries, the unit template and the completion are there" {
+@test "libraries, units, tmpfiles and the completion are there" {
     local path
     for path in /usr/libexec/bresca/lib/{messages,registry-tls,download-progress}.sh \
         /usr/lib/systemd/system/bresca-updates@.service \
+        /usr/lib/systemd/system/bresca-updates-check.timer \
+        /usr/lib/tmpfiles.d/bresca-updates.conf \
         /usr/share/bash-completion/completions/bresca; do
         [[ -f $path ]] || {
             echo "missing: $path"
             return 1
         }
     done
+}
+
+@test "the periodic check is enabled" {
+    [[ -e /etc/systemd/system/timers.target.wants/bresca-updates-check.timer ]]
 }
 
 @test "jq is installed" {

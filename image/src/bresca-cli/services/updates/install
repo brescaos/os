@@ -33,3 +33,10 @@ bootc status --format=json | jq -c --arg installed_at "$installed_at" '
        current_version: (.status.booted.image.version // "unknown"),
        installed_version: (if $staged != null and $staged.downloadOnly != true
                            then $staged.image.version // "unknown" else null end)}' | write_file "$result_file"
+
+# The version the last check announced is installed: its result is stale, and
+# without it the tray icon goes. The next check (after the reboot) says what's
+# newer.
+if jq -e '.installed_version != null' "$result_file" >/dev/null; then
+    rm -f /run/bresca/updates/check.json
+fi

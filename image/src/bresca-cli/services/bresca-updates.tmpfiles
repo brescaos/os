@@ -1,0 +1,3 @@
+# The update operations' results (bresca-updates@.service), there from boot so
+# the tray applet can watch the folder before the first check runs.
+d /run/bresca/updates 0755 root root -

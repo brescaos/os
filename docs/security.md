@@ -4,12 +4,12 @@ BrescaOS aims to be safe by default. Here are the list of changes from the base 
 
 | What | Default | Why | To turn it on |
 |---|---|---|---|
-| Automatic updates (`bootc-fetch-apply-updates.timer`) | Masked | It installs a new version and reboots at once, without asking. Updates go through `bresca updates` | — |
+| Automatic updates (`bootc-fetch-apply-updates.timer`) | Masked | It installs a new version and reboots at once, without asking. Instead, `bresca-updates-check.timer` checks every 6 hours, never installs or reboots, and a tray icon and a notification say what it finds; installing goes through `bresca updates` | — |
 | SSH server (`sshd`) | Disabled, still installed | Nothing listens on the network by default | `sudo systemctl enable --now sshd` |
 | `sssd` (enterprise logins), `mdmonitor` and `raid-check.timer` (software RAID), `nfs-client.target` (rpcbind, rpc.statd) | Disabled | Not needed on a desktop | `sudo systemctl enable --now <unit>` |
 | `rpm-ostree-countme.timer` | Disabled | It counts the system as a Fedora one | — |
 | LLMNR in `systemd-resolved` | Off | It answers name queries on every network, which anyone on it can spoof | — |
-| Firewall (`firewalld`) | On, zone `default` ("BrescaOS default") for every network without a zone of its own, as every new one is. Fedora's other zones are removed except `block`, `drop` and `trusted` (firewalld needs them) and `nm-shared` (Wi-Fi hotspot), and so are its `gateway-*` policies, for routing other networks, which name the removed zones | Every incoming connection is dropped; only DHCPv6 replies get in | Open a service in Settings > Firewall, or `sudo firewall-cmd --permanent --add-service=<service> && sudo firewall-cmd --reload` (e.g. `ssh`, after enabling `sshd`) |
+| Firewall (`firewalld`) | On, zone `default` ("BrescaOS default") for every network without a zone of its own, as every new one is. Of Fedora's zones only `block`, `drop` and `trusted` (firewalld needs them) and `nm-shared` (Wi-Fi hotspot) are kept. Fedora's `gateway-*` policies, for routing other networks, are removed too: they name zones that are gone | Every incoming connection is dropped; only DHCPv6 replies get in | Open a service in Settings > Firewall, or `sudo firewall-cmd --permanent --add-service=<service> && sudo firewall-cmd --reload` (e.g. `ssh`, after enabling `sshd`) |
 
 The disabled units are also in
 `/usr/lib/systemd/system-preset/10-brescaos-disable.preset`, so a system's
