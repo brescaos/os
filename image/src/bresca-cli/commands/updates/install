@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# bresca updates install: installs the downloaded BrescaOS version, or with
+# --download downloads the newer one first. It runs as bresca-updates@install
+# (bresca-updates@download-install with --download); this starts it and prints
+# its result.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: sudo bresca updates install [--download] [--reboot] [--format=json|text]
+
+Installs the downloaded BrescaOS version: the next boot uses it. Without
+--download it only installs what 'bresca updates download' downloaded, without
+the network.
+
+Options:
+  --download     Download the newer version first, if there is one
+  --reboot       Restart after installing
+  --format=json  Print {installed_at, current_version, installed_version}, or
+                 the {..., error} of the download or the install
+  -h, --help     Show this help
+EOF
+}
+
+should_download=false
+should_reboot=false
+format=text
+for argument in "$@"; do
+    case $argument in
+        --download) should_download=true ;;
+        --reboot) should_reboot=true ;;
+        --format=json) format=json ;;
+        --format=text) format=text ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ((EUID != 0)); then
+    printf "error: 'bresca updates install' needs root: run it with sudo\n" >&2
+    exit 1
+fi
+
+results_dir=/run/bresca/updates
+operation=install
+$should_download && operation=download-install
+
+if $should_download && [[ $format == text ]]; then
+    # shellcheck source=SCRIPTDIR/../../lib/download-progress.sh
+    . /usr/libexec/bresca/lib/download-progress.sh
+    start_operation_showing_download_progress "$operation"
+else
+    # If one is already running, this waits for it. Its failure message only
+    # points to systemctl status: the result has ours.
+    systemctl start "bresca-updates@$operation.service" 2>/dev/null || true
+fi
+
+if $should_download && [[ -f $results_dir/download.json ]]; then
+    download_error=$(jq -r '.error // empty' "$results_dir/download.json")
+    if [[ -n $download_error ]]; then
+        if [[ $format == json ]]; then
+            cat "$results_dir/download.json"
+        else
+            printf "error: couldn't download the update: %s\n" "$download_error" >&2
+        fi
+        exit 1
+    fi
+fi
+
+if [[ ! -f $results_dir/install.json ]]; then
+    printf "error: the install didn't finish: see journalctl -u bresca-updates@%s\n" "$operation" >&2
+    exit 1
+fi
+install_result=$(<"$results_dir/install.json")
+install_error=$(jq -r '.error // empty' <<<"$install_result")
+installed_version=$(jq -r '.installed_version // empty' <<<"$install_result")
+
+if [[ $format == json ]]; then
+    printf '%s\n' "$install_result"
+elif [[ -n $install_error ]]; then
+    printf "error: couldn't install the update: %s\n" "$install_error" >&2
+elif [[ -n $installed_version ]]; then
+    if $should_reboot; then
+        printf 'Installed BrescaOS %s. Restarting...\n' "$installed_version"
+    else
+        printf 'Installed BrescaOS %s. Restart to use it: sudo systemctl reboot\n' "$installed_version"
+    fi
+elif $should_download; then
+    jq -r '"BrescaOS is up to date (\(.current_version)): nothing to install."' <<<"$install_result"
+else
+    printf "Nothing to install: no version is downloaded.\n"
+    printf "Download it with 'sudo bresca updates download', or use --download.\n"
+fi
+[[ -z $install_error ]] || exit 1
+
+if $should_reboot && [[ -n $installed_version ]]; then
+    systemctl reboot
+fi

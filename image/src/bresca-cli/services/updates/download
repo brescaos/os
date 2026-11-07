@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Runs as bresca-updates@download.service: downloads the newer BrescaOS version,
-# if there is one, without installing it.
+# Runs as bresca-updates@download.service, and in download-install:
+# downloads the newer BrescaOS version, if there is one, without installing it.
 # Its progress goes to download-progress.json while it runs, the result to download.json.
 set -euo pipefail
 

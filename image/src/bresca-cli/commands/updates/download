@@ -42,28 +42,16 @@ if ((EUID != 0)); then
 fi
 
 result_file=/run/bresca/updates/download.json
-progress_file=/run/bresca/updates/download-progress.json
 
-# If one is already running (e.g. started by System Settings), this waits for
-# it. Its failure message only points to systemctl status: the result has ours.
-systemctl start bresca-updates@download.service 2>/dev/null &
-start_pid=$!
-
-if [[ $format == text && -t 1 ]]; then
-    while kill -0 "$start_pid" 2>/dev/null; do
-        # Missing before the service starts and after it ends.
-        if progress_line=$(jq -r '
-            (if .phase == "checking" then "Checking for updates..."
-             elif .phase == "downloading" then "Downloading..."
-             else "Preparing it..." end)
-            + (if .percent then " \(.percent)%" else "" end)' "$progress_file" 2>/dev/null); then
-            printf '\r\e[K%s' "$progress_line"
-        fi
-        sleep 0.5
-    done
-    printf '\r\e[K'
+if [[ $format == text ]]; then
+    # shellcheck source=SCRIPTDIR/../../lib/download-progress.sh
+    . /usr/libexec/bresca/lib/download-progress.sh
+    start_operation_showing_download_progress download
+else
+    # If one is already running, this waits for it. Its failure message only
+    # points to systemctl status: the result has ours.
+    systemctl start bresca-updates@download.service 2>/dev/null || true
 fi
-wait "$start_pid" || true
 
 if [[ ! -f $result_file ]]; then
     printf "error: the download didn't finish: see journalctl -u bresca-updates@download\n" >&2

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Runs as bresca-updates@download-install.service: downloads the newer BrescaOS
+# version, if there is one, and installs it. One unit for both, so the install
+# still happens if whoever started it goes away after the download. The
+# download's progress and result, and the install's result, are their own.
+set -euo pipefail
+
+# Not left from an earlier install if the download fails.
+rm -f /run/bresca/updates/install.json
+
+/usr/libexec/bresca/services/updates/download
+exec /usr/libexec/bresca/services/updates/install

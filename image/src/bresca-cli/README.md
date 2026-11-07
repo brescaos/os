@@ -13,6 +13,7 @@
 | `completion.bash` | `/usr/share/bash-completion/completions/bresca` |
 | `services/bresca-updates@.service` | `/usr/lib/systemd/system/bresca-updates@.service` |
 | `services/updates/<operation>` | `/usr/libexec/bresca/services/updates/<operation>` |
+| `lib/<name>.sh` | `/usr/libexec/bresca/lib/<name>.sh`, sourced by commands |
 
 `bresca` only dispatches: it runs `/usr/libexec/bresca/<command>` (or
 `<group>/<subcommand>`, e.g. `updates/status`) with the remaining arguments.
@@ -43,6 +44,12 @@ operation may also publish its progress in
 `/run/bresca/updates/<operation>-progress.json` (`download` does), removed
 when it ends. The CLI commands only start the unit, show the progress and
 print the result.
+
+An operation can run others: `download-install` (`bresca updates install
+--download`) runs `download` and then `install` in one unit, so the install
+still happens if whoever started it goes away after the download; their
+progress and results are the usual `download-progress.json`, `download.json`
+and `install.json`.
 
 To add an operation, add its script to `services/updates/`: the template unit
 doesn't change.
