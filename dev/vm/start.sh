@@ -2,7 +2,8 @@
 # Boots .vm/disk.qcow2 in a QEMU window (make vm, make vm-start).
 # The boot log goes to .vm/serial.log.
 #
-# Environment: VM_MEMORY, VM_CPUS, QEMU_FIRMWARE, QEMU_FIRMWARE_VARS
+# Environment: VM_MEMORY, VM_CPUS, QEMU_AUDIO_BACKEND, QEMU_FIRMWARE,
+#              QEMU_FIRMWARE_VARS
 #              (defaults and meaning in dev/vm/settings.sh).
 set -euo pipefail
 # shellcheck source=dev/vm/common.sh
@@ -60,6 +61,18 @@ create_uefi_vars() {
     chmod u+w "$VARS"
 }
 
+# Prints QEMU's audio backend: QEMU_AUDIO_BACKEND, or the host's usual one.
+print_qemu_audio_backend() {
+    if [ -n "$QEMU_AUDIO_BACKEND" ]; then
+        echo "$QEMU_AUDIO_BACKEND"
+        return
+    fi
+    case $(uname -s) in
+        Darwin) echo coreaudio ;;
+        *) echo pa ;;
+    esac
+}
+
 # Prints QEMU's accelerator for ARCH on this host; tcg (emulation) without one.
 print_qemu_accelerator() {
     if [ "$ARCH" = "$HOST_ARCH" ]; then
@@ -96,6 +109,8 @@ create_uefi_vars "$firmware_code" "${firmware#*|}"
 
 step "Booting .vm/disk.qcow2 ($ARCH) in a QEMU window. Boot log: .vm/serial.log; close the window or Ctrl-C to quit."
 # usb-tablet: absolute pointer, the cursor follows the host's without a grab.
+# Sound: an Intel HDA card that plays and records (hda-duplex): the VM gets
+# the host's microphone too.
 # The repository goes read-only to the VM over 9p, for its hot reload
 # (dev/vm/hotreload.sh): QEMU serves it itself, no daemon on the host.
 "$(print_qemu_binary)" \
@@ -115,4 +130,7 @@ step "Booting .vm/disk.qcow2 ($ARCH) in a QEMU window. Boot log: .vm/serial.log;
     -device qemu-xhci \
     -device usb-kbd \
     -device usb-tablet \
+    -audiodev "$(print_qemu_audio_backend),id=audio0" \
+    -device ich9-intel-hda \
+    -device hda-duplex,audiodev=audio0 \
     -serial "file:$VM_DIR/serial.log"

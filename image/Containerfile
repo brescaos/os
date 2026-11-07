@@ -16,6 +16,8 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
 ARG FEDORA_VERSION
 
 # Fedora packages used by BrescaOS.
+# libglvnd-gles: KWin draws with OpenGL ES through libepoxy, which dlopens
+# libGLESv2 (so no package requires it) and aborts without it.
 # TODO: boot.automount: systemd-gpt-auto-generator stacks a boot.automount on top of
 # ostree's /boot bind mount; ostree-finalize-staged's remount of /boot then
 # fails with EINVAL and drops the staged update (bootc-dev/bootc#2402). The
@@ -27,12 +29,21 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         bash-completion \
         jq \
         glibc-langpack-en glibc-langpack-es glibc-langpack-ca \
+        plasma-desktop plasma-login-manager libglvnd-gles \
+        konsole dolphin \
+        plasma-breeze breeze-icon-theme \
+        kscreen kscreenlocker \
+        plasma-nm NetworkManager-wifi \
+        pipewire pipewire-pulseaudio wireplumber plasma-pa \
+        bluedevil \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
     && { { [ "$#" -eq 1 ] && [ -f "$1/initramfs.img" ]; } \
         || { echo "error: expected one kernel with its initramfs.img, got: $*" >&2; exit 1; }; } \
-    && systemctl mask boot.automount
+    && systemctl mask boot.automount \
+    && systemctl enable plasmalogin.service \
+    && systemctl set-default graphical.target
 
 # Version-independent system setup
 COPY build/system.sh /tmp/brescaos-build-system.sh

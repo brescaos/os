@@ -7,7 +7,7 @@
 #   REGISTRY_PORT (local registry, default 5050: dev/registry/settings.sh)
 #   VM_MEMORY, VM_CPUS, DISK_SIZE, VM_USER, VM_FULL_NAME, VM_PASSWORD,
 #   VM_KEYBOARD_LAYOUT, VM_KEYBOARD_VARIANT, VM_TIMEZONE, VM_LANG,
-#   QEMU_FIRMWARE, QEMU_FIRMWARE_VARS (make vm; defaults: dev/vm/settings.sh)
+#   QEMU_AUDIO_BACKEND, QEMU_FIRMWARE, QEMU_FIRMWARE_VARS (make vm; defaults: dev/vm/settings.sh)
 
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help

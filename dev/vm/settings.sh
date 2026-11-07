@@ -36,6 +36,11 @@ LOCAL_REGISTRY_FROM_VM=10.0.2.2:$REGISTRY_PORT
 # folder isn't on macOS. make vm-clean deletes it.
 VM_WORK_VOLUME=brescaos-vm-work
 
+# QEMU's audio backend: the VM's sound card plays through the host's sound.
+# Empty: coreaudio on macOS, pa on Linux (PulseAudio, or PipeWire's server for
+# it).
+QEMU_AUDIO_BACKEND=${QEMU_AUDIO_BACKEND:-}
+
 # UEFI firmware code and variables template. Empty: found automatically.
 QEMU_FIRMWARE=${QEMU_FIRMWARE:-}
 QEMU_FIRMWARE_VARS=${QEMU_FIRMWARE_VARS:-}

@@ -24,7 +24,8 @@ make vm
 3. Installs it on a new disk, `.vm/disk.qcow2`.
 4. Boots the disk in a QEMU window. The boot log goes to `.vm/serial.log`.
 
-Log in as `bresca`, password `bresca`. This user is an administrator.
+It boots to Plasma's login screen: log in as `bresca`, password `bresca`.
+This user is an administrator.
 
 > [!WARNING]
 > Each `make vm` replaces the disk, so the VM starts over. To boot the
@@ -65,6 +66,7 @@ Defaults are in [`dev/vm/settings.sh`](../dev/vm/settings.sh). For example
 | `VM_KEYBOARD_LAYOUT` / `VM_KEYBOARD_VARIANT` | `us` / (none) | Keyboard as xkb layout and variant, such as `es` / `cat` |
 | `VM_TIMEZONE` | `Europe/Madrid` | Time zone |
 | `VM_LANG` | `en_US.UTF-8` | Language as a `LANG` value; only the languages the image has (`en`, `es`, `ca`) |
+| `QEMU_AUDIO_BACKEND` | `coreaudio` (macOS), `pa` (Linux) | Where the VM's sound plays on the host; also applies to `make vm-start` |
 | `QEMU_FIRMWARE` / `QEMU_FIRMWARE_VARS` | found automatically | UEFI firmware code and variables template |
 
 ## How it works
@@ -88,6 +90,8 @@ on macOS, KVM on Linux).
   9p, from `make vm-start` too) and runs `bresca-dev-hotreload.service`
   ([`dev/vm/hotreload.sh`](../dev/vm/hotreload.sh), straight from there):
   both in the disk's `/etc`, not in the image.
+- Its sound card (Intel HDA) plays through the host's sound and records from
+  the host's microphone (on macOS, QEMU asks for it the first time).
 - It allows the local registry over plain HTTP, in
   `/etc/containers/registries.conf.d/50-brescaos-vm.conf`. The image itself
   doesn't.
