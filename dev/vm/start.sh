@@ -96,7 +96,11 @@ create_uefi_vars "$firmware_code" "${firmware#*|}"
 
 step "Booting .vm/disk.qcow2 ($ARCH) in a QEMU window. Boot log: .vm/serial.log; close the window or Ctrl-C to quit."
 # usb-tablet: absolute pointer, the cursor follows the host's without a grab.
+# The repository goes read-only to the VM over 9p, for its hot reload
+# (dev/vm/hotreload.sh): QEMU serves it itself, no daemon on the host.
 "$(print_qemu_binary)" \
+    -fsdev "local,id=src,path=$REPO_ROOT,security_model=none,readonly=on" \
+    -device "virtio-9p-pci,fsdev=src,mount_tag=bresca-src" \
     -machine "$machine,accel=$accelerator" \
     -cpu "$cpu" \
     -smp "$VM_CPUS" \

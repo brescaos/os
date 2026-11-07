@@ -30,6 +30,26 @@ Log in as `bresca`, password `bresca`. This user is an administrator.
 > Each `make vm` replaces the disk, so the VM starts over. To boot the
 > existing disk as you left it, use `make vm-start`.
 
+## Hot reload
+
+While the VM runs, what you change in `image/src/` reaches it within a second,
+without rebuilding the image: today, the whole `bresca` CLI
+(`image/src/bresca-cli/`). See what it copies with:
+
+```bash
+journalctl -fu bresca-dev-hotreload   # in the VM
+```
+
+- What reloads is what `image/Containerfile` copies from `src/`, to the same
+  places; a new `COPY` there reloads too.
+- A changed systemd unit is reloaded (`systemctl daemon-reload`); a service
+  that is already running keeps the old one until it restarts.
+- `/usr` is only writable until the next boot (`bootc usr-overlay`): after a
+  reboot the image's files come back and the changed ones are copied again.
+  Files you delete on the host stay in the VM until then.
+- Changes to anything else (packages, `image/build/`) still need `make vm`.
+- A disk created before hot reload existed doesn't have it: `make vm` once.
+
 ## Variables
 
 Defaults are in [`dev/vm/settings.sh`](../dev/vm/settings.sh). For example
@@ -64,6 +84,10 @@ on macOS, KVM on Linux).
 
 - SELinux is disabled on its disk, because `bootc install` can't label files
   from a host without SELinux.
+- It mounts this repository read-only at `/run/bresca-dev/src` (QEMU's
+  9p, from `make vm-start` too) and runs `bresca-dev-hotreload.service`
+  ([`dev/vm/hotreload.sh`](../dev/vm/hotreload.sh), straight from there):
+  both in the disk's `/etc`, not in the image.
 - It allows the local registry over plain HTTP, in
   `/etc/containers/registries.conf.d/50-brescaos-vm.conf`. The image itself
   doesn't.
