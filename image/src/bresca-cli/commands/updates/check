@@ -40,6 +40,10 @@ if ((EUID != 0)); then
     exit 1
 fi
 
+# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
+. /usr/libexec/bresca/lib/registry-tls.sh
+warn_if_registry_without_tls
+
 result_file=/run/bresca/updates/check.json
 
 [[ $format == json ]] || printf 'Checking for updates...\n'

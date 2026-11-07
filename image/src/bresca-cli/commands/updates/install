@@ -7,7 +7,8 @@ set -euo pipefail
 
 print_usage() {
     cat <<EOF
-Usage: sudo bresca updates install [--download] [--reboot] [--format=json|text]
+Usage: sudo bresca updates install [--download [--no-tls]] [--reboot]
+                                   [--format=json|text]
 
 Installs the downloaded BrescaOS version: the next boot uses it. Without
 --download it only installs what 'bresca updates download' downloaded, without
@@ -15,6 +16,7 @@ the network.
 
 Options:
   --download     Download the newer version first, if there is one
+  --no-tls       With --download, accept a registry allowed without TLS
   --reboot       Restart after installing
   --format=json  Print {installed_at, current_version, installed_version}, or
                  the {..., error} of the download or the install
@@ -24,11 +26,13 @@ EOF
 
 should_download=false
 should_reboot=false
+is_no_tls_accepted=false
 format=text
 for argument in "$@"; do
     case $argument in
         --download) should_download=true ;;
         --reboot) should_reboot=true ;;
+        --no-tls) is_no_tls_accepted=true ;;
         --format=json) format=json ;;
         --format=text) format=text ;;
         -h | --help)
@@ -46,6 +50,15 @@ done
 if ((EUID != 0)); then
     printf "error: 'bresca updates install' needs root: run it with sudo\n" >&2
     exit 1
+fi
+
+# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
+. /usr/libexec/bresca/lib/registry-tls.sh
+# Without --download nothing comes from the registry: only a warning.
+if $should_download; then
+    stop_if_registry_without_tls "$is_no_tls_accepted"
+else
+    warn_if_registry_without_tls
 fi
 
 results_dir=/run/bresca/updates

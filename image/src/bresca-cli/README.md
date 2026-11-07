@@ -51,5 +51,12 @@ still happens if whoever started it goes away after the download; their
 progress and results are the usual `download-progress.json`, `download.json`
 and `install.json`.
 
+Every `bresca updates` command warns on stderr when the registry updates come
+from is allowed without TLS (`insecure = true` in containers'
+`registries.conf`), e.g. the development VM's local registry. The commands
+that download (`download`, `install --download`) refuse it unless they're
+given `--no-tls`. That check is the client's (the CLI, later the KCM): the
+services don't make it, since `systemctl start` takes no parameters.
+
 To add an operation, add its script to `services/updates/`: the template unit
 doesn't change.
