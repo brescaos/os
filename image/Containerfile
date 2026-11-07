@@ -40,6 +40,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         upower tuned-ppd \
         qt6-qttranslations qt6-qtimageformats \
         inotify-tools \
+        plasma-milou \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
