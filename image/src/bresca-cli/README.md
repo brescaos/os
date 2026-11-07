@@ -11,6 +11,8 @@
 | `commands/<command>` | `/usr/libexec/bresca/<command>` |
 | `commands/<group>/<subcommand>` | `/usr/libexec/bresca/<group>/<subcommand>` |
 | `completion.bash` | `/usr/share/bash-completion/completions/bresca` |
+| `services/bresca-updates@.service` | `/usr/lib/systemd/system/bresca-updates@.service` |
+| `services/updates/<operation>` | `/usr/libexec/bresca/services/updates/<operation>` |
 
 `bresca` only dispatches: it runs `/usr/libexec/bresca/<command>` (or
 `<group>/<subcommand>`, e.g. `updates/status`) with the remaining arguments.
@@ -24,3 +26,20 @@ Each command is its own script, with its own help and options. A group's help
    `case` lists the commands on purpose, so `bresca` never runs an arbitrary
    path.
 3. Add it and its options to `completion.bash`.
+
+## Update services
+
+Update operations don't run in the terminal or in System Settings: each one
+runs as `bresca-updates@<operation>.service` (e.g. `bresca-updates@check`),
+which runs `/usr/libexec/bresca/services/updates/<operation>`. So an operation
+keeps going when whoever started it goes away, and a second `systemctl start`
+waits for the running one instead of starting another.
+
+Each operation writes its result to `/run/bresca/updates/<operation>.json`,
+readable without root; it is removed when the operation starts and lasts
+until the next reboot. Whether an operation is running is the unit's state
+(`systemctl is-active bresca-updates@<operation>`). The CLI commands only
+start the unit and print the result.
+
+To add an operation, add its script to `services/updates/`: the template unit
+doesn't change.

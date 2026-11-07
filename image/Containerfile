@@ -44,6 +44,8 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 COPY --chmod=0755 src/bresca-cli/bresca /usr/bin/bresca
 COPY --chmod=0755 src/bresca-cli/commands/ /usr/libexec/bresca/
 COPY src/bresca-cli/completion.bash /usr/share/bash-completion/completions/bresca
+COPY --chmod=0755 src/bresca-cli/services/updates/ /usr/libexec/bresca/services/updates/
+COPY src/bresca-cli/services/bresca-updates@.service /usr/lib/systemd/system/
 
 COPY LICENSE /usr/share/licenses/brescaos/LICENSE
 

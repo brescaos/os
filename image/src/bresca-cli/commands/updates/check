@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# bresca updates check: whether a newer BrescaOS version is available. The
+# check runs as bresca-updates@check.service; this starts it and prints its
+# result.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: sudo bresca updates check [--format=json|text]
+
+Checks whether a newer BrescaOS version is available, without downloading
+or changing anything.
+
+Options:
+  --format=json  Print {checked_at, update_available, current_version,
+                 available_version}, or {checked_at, error}
+  -h, --help     Show this help
+EOF
+}
+
+format=text
+for argument in "$@"; do
+    case $argument in
+        --format=json) format=json ;;
+        --format=text) format=text ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ((EUID != 0)); then
+    printf "error: 'bresca updates check' needs root: run it with sudo\n" >&2
+    exit 1
+fi
+
+result_file=/run/bresca/updates/check.json
+
+[[ $format == json ]] || printf 'Checking for updates...\n'
+# If one is already running (e.g. started by System Settings), this waits for
+# it. Its failure message only points to systemctl status: the result has ours.
+systemctl start bresca-updates@check.service 2>/dev/null || true
+
+if [[ ! -f $result_file ]]; then
+    printf "error: the check didn't finish: see journalctl -u bresca-updates@check\n" >&2
+    exit 1
+fi
+check_result=$(<"$result_file")
+check_error=$(jq -r '.error // empty' <<<"$check_result")
+
+if [[ $format == json ]]; then
+    printf '%s\n' "$check_result"
+elif [[ -z $check_error ]]; then
+    jq -r 'if .update_available
+           then "BrescaOS \(.available_version) is available (running \(.current_version))."
+           else "BrescaOS is up to date (\(.current_version))." end' <<<"$check_result"
+else
+    printf "error: couldn't check for updates: %s\n" "$check_error" >&2
+fi
+[[ -z $check_error ]] || exit 1

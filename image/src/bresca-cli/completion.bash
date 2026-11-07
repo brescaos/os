@@ -14,8 +14,8 @@ _comp_cmd_bresca() {
     elif [[ ${words[1]} == version && $cur == -* ]]; then
         _comp_compgen -- -W '--short --format=json --format=text --help'
     elif [[ ${words[1]} == updates ]] && ((cword == 2)); then
-        _comp_compgen -- -W 'status help --help'
-    elif [[ ${words[1]} == updates && ${words[2]} == status && $cur == -* ]]; then
+        _comp_compgen -- -W 'status check help --help'
+    elif [[ ${words[1]} == updates && ${words[2]} == @(status|check) && $cur == -* ]]; then
         _comp_compgen -- -W '--format=json --format=text --help'
     fi
 } \

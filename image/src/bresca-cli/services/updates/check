@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Runs as bresca-updates@check.service: checks whether a newer BrescaOS version
+# is available and writes the result to /run/bresca/updates/check.json.
+set -euo pipefail
+
+result_file=/run/bresca/updates/check.json
+checked_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+# Atomically, so a reader never sees half a file.
+write_result() {
+    cat >"$result_file.tmp"
+    mv "$result_file.tmp" "$result_file"
+}
+
+# No result while checking: if this fails unexpectedly, there's no stale one.
+rm -f "$result_file"
+
+if ! bootc_output=$(bootc upgrade --check 2>&1); then
+    printf '%s\n' "$bootc_output" >&2
+    jq -cn --arg checked_at "$checked_at" --arg error "$bootc_output" \
+        '{checked_at: $checked_at, error: $error}' | write_result
+    exit 1
+fi
+printf '%s\n' "$bootc_output"
+
+# bootc upgrade --check keeps what it found in the booted entry's cachedUpdate.
+bootc status --format=json | jq -c --arg checked_at "$checked_at" '
+    .status.booted as $booted
+    | $booted.cachedUpdate as $update
+    | {checked_at: $checked_at,
+       update_available: ($update != null and $update.imageDigest != $booted.image.imageDigest),
+       current_version: ($booted.image.version // "unknown"),
+       available_version: (($update // $booted.image).version // "unknown")}' | write_result

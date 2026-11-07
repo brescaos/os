@@ -25,6 +25,7 @@ Usage: bresca updates <subcommand> [options]
 
 Subcommands:
   status      Current, staged and rollback versions (root)
+  check       Check whether an update is available (root)
   help        Show this help
 
 Options:
@@ -42,7 +43,7 @@ case ${1:-help} in
         ;;
     updates)
         case ${2:-help} in
-            status) exec "/usr/libexec/bresca/updates/$2" "${@:3}" ;;
+            status | check) exec "/usr/libexec/bresca/updates/$2" "${@:3}" ;;
             help | -h | --help) print_updates_usage ;;
             *)
                 print_updates_usage >&2
