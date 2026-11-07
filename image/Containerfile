@@ -36,6 +36,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         plasma-nm NetworkManager-wifi \
         pipewire pipewire-pulseaudio wireplumber plasma-pa \
         bluedevil \
+        firewalld plasma-firewall plasma-firewall-firewalld \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
