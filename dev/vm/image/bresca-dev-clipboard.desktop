@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Development VM clipboard bridge
+Comment=Copies the Wayland clipboard to X11 for spice-vdagent (dev/vm/image/)
+Exec=/usr/libexec/bresca-dev/clipboard-bridge
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2

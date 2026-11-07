@@ -19,10 +19,15 @@ On top of what [building](building.md) needs:
 make vm
 ```
 
-1. Starts the local registry on `127.0.0.1:5050`.
-2. Builds the image as `brescaos:0.0.0-<ARCH>` and pushes it there.
-3. Installs it on a new disk, `.vm/disk.qcow2`.
-4. Boots the disk in a QEMU window. The boot log goes to `.vm/serial.log`.
+1. Builds the image as `brescaos:0.0.0-<ARCH>`.
+2. Builds the VM's image on it, `brescaos-dev:0.0.0-<ARCH>`
+   ([`dev/vm/image/`](../dev/vm/image/)): BrescaOS plus what only the VM
+   needs.
+3. Starts the local registry on `127.0.0.1:5050` and pushes the VM's image
+   there.
+4. Installs it on a new disk, `.vm/disk.qcow2`. The VM follows it for its
+   updates.
+5. Boots the disk in a QEMU window. The boot log goes to `.vm/serial.log`.
 
 It boots to Plasma's login screen: log in as `bresca`, password `bresca`.
 This user is an administrator.
@@ -30,6 +35,26 @@ This user is an administrator.
 > [!WARNING]
 > Each `make vm` replaces the disk, so the VM starts over. To boot the
 > existing disk as you left it, use `make vm-start`.
+
+## Updating the VM
+
+To try a change to the image as an update, without a new disk:
+
+```bash
+make vm-update                                     # on the host: rebuilds both images, pushes the VM's
+sudo bresca updates install --download --no-tls    # in the VM (--no-tls: the local registry is HTTP)
+```
+
+`make publish-dev` pushes the BrescaOS image itself, which the VM doesn't
+follow.
+
+## Shared clipboard
+
+Text you copy on the host can be pasted in the VM, and the other way round.
+It needs QEMU 8.1 or newer (`make vm-start` warns otherwise): QEMU's
+`qemu-vdagent` talks to `spice-vdagent` in the VM's image. `spice-vdagent`
+only reads X11's clipboard, so `clipboard-bridge`, started at login, copies
+Plasma's (Wayland) clipboard to it. Text only.
 
 ## Hot reload
 
@@ -48,8 +73,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
 - `/usr` is only writable until the next boot (`bootc usr-overlay`): after a
   reboot the image's files come back and the changed ones are copied again.
   Files you delete on the host stay in the VM until then.
-- Changes to anything else (packages, `image/build/`) still need `make vm`.
-- A disk created before hot reload existed doesn't have it: `make vm` once.
+- Changes to anything else (packages, `image/build/`, the hot reload itself)
+  need `make vm-update` or `make vm`.
 
 ## Variables
 
@@ -86,10 +111,11 @@ on macOS, KVM on Linux).
 
 - SELinux is disabled on its disk, because `bootc install` can't label files
   from a host without SELinux.
-- It mounts this repository read-only at `/run/bresca-dev/src` (QEMU's
-  9p, from `make vm-start` too) and runs `bresca-dev-hotreload.service`
-  ([`dev/vm/hotreload.sh`](../dev/vm/hotreload.sh), straight from there):
-  both in the disk's `/etc`, not in the image.
+- Its image is `brescaos-dev`, BrescaOS plus `spice-vdagent`, `wl-clipboard`,
+  `xclip` and two services: the hot reload
+  ([`hotreload.sh`](../dev/vm/image/hotreload.sh)), which mounts this
+  repository read-only at `/run/bresca-dev/src` (QEMU's 9p), and the
+  clipboard bridge.
 - Its sound card (Intel HDA) plays through the host's sound and records from
   the host's microphone (on macOS, QEMU asks for it the first time).
 - It allows the local registry over plain HTTP, in

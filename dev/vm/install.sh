@@ -118,30 +118,6 @@ mkdir -p "$etc/containers/registries.conf.d"
 printf '# Development VM: allow the local registry over plain HTTP.\n[[registry]]\nlocation = "%s"\ninsecure = true\n' \
     "${TARGET%%/*}" >"$etc/containers/registries.conf.d/50-brescaos-vm.conf"
 
-# --- Hot reload ---------------------------------------------------------------------
-# start.sh shares the repository read-only over 9p; hotreload.sh, run from
-# there, copies what changes in image/src/ onto the running system. Only on
-# this VM's disk. nofail: without the share the VM still boots.
-printf '# Development VM: the repository, shared by dev/vm/start.sh.\nbresca-src /run/bresca-dev/src 9p trans=virtio,version=9p2000.L,ro,nofail 0 0\n' \
-    >>"$etc/fstab"
-cat >"$etc/systemd/system/bresca-dev-hotreload.service" <<'EOF'
-# Development VM: hot reload of image/src/ (dev/vm/hotreload.sh).
-[Unit]
-Description=BrescaOS development VM: hot reload
-RequiresMountsFor=/run/bresca-dev/src
-
-[Service]
-ExecStart=/usr/bin/bash /run/bresca-dev/src/dev/vm/hotreload.sh
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-mkdir -p "$etc/systemd/system/multi-user.target.wants"
-ln -sfn /etc/systemd/system/bresca-dev-hotreload.service \
-    "$etc/systemd/system/multi-user.target.wants/bresca-dev-hotreload.service"
-
 cleanup
 trap - EXIT
 

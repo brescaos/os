@@ -12,7 +12,7 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help check format image test publish publish-dev registry-start registry-stop clean vm vm-start vm-clean
+.PHONY: help check format image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[38;5;111m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -49,11 +49,15 @@ clean: ## Delete the local registry's container and its data (local brescaos:* i
 
 # Development VM (dev/vm/): the image on a QEMU disk, without an installer.
 # Always built as VERSION 0.0.0 and pushed only to the local registry.
-vm: ## Build the image (0.0.0), push it to the local registry, install it on a new VM disk (.vm/) and boot it
+vm: ## Build the image (0.0.0) and the VM's on it, push that to the local registry, install it on a new VM disk (.vm/) and boot it
 	@$(MAKE) --no-print-directory image VERSION=0.0.0
-	@$(MAKE) --no-print-directory publish-dev VERSION=0.0.0
+	@VERSION=0.0.0 dev/vm/image.sh
 	@VERSION=0.0.0 dev/vm/create.sh
 	@dev/vm/start.sh
+
+vm-update: ## Rebuild both images (0.0.0) and push the VM's as its update (in the VM: sudo bresca updates install --download --no-tls)
+	@$(MAKE) --no-print-directory image VERSION=0.0.0
+	@VERSION=0.0.0 dev/vm/image.sh
 
 vm-start: ## Boot the VM disk again, as it was left
 	@dev/vm/start.sh

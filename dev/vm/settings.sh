@@ -7,6 +7,11 @@
 # The VM's disk, UEFI variables and boot log; make vm-clean deletes it.
 VM_DIR=$REPO_ROOT/.vm
 
+# The VM's image (dev/vm/image/): BrescaOS plus what only the VM needs. The VM
+# installs <VM_IMAGE_NAME>:0.0.0-<ARCH> from the local registry and updates
+# from it.
+VM_IMAGE_NAME=${VM_IMAGE_NAME:-brescaos-dev}
+
 # Memory in MiB and CPUs.
 VM_MEMORY=${VM_MEMORY:-4096}
 VM_CPUS=${VM_CPUS:-4}

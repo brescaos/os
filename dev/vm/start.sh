@@ -61,6 +61,17 @@ create_uefi_vars() {
     chmod u+w "$VARS"
 }
 
+# Whether QEMU is 8.1 or newer: its qemu-vdagent shares the clipboard with its
+# window (GTK on Linux, cocoa on macOS from 8.1).
+can_qemu_share_clipboard() {
+    local version major minor
+    version=$("$(print_qemu_binary)" --version | sed -n 's/^QEMU emulator version \([0-9]*\)\.\([0-9]*\).*/\1 \2/p')
+    read -r major minor <<EOF
+$version
+EOF
+    [ -n "$major" ] && { [ "$major" -gt 8 ] || { [ "$major" -eq 8 ] && [ "$minor" -ge 1 ]; }; }
+}
+
 # Prints QEMU's audio backend: QEMU_AUDIO_BACKEND, or the host's usual one.
 print_qemu_audio_backend() {
     if [ -n "$QEMU_AUDIO_BACKEND" ]; then
@@ -107,13 +118,23 @@ firmware=$(find_firmware)
 firmware_code=${firmware%%|*}
 create_uefi_vars "$firmware_code" "${firmware#*|}"
 
+# Shared clipboard: QEMU's own SPICE agent end, spice-vdagent in the VM's image
+# (dev/vm/image/) on the other. mouse=off: usb-tablet handles the pointer.
+clipboard_options=""
+if can_qemu_share_clipboard; then
+    clipboard_options="-device virtio-serial-pci -chardev qemu-vdagent,id=vdagent,name=vdagent,clipboard=on,mouse=off -device virtserialport,chardev=vdagent,name=com.redhat.spice.0"
+else
+    warn "QEMU older than 8.1: no shared clipboard with the VM"
+fi
+
 step "Booting .vm/disk.qcow2 ($ARCH) in a QEMU window. Boot log: .vm/serial.log; close the window or Ctrl-C to quit."
 # usb-tablet: absolute pointer, the cursor follows the host's without a grab.
 # Sound: an Intel HDA card that plays and records (hda-duplex): the VM gets
 # the host's microphone too.
 # The repository goes read-only to the VM over 9p, for its hot reload
-# (dev/vm/hotreload.sh): QEMU serves it itself, no daemon on the host.
-"$(print_qemu_binary)" \
+# (dev/vm/image/hotreload.sh): QEMU serves it itself, no daemon on the host.
+# shellcheck disable=SC2086 # clipboard_options is empty or whole options
+"$(print_qemu_binary)" $clipboard_options \
     -fsdev "local,id=src,path=$REPO_ROOT,security_model=none,readonly=on" \
     -device "virtio-9p-pci,fsdev=src,mount_tag=bresca-src" \
     -machine "$machine,accel=$accelerator" \

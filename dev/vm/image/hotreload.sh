@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Hot reload for the development VM: copies the files image/Containerfile takes
 # from image/src/ onto the running system whenever they change on the host.
+# In the VM's image (dev/vm/image/Containerfile) as
+# /usr/libexec/bresca-dev/hotreload, run as root by bresca-dev-hotreload.service.
+# It reads the repository that dev/vm/start.sh shares read-only over 9p.
 #
 # /usr is read-only: bootc usr-overlay makes it writable until the next boot,
 # when the image's files come back and this copies the changed ones again.
@@ -67,6 +70,8 @@ copy_changed_files() {
     fi
 }
 
+mkdir -p "$SHARE"
+mountpoint -q "$SHARE" || mount -t 9p -o trans=virtio,version=9p2000.L,ro bresca-src "$SHARE"
 mountpoint -q /usr || bootc usr-overlay >/dev/null
 echo "watching the host's image/src/"
 while true; do

@@ -1,0 +1,14 @@
+# Development VM: hot reload of image/src/ (dev/vm/image/hotreload.sh).
+# Without the share (QEMU started without it) it gives up after three tries.
+[Unit]
+Description=BrescaOS development VM: hot reload
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+ExecStart=/usr/libexec/bresca-dev/hotreload
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

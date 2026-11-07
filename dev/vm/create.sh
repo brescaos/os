@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Installs brescaos:<VERSION>-<ARCH> from the local registry on a new
-# .vm/disk.qcow2 (make vm, which builds the image as 0.0.0 and pushes it
-# there first).
+# Installs the VM's image, <VM_IMAGE_NAME>:<VERSION>-<ARCH>, from the local
+# registry on a new .vm/disk.qcow2 (make vm, which builds it as 0.0.0 and
+# pushes it there first: dev/vm/image.sh).
 #
 # The image installs itself: a short-lived privileged container of the image
 # runs `bootc install to-disk` onto a loop-mounted raw file
@@ -17,15 +17,16 @@ set -euo pipefail
 require_version
 require_qemu
 require_engine
-require_local_image
+vm_image=$VM_IMAGE_NAME:$VERSION-$ARCH
+engine image inspect "$vm_image" >/dev/null 2>&1 \
+    || fail "image $vm_image not found: run 'make vm', which builds it"
 is_registry_running \
-    || fail "the local registry isn't running: use 'make vm', which starts it and pushes the image there"
+    || fail "the local registry isn't running: use 'make vm', which starts it and pushes the VM's image there"
 [ "$ARCH" = "$HOST_ARCH" ] \
     || warn "installing a $ARCH image on a $HOST_ARCH host runs under emulation: slow, and may fail"
 
 WORK=$VM_DIR/build
 engine_options=""
-tag=$IMAGE_NAME:$VERSION-$ARCH
 rm -rf "$WORK"
 mkdir -p "$WORK"
 trap 'rm -rf "$WORK"' EXIT
@@ -54,8 +55,8 @@ engine run --rm --privileged $engine_options \
     -v "$VM_WORK_VOLUME:/var/tmp" \
     -v "$WORK:/io" \
     -e DISK_SIZE="$DISK_SIZE" \
-    -e SOURCE="localhost:5000/$tag" \
-    -e TARGET="$LOCAL_REGISTRY_FROM_VM/$tag" \
+    -e SOURCE="localhost:5000/$vm_image" \
+    -e TARGET="$LOCAL_REGISTRY_FROM_VM/$vm_image" \
     -e SERIAL="$serial" \
     -e VM_USER="$VM_USER" \
     -e VM_FULL_NAME="$VM_FULL_NAME" \
@@ -66,7 +67,7 @@ engine run --rm --privileged $engine_options \
     -e VM_LANG="$VM_LANG" \
     -e HOST_UID="$(id -u)" \
     -e HOST_GID="$(id -g)" \
-    "$LOCAL_IMAGE" \
+    "$vm_image" \
     bash /io/install.sh
 
 step "Converting to qcow2"
