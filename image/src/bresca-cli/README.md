@@ -38,8 +38,11 @@ waits for the running one instead of starting another.
 Each operation writes its result to `/run/bresca/updates/<operation>.json`,
 readable without root; it is removed when the operation starts and lasts
 until the next reboot. Whether an operation is running is the unit's state
-(`systemctl is-active bresca-updates@<operation>`). The CLI commands only
-start the unit and print the result.
+(`systemctl is-active bresca-updates@<operation>`). While it runs, an
+operation may also publish its progress in
+`/run/bresca/updates/<operation>-progress.json` (`download` does), removed
+when it ends. The CLI commands only start the unit, show the progress and
+print the result.
 
 To add an operation, add its script to `services/updates/`: the template unit
 doesn't change.

@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Runs as bresca-updates@download.service: downloads the newer BrescaOS version,
+# if there is one, without installing it.
+# Its progress goes to download-progress.json while it runs, the result to download.json.
+set -euo pipefail
+
+result_file=/run/bresca/updates/download.json
+progress_file=/run/bresca/updates/download-progress.json
+
+# Atomically, so a reader never sees half a file.
+write_file() {
+    cat >"$1.tmp"
+    mv "$1.tmp" "$1"
+}
+
+# bootc's --progress-fd events (JSON Lines) as {phase, percent, message}. After
+# the download bootc sends ProgressSteps, for importing and staging it. A line
+# that isn't JSON is skipped rather than ending the stream.
+readonly EVENTS_TO_PROGRESS='
+    fromjson?
+    | if .type == "ProgressBytes" then
+        {phase: "downloading", message: .description}
+        + (if (.bytesTotal // 0) > 0 then {percent: (.bytes * 100 / .bytesTotal | floor)} else {} end)
+      elif .type == "ProgressSteps" then
+        {phase: "preparing", message: .description}
+        + (if (.stepsTotal // 0) > 0 then {percent: (.steps * 100 / .stepsTotal | floor)} else {} end)
+      else empty end'
+
+rm -f "$result_file"
+bootc_log=$(mktemp)
+trap 'rm -f "$bootc_log" "$progress_file"' EXIT
+
+# bootc upgrade --download-only checks the registry itself, and downloads
+# nothing if there's no newer version: "checking" covers that wait.
+printf '{"phase":"checking"}\n' | write_file "$progress_file"
+
+# fd 3 (bootc's events) goes to the pipe; bootc's own output to the log.
+is_download_failed=false
+bootc upgrade --download-only --progress-fd 3 3>&1 >"$bootc_log" 2>&1 \
+    | jq -R --unbuffered -c "$EVENTS_TO_PROGRESS" \
+    | while IFS= read -r progress; do
+        printf '%s\n' "$progress" | write_file "$progress_file"
+    done \
+    || is_download_failed=true
+cat "$bootc_log"
+
+downloaded_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+if $is_download_failed; then
+    jq -cn --arg downloaded_at "$downloaded_at" --arg error "$(tail -n 5 "$bootc_log")" \
+        '{downloaded_at: $downloaded_at, error: $error}' | write_file "$result_file"
+    exit 1
+fi
+
+bootc status --format=json | jq -c --arg downloaded_at "$downloaded_at" '
+    {downloaded_at: $downloaded_at,
+     update_available: (.status.staged != null),
+     current_version: (.status.booted.image.version // "unknown"),
+     downloaded_version: .status.staged.image.version}' | write_file "$result_file"

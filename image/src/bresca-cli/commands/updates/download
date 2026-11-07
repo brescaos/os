@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# bresca updates download: downloads the newer BrescaOS version, if there is
+# one, without installing it. The download runs as
+# bresca-updates@download.service; this starts it, shows its progress and
+# prints its result.
+set -euo pipefail
+
+print_usage() {
+    cat <<EOF
+Usage: sudo bresca updates download [--format=json|text]
+
+Downloads the newer BrescaOS version, if there is one, without installing it:
+the next boot still uses the current version until it's installed.
+
+Options:
+  --format=json  Print {downloaded_at, update_available, current_version,
+                 downloaded_version}, or {downloaded_at, error}
+  -h, --help     Show this help
+EOF
+}
+
+format=text
+for argument in "$@"; do
+    case $argument in
+        --format=json) format=json ;;
+        --format=text) format=text ;;
+        -h | --help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+if ((EUID != 0)); then
+    printf "error: 'bresca updates download' needs root: run it with sudo\n" >&2
+    exit 1
+fi
+
+result_file=/run/bresca/updates/download.json
+progress_file=/run/bresca/updates/download-progress.json
+
+# If one is already running (e.g. started by System Settings), this waits for
+# it. Its failure message only points to systemctl status: the result has ours.
+systemctl start bresca-updates@download.service 2>/dev/null &
+start_pid=$!
+
+if [[ $format == text && -t 1 ]]; then
+    while kill -0 "$start_pid" 2>/dev/null; do
+        # Missing before the service starts and after it ends.
+        if progress_line=$(jq -r '
+            (if .phase == "checking" then "Checking for updates..."
+             elif .phase == "downloading" then "Downloading..."
+             else "Preparing it..." end)
+            + (if .percent then " \(.percent)%" else "" end)' "$progress_file" 2>/dev/null); then
+            printf '\r\e[K%s' "$progress_line"
+        fi
+        sleep 0.5
+    done
+    printf '\r\e[K'
+fi
+wait "$start_pid" || true
+
+if [[ ! -f $result_file ]]; then
+    printf "error: the download didn't finish: see journalctl -u bresca-updates@download\n" >&2
+    exit 1
+fi
+download_result=$(<"$result_file")
+download_error=$(jq -r '.error // empty' <<<"$download_result")
+
+if [[ $format == json ]]; then
+    printf '%s\n' "$download_result"
+elif [[ -z $download_error ]]; then
+    jq -r 'if .update_available
+           then "Downloaded BrescaOS \(.downloaded_version). The next boot still uses \(.current_version) until it'\''s installed."
+           else "BrescaOS is up to date (\(.current_version)): nothing to download." end' <<<"$download_result"
+else
+    printf "error: couldn't download the update: %s\n" "$download_error" >&2
+fi
+[[ -z $download_error ]] || exit 1
