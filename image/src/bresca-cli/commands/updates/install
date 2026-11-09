@@ -4,10 +4,11 @@
 # (bresca-updates@download-install with --download); this starts it and prints
 # its result.
 set -euo pipefail
+# shellcheck source=SCRIPTDIR/../../lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
 
 print_usage() {
-    cat <<EOF
-Usage: sudo bresca updates install [--download [--no-tls]] [--reboot]
+    printf '%s\n' $"Usage: sudo bresca updates install [--download [--no-tls]] [--reboot]
                                    [--format=json|text]
 
 Installs the downloaded BrescaOS version: the next boot uses it. Without
@@ -20,8 +21,7 @@ Options:
   --reboot       Restart after installing
   --format=json  Print {installed_at, current_version, installed_version}, or
                  the {..., error} of the download or the install
-  -h, --help     Show this help
-EOF
+  -h, --help     Show this help"
 }
 
 should_download=false
@@ -40,7 +40,8 @@ for argument in "$@"; do
             exit 0
             ;;
         *)
-            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_error $"unknown option: %s" "$argument"
+            echo >&2
             print_usage >&2
             exit 2
             ;;
@@ -48,7 +49,7 @@ for argument in "$@"; do
 done
 
 if ((EUID != 0)); then
-    printf "error: 'bresca updates install' needs root: run it with sudo\n" >&2
+    print_error $"'%s' needs root: run it with sudo" "bresca updates install"
     exit 1
 fi
 
@@ -81,14 +82,14 @@ if $should_download && [[ -f $results_dir/download.json ]]; then
         if [[ $format == json ]]; then
             cat "$results_dir/download.json"
         else
-            printf "error: couldn't download the update: %s\n" "$download_error" >&2
+            print_error $"couldn't download the update: %s" "$download_error"
         fi
         exit 1
     fi
 fi
 
 if [[ ! -f $results_dir/install.json ]]; then
-    printf "error: the install didn't finish: see journalctl -u bresca-updates@%s\n" "$operation" >&2
+    print_error $"the install didn't finish: see journalctl -u bresca-updates@%s" "$operation"
     exit 1
 fi
 install_result=$(<"$results_dir/install.json")
@@ -98,18 +99,19 @@ installed_version=$(jq -r '.installed_version // empty' <<<"$install_result")
 if [[ $format == json ]]; then
     printf '%s\n' "$install_result"
 elif [[ -n $install_error ]]; then
-    printf "error: couldn't install the update: %s\n" "$install_error" >&2
+    print_error $"couldn't install the update: %s" "$install_error"
 elif [[ -n $installed_version ]]; then
     if $should_reboot; then
-        printf 'Installed BrescaOS %s. Restarting...\n' "$installed_version"
+        print_message $"Installed BrescaOS %s. Restarting..." "$installed_version"
     else
-        printf 'Installed BrescaOS %s. Restart to use it: sudo systemctl reboot\n' "$installed_version"
+        print_message $"Installed BrescaOS %s. Restart to use it: sudo systemctl reboot" "$installed_version"
     fi
 elif $should_download; then
-    jq -r '"BrescaOS is up to date (\(.current_version)): nothing to install."' <<<"$install_result"
+    print_message $"BrescaOS is up to date (%s): nothing to install." \
+        "$(jq -r '.current_version' <<<"$install_result")"
 else
-    printf "Nothing to install: no version is downloaded.\n"
-    printf "Download it with 'sudo bresca updates download', or use --download.\n"
+    print_message $"Nothing to install: no version is downloaded.
+Download it with 'sudo bresca updates download', or use --download."
 fi
 [[ -z $install_error ]] || exit 1
 

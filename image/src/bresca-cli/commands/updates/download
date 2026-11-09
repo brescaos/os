@@ -4,10 +4,11 @@
 # bresca-updates@download.service; this starts it, shows its progress and
 # prints its result.
 set -euo pipefail
+# shellcheck source=SCRIPTDIR/../../lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
 
 print_usage() {
-    cat <<EOF
-Usage: sudo bresca updates download [--no-tls] [--format=json|text]
+    printf '%s\n' $"Usage: sudo bresca updates download [--no-tls] [--format=json|text]
 
 Downloads the newer BrescaOS version, if there is one, without installing it:
 the next boot still uses the current version until it's installed.
@@ -16,8 +17,7 @@ Options:
   --no-tls       Accept a registry allowed without TLS
   --format=json  Print {downloaded_at, update_available, current_version,
                  downloaded_version}, or {downloaded_at, error}
-  -h, --help     Show this help
-EOF
+  -h, --help     Show this help"
 }
 
 is_no_tls_accepted=false
@@ -32,7 +32,8 @@ for argument in "$@"; do
             exit 0
             ;;
         *)
-            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_error $"unknown option: %s" "$argument"
+            echo >&2
             print_usage >&2
             exit 2
             ;;
@@ -40,7 +41,7 @@ for argument in "$@"; do
 done
 
 if ((EUID != 0)); then
-    printf "error: 'bresca updates download' needs root: run it with sudo\n" >&2
+    print_error $"'%s' needs root: run it with sudo" "bresca updates download"
     exit 1
 fi
 
@@ -61,7 +62,7 @@ else
 fi
 
 if [[ ! -f $result_file ]]; then
-    printf "error: the download didn't finish: see journalctl -u bresca-updates@download\n" >&2
+    print_error $"the download didn't finish: see journalctl -u bresca-updates@download"
     exit 1
 fi
 download_result=$(<"$result_file")
@@ -70,10 +71,14 @@ download_error=$(jq -r '.error // empty' <<<"$download_result")
 if [[ $format == json ]]; then
     printf '%s\n' "$download_result"
 elif [[ -z $download_error ]]; then
-    jq -r 'if .update_available
-           then "Downloaded BrescaOS \(.downloaded_version). The next boot still uses \(.current_version) until it'\''s installed."
-           else "BrescaOS is up to date (\(.current_version)): nothing to download." end' <<<"$download_result"
+    current_version=$(jq -r '.current_version' <<<"$download_result")
+    if [[ $(jq -r '.update_available' <<<"$download_result") == true ]]; then
+        print_message $"Downloaded BrescaOS %s. The next boot still uses %s until it's installed." \
+            "$(jq -r '.downloaded_version' <<<"$download_result")" "$current_version"
+    else
+        print_message $"BrescaOS is up to date (%s): nothing to download." "$current_version"
+    fi
 else
-    printf "error: couldn't download the update: %s\n" "$download_error" >&2
+    print_error $"couldn't download the update: %s" "$download_error"
 fi
 [[ -z $download_error ]] || exit 1

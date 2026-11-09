@@ -5,8 +5,15 @@ available.
 
 | Source | In the image |
 | --- | --- |
-| `package/` (`metadata.json`, `contents/ui/main.qml`) | `/usr/share/plasma/plasmoids/com.brescaos.updates/` |
-| `brescaos-updates.notifyrc` | `/usr/share/knotifications6/brescaos-updates.notifyrc` |
+| `package/` (`contents/ui/main.qml`) | `/usr/share/plasma/plasmoids/com.brescaos.updates/` |
+| `metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.updates/metadata.json` |
+| `brescaos-updates.notifyrc.in`, translated | `/usr/share/knotifications6/brescaos-updates.notifyrc` |
+| `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/plasma_applet_com.brescaos.updates.mo` |
+
+Its texts are translated ([`docs/translations.md`](../../../docs/translations.md)):
+`i18n()` in the QML, and the English-only templates `metadata.json.in` and
+`brescaos-updates.notifyrc.in`, which the build fills in with the
+translations of `po/`.
 
 ## How it works
 
@@ -21,16 +28,17 @@ available.
   the icon goes.
 - With nothing to install, its popup has **Check for Updates**: it starts
   `bresca-updates@check` (`systemctl start --no-block`).
-- The notification, event `updateAvailable` of `brescaos-updates.notifyrc`,
+- The notification, event `updateAvailable` of `brescaos-updates.notifyrc.in`,
   comes when the applet sees a version for the first time in a session: when
   a check finds it, and at every login while it isn't installed, as a
   reminder. It stays until closed. Settings > Notifications > Applications >
   BrescaOS Updates configures or mutes it.
 
 The system tray loads it on its own: `X-Plasma-NotificationArea` and
-`EnabledByDefault` in `metadata.json`. In the development VM hot reload copies
+`EnabledByDefault` in `metadata.json.in`. In the development VM hot reload copies
 a change and restarts plasmashell, which loads it.
 
-`tests/` (`make test`) checks, in the BrescaOS image, that its files and
+`tests/` (`make test`) checks, in the BrescaOS image, that its files, its
+translations (and the translated notifyrc and metadata.json) and
 `inotifywait` are installed. Its QML only runs in Plasma: try it in the
 development VM.

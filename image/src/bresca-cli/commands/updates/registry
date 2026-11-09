@@ -2,18 +2,18 @@
 # bresca updates registry: where updates come from, the image this system
 # follows and whether its registry is allowed without TLS.
 set -euo pipefail
+# shellcheck source=SCRIPTDIR/../../lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
 
 print_usage() {
-    cat <<EOF
-Usage: sudo bresca updates registry [--format=json|text]
+    printf '%s\n' $"Usage: sudo bresca updates registry [--format=json|text]
 
 Shows the image updates come from: its registry, repository and tag, and
 whether the registry is allowed without TLS.
 
 Options:
   --format=json  Print {image, registry, repository, tag, tls}
-  -h, --help     Show this help
-EOF
+  -h, --help     Show this help"
 }
 
 format=text
@@ -26,7 +26,8 @@ for argument in "$@"; do
             exit 0
             ;;
         *)
-            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_error $"unknown option: %s" "$argument"
+            echo >&2
             print_usage >&2
             exit 2
             ;;
@@ -34,7 +35,7 @@ for argument in "$@"; do
 done
 
 if ((EUID != 0)); then
-    printf "error: 'bresca updates registry' needs root: run it with sudo\n" >&2
+    print_error $"'%s' needs root: run it with sudo" "bresca updates registry"
     exit 1
 fi
 
@@ -44,7 +45,7 @@ warn_if_registry_without_tls
 
 image=$(find_followed_image)
 if [[ -z $image ]]; then
-    printf "error: bootc status shows no image this system follows\n" >&2
+    print_error $"bootc status shows no image this system follows"
     exit 1
 fi
 
@@ -83,10 +84,10 @@ else
     bold='' dim='' accent='' yellow='' reset=''
 fi
 
-printf '%sBrescaOS updates%s\n\n' "$bold$accent" "$reset"
-printf '  %s%-11s%s %s\n' "$dim" "Image" "$reset" "$image"
-printf '  %s%-11s%s %s' "$dim" "Registry" "$reset" "${registry:-—}"
-$has_tls || printf '  %s(without TLS)%s' "$yellow" "$reset"
+printf '%s%s%s\n\n' "$bold$accent" $"BrescaOS updates" "$reset"
+printf '  %s%-11s%s %s\n' "$dim" $"Image" "$reset" "$image"
+printf '  %s%-11s%s %s' "$dim" $"Registry" "$reset" "${registry:-—}"
+$has_tls || printf '  %s(%s)%s' "$yellow" $"without TLS" "$reset"
 printf '\n'
-printf '  %s%-11s%s %s\n' "$dim" "Repository" "$reset" "$repository"
-printf '  %s%-11s%s %s\n\n' "$dim" "Tag" "$reset" "$tag"
+printf '  %s%-11s%s %s\n' "$dim" $"Repository" "$reset" "$repository"
+printf '  %s%-11s%s %s\n\n' "$dim" $"Tag" "$reset" "$tag"

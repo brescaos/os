@@ -12,13 +12,22 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help check format image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
+.PHONY: help check check-scripts check-translations format pot image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
 
 help: ## Show this help
-	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[38;5;111m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[38;5;111m%-19s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-check: ## shellcheck, shfmt and syntax on every script
+# make -k check runs both even when the first fails (the CI does).
+check: check-scripts check-translations ## check-scripts and check-translations
+
+check-scripts: ## shellcheck, shfmt and syntax on every script
 	@scripts/check.sh
+
+check-translations: ## The translations of image/src/ are complete and in sync with the code
+	@scripts/translations.sh check
+
+pot: ## Extract the strings of image/src/ into each po/*.pot and merge them into every .po
+	@scripts/translations.sh pot
 
 format: ## Fix the shfmt formatting of every script (style: .editorconfig)
 	@shfmt -w .

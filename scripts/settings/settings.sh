@@ -28,3 +28,8 @@ REGISTRY=${REGISTRY:-}
 
 # 1: REGISTRY speaks HTTPS; 0: plain HTTP. Required by publish, so no default.
 REGISTRY_TLS=${REGISTRY_TLS:-}
+
+# Languages of BrescaOS's own translations, besides English, the language of
+# the code: every image/src/ component with a po/ folder has a po/<lang>.po
+# for each (make check fails otherwise).
+TRANSLATION_LANGUAGES=${TRANSLATION_LANGUAGES:-es ca}

@@ -33,7 +33,9 @@ Pass them on the command line, for example
 `image/` and builds
 [`image/Containerfile`](../image/Containerfile) with `--pull`, so a newer
 `quay.io/fedora/fedora-bootc` base rebuilds everything on top of it.
-With Docker, a warning from its build checks fails the build.
+With Docker, a warning from its build checks fails the build. A first stage,
+on `quay.io/fedora/fedora`, compiles the translations of `image/src/`
+([Translations](translations.md)); the image only takes its result.
 
 ## Publishing
 
@@ -74,3 +76,5 @@ test images (`brescaos-tests-<component>:0.0.0-<ARCH>`) stay, like the
 | `the local registry doesn't answer` | Port 5050 may be in use: set `REGISTRY_PORT` |
 | `build/system.sh: ... missing, check fedora-release-common's file list` | Fedora changed its release package: update `image/build/system.sh` |
 | `make check` reports a shfmt diff | Run `make format` |
+| `make check`: `… is stale` or `… is out of sync with the code` | Run `make pot`, then translate what's new ([Translations](translations.md)) |
+| `make check`: `… untranslated` or `… fuzzy` | Translate or review those strings in Poedit ([Translations](translations.md)) |

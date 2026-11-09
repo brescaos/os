@@ -59,7 +59,7 @@ warn_if_registry_without_tls() {
     local registry
     registry=$(find_registry_without_tls)
     [[ -n $registry ]] || return 0
-    print_warning "updates come from $registry without TLS: anyone on the network path could serve a different image."
+    print_warning $"updates come from %s without TLS: anyone on the network path could serve a different image." "$registry"
 }
 
 # For the commands that download: with a registry allowed without TLS, they
@@ -74,6 +74,6 @@ stop_if_registry_without_tls() {
     fi
     registry=$(find_registry_without_tls)
     [[ -n $registry ]] || return 0
-    print_error "updates come from $registry without TLS: anyone on the network path could serve a different image. Run it again with --no-tls to accept it."
+    print_error $"updates come from %s without TLS: anyone on the network path could serve a different image. Run it again with --no-tls to accept it." "$registry"
     exit 1
 }

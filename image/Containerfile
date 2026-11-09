@@ -11,6 +11,14 @@
 # scripts/settings/settings.sh. Without it the FROM line fails (empty tag).
 ARG FEDORA_VERSION
 
+# The translations of src/ (docs/translations.md), compiled with gettext.
+FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS translations
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True gettext jq
+COPY build/translations.sh /tmp/brescaos-build-translations.sh
+RUN --mount=type=bind,source=src,target=/tmp/src \
+    bash /tmp/brescaos-build-translations.sh /tmp/src /out
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
 
 ARG FEDORA_VERSION
@@ -68,8 +76,10 @@ COPY src/bresca-cli/services/bresca-updates.tmpfiles /usr/lib/tmpfiles.d/bresca-
 COPY src/bresca-cli/services/bresca-updates-check.rules /usr/share/polkit-1/rules.d/50-brescaos-updates-check.rules
 # The tray icon and notification for a new version (src/updates-applet/README.md).
 COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
-COPY src/updates-applet/brescaos-updates.notifyrc /usr/share/knotifications6/
 RUN systemctl enable bresca-updates-check.timer
+
+# The translations of src/.
+COPY --from=translations /out/ /
 
 COPY LICENSE /usr/share/licenses/brescaos/LICENSE
 

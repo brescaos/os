@@ -8,7 +8,7 @@
 start_operation_showing_download_progress() {
     local operation=$1
     local progress_file=/run/bresca/updates/download-progress.json
-    local start_pid progress_line
+    local start_pid progress phase percent progress_line
 
     systemctl start "bresca-updates@$operation.service" 2>/dev/null &
     start_pid=$!
@@ -16,11 +16,14 @@ start_operation_showing_download_progress() {
     if [[ -t 1 ]]; then
         while kill -0 "$start_pid" 2>/dev/null; do
             # Missing before the download starts and after it ends.
-            if progress_line=$(jq -r '
-                (if .phase == "checking" then "Checking for updates..."
-                 elif .phase == "downloading" then "Downloading..."
-                 else "Preparing it..." end)
-                + (if .percent then " \(.percent)%" else "" end)' "$progress_file" 2>/dev/null); then
+            if progress=$(jq -r '"\(.phase) \(.percent // "")"' "$progress_file" 2>/dev/null); then
+                read -r phase percent <<<"$progress"
+                case $phase in
+                    checking) progress_line=$"Checking for updates..." ;;
+                    downloading) progress_line=$"Downloading..." ;;
+                    *) progress_line=$"Preparing it..." ;;
+                esac
+                [[ -z $percent ]] || progress_line+=" $percent%"
                 printf '\r\e[K%s' "$progress_line"
             fi
             sleep 0.5

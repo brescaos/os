@@ -2,10 +2,11 @@
 # bresca: the BrescaOS system CLI. Each command is its own script in
 # /usr/libexec/bresca/; this one only runs it.
 set -euo pipefail
+# shellcheck source=lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
 
 print_usage() {
-    cat <<EOF
-Usage: bresca <command> [options]
+    printf '%s\n' $"Usage: bresca <command> [options]
 
 Commands:
   version     Print the running BrescaOS version
@@ -15,13 +16,11 @@ Commands:
 Options:
   -h, --help  Show this help
 
-Run 'bresca <command> --help' for its options.
-EOF
+Run 'bresca <command> --help' for its options."
 }
 
 print_updates_usage() {
-    cat <<EOF
-Usage: bresca updates <subcommand> [options]
+    printf '%s\n' $"Usage: bresca updates <subcommand> [options]
 
 Subcommands:
   status      Current, staged and rollback versions (root)
@@ -35,8 +34,7 @@ Subcommands:
 Options:
   -h, --help  Show this help
 
-Run 'bresca updates <subcommand> --help' for its options.
-EOF
+Run 'bresca updates <subcommand> --help' for its options."
 }
 
 case ${1:-help} in

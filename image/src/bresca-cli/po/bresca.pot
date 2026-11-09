@@ -1,0 +1,364 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-09 17:10+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: bresca
+msgid ""
+"Usage: bresca <command> [options]\n"
+"\n"
+"Commands:\n"
+"  version     Print the running BrescaOS version\n"
+"  updates     Manage BrescaOS updates\n"
+"  help        Show this help\n"
+"\n"
+"Options:\n"
+"  -h, --help  Show this help\n"
+"\n"
+"Run 'bresca <command> --help' for its options."
+msgstr ""
+
+#: bresca
+msgid ""
+"Usage: bresca updates <subcommand> [options]\n"
+"\n"
+"Subcommands:\n"
+"  status      Current, staged and rollback versions (root)\n"
+"  check       Check whether an update is available (root)\n"
+"  download    Download the newer version without installing it (root)\n"
+"  install     Install the downloaded version (root)\n"
+"  rollback    Boot the previous version next time (root)\n"
+"  registry    Where updates come from: image, registry, TLS (root)\n"
+"  help        Show this help\n"
+"\n"
+"Options:\n"
+"  -h, --help  Show this help\n"
+"\n"
+"Run 'bresca updates <subcommand> --help' for its options."
+msgstr ""
+
+#: commands/updates/check
+msgid ""
+"Usage: sudo bresca updates check [--format=json|text]\n"
+"\n"
+"Checks whether a newer BrescaOS version is available, without downloading\n"
+"or changing anything.\n"
+"\n"
+"Options:\n"
+"  --format=json  Print {checked_at, update_available, current_version,\n"
+"                 available_version}, or {checked_at, error}\n"
+"  -h, --help     Show this help"
+msgstr ""
+
+#: commands/updates/check commands/updates/download commands/updates/install
+#: commands/updates/registry commands/updates/rollback commands/updates/status
+#: commands/version
+#, sh-printf-format
+msgid "unknown option: %s"
+msgstr ""
+
+#: commands/updates/check commands/updates/download commands/updates/install
+#: commands/updates/registry commands/updates/rollback commands/updates/status
+#, sh-printf-format
+msgid "'%s' needs root: run it with sudo"
+msgstr ""
+
+#: commands/updates/check lib/download-progress.sh
+msgid "Checking for updates..."
+msgstr ""
+
+#: commands/updates/check
+msgid "the check didn't finish: see journalctl -u bresca-updates@check"
+msgstr ""
+
+#: commands/updates/check
+#, sh-printf-format
+msgid "BrescaOS %s is available (running %s)."
+msgstr ""
+
+#: commands/updates/check
+#, sh-printf-format
+msgid "BrescaOS is up to date (%s)."
+msgstr ""
+
+#: commands/updates/check
+#, sh-printf-format
+msgid "couldn't check for updates: %s"
+msgstr ""
+
+#: commands/updates/download
+msgid ""
+"Usage: sudo bresca updates download [--no-tls] [--format=json|text]\n"
+"\n"
+"Downloads the newer BrescaOS version, if there is one, without installing "
+"it:\n"
+"the next boot still uses the current version until it's installed.\n"
+"\n"
+"Options:\n"
+"  --no-tls       Accept a registry allowed without TLS\n"
+"  --format=json  Print {downloaded_at, update_available, current_version,\n"
+"                 downloaded_version}, or {downloaded_at, error}\n"
+"  -h, --help     Show this help"
+msgstr ""
+
+#: commands/updates/download
+msgid "the download didn't finish: see journalctl -u bresca-updates@download"
+msgstr ""
+
+#: commands/updates/download
+#, sh-printf-format
+msgid ""
+"Downloaded BrescaOS %s. The next boot still uses %s until it's installed."
+msgstr ""
+
+#: commands/updates/download
+#, sh-printf-format
+msgid "BrescaOS is up to date (%s): nothing to download."
+msgstr ""
+
+#: commands/updates/download commands/updates/install
+#, sh-printf-format
+msgid "couldn't download the update: %s"
+msgstr ""
+
+#: commands/updates/install
+msgid ""
+"Usage: sudo bresca updates install [--download [--no-tls]] [--reboot]\n"
+"                                   [--format=json|text]\n"
+"\n"
+"Installs the downloaded BrescaOS version: the next boot uses it. Without\n"
+"--download it only installs what 'bresca updates download' downloaded, "
+"without\n"
+"the network.\n"
+"\n"
+"Options:\n"
+"  --download     Download the newer version first, if there is one\n"
+"  --no-tls       With --download, accept a registry allowed without TLS\n"
+"  --reboot       Restart after installing\n"
+"  --format=json  Print {installed_at, current_version, installed_version}, "
+"or\n"
+"                 the {..., error} of the download or the install\n"
+"  -h, --help     Show this help"
+msgstr ""
+
+#: commands/updates/install
+#, sh-printf-format
+msgid "the install didn't finish: see journalctl -u bresca-updates@%s"
+msgstr ""
+
+#: commands/updates/install
+#, sh-printf-format
+msgid "couldn't install the update: %s"
+msgstr ""
+
+#: commands/updates/install
+#, sh-printf-format
+msgid "Installed BrescaOS %s. Restarting..."
+msgstr ""
+
+#: commands/updates/install
+#, sh-printf-format
+msgid "Installed BrescaOS %s. Restart to use it: sudo systemctl reboot"
+msgstr ""
+
+#: commands/updates/install
+#, sh-printf-format
+msgid "BrescaOS is up to date (%s): nothing to install."
+msgstr ""
+
+#: commands/updates/install
+msgid ""
+"Nothing to install: no version is downloaded.\n"
+"Download it with 'sudo bresca updates download', or use --download."
+msgstr ""
+
+#: commands/updates/registry
+msgid ""
+"Usage: sudo bresca updates registry [--format=json|text]\n"
+"\n"
+"Shows the image updates come from: its registry, repository and tag, and\n"
+"whether the registry is allowed without TLS.\n"
+"\n"
+"Options:\n"
+"  --format=json  Print {image, registry, repository, tag, tls}\n"
+"  -h, --help     Show this help"
+msgstr ""
+
+#: commands/updates/registry
+msgid "bootc status shows no image this system follows"
+msgstr ""
+
+#: commands/updates/registry
+msgid "BrescaOS updates"
+msgstr ""
+
+#: commands/updates/registry
+msgid "Image"
+msgstr ""
+
+#: commands/updates/registry
+msgid "Registry"
+msgstr ""
+
+#: commands/updates/registry
+msgid "without TLS"
+msgstr ""
+
+#: commands/updates/registry
+msgid "Repository"
+msgstr ""
+
+#: commands/updates/registry
+msgid "Tag"
+msgstr ""
+
+#: commands/updates/rollback
+msgid ""
+"Usage: sudo bresca updates rollback [--discard-staged] [--reboot]\n"
+"                                    [--format=json|text]\n"
+"\n"
+"Makes the previous BrescaOS version the one that boots next. Both stay on\n"
+"disk, so running it again before the reboot goes back to the current one.\n"
+"\n"
+"Options:\n"
+"  --discard-staged  Accept that a downloaded or installed version, not "
+"booted\n"
+"                    yet, is deleted\n"
+"  --reboot          Restart after it, when the previous version boots next\n"
+"  --format=json     Print {rolled_back_at, current_version, "
+"rollback_queued,\n"
+"                    boots_next_version}, or {rolled_back_at, error}\n"
+"  -h, --help        Show this help"
+msgstr ""
+
+#: commands/updates/rollback
+#, sh-printf-format
+msgid ""
+"BrescaOS %s is downloaded: rolling back deletes it. Run it again with --"
+"discard-staged to accept it."
+msgstr ""
+
+#: commands/updates/rollback
+#, sh-printf-format
+msgid ""
+"BrescaOS %s is installed: rolling back deletes it. Run it again with --"
+"discard-staged to accept it."
+msgstr ""
+
+#: commands/updates/rollback
+msgid "the rollback didn't finish: see journalctl -u bresca-updates@rollback"
+msgstr ""
+
+#: commands/updates/rollback
+#, sh-printf-format
+msgid "couldn't roll back: %s"
+msgstr ""
+
+#: commands/updates/rollback
+#, sh-printf-format
+msgid "BrescaOS %s boots next. Restarting..."
+msgstr ""
+
+#: commands/updates/rollback
+#, sh-printf-format
+msgid "BrescaOS %s boots next. Restart to use it: sudo systemctl reboot"
+msgstr ""
+
+#: commands/updates/rollback
+msgid "Nothing to roll back to: there's no previous version."
+msgstr ""
+
+#: commands/updates/rollback
+#, sh-printf-format
+msgid "BrescaOS %s (the current one) boots next again."
+msgstr ""
+
+#: commands/updates/status
+msgid ""
+"Usage: sudo bresca updates status [--format=json|text]\n"
+"\n"
+"Shows the current version, the staged one (downloaded, booted next unless "
+"it\n"
+"was only downloaded) and the rollback one, and which boots next.\n"
+"\n"
+"Options:\n"
+"  --format=json  Print {current, staged, rollback, rollback_queued, "
+"boots_next}\n"
+"  -h, --help     Show this help"
+msgstr ""
+
+#: commands/updates/status
+msgid "Current"
+msgstr ""
+
+#: commands/updates/status
+msgid "Staged"
+msgstr ""
+
+#: commands/updates/status
+msgid "Rollback"
+msgstr ""
+
+#: commands/updates/status
+msgid "downloaded, not installed"
+msgstr ""
+
+#: commands/updates/status
+msgid "← boots next"
+msgstr ""
+
+#: commands/version
+msgid ""
+"Usage: bresca version [--short] [--format=json|text]\n"
+"\n"
+"Prints the running BrescaOS version.\n"
+"\n"
+"Options:\n"
+"  --short        Print only the version number\n"
+"  --format=json  Print {version}\n"
+"  -h, --help     Show this help"
+msgstr ""
+
+#: lib/download-progress.sh
+msgid "Downloading..."
+msgstr ""
+
+#: lib/download-progress.sh
+msgid "Preparing it..."
+msgstr ""
+
+#: lib/messages.sh
+msgid "warning:"
+msgstr ""
+
+#: lib/messages.sh
+msgid "error:"
+msgstr ""
+
+#: lib/registry-tls.sh
+#, sh-printf-format
+msgid ""
+"updates come from %s without TLS: anyone on the network path could serve a "
+"different image."
+msgstr ""
+
+#: lib/registry-tls.sh
+#, sh-printf-format
+msgid ""
+"updates come from %s without TLS: anyone on the network path could serve a "
+"different image. Run it again with --no-tls to accept it."
+msgstr ""

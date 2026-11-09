@@ -3,7 +3,7 @@
 # The development VM's image: BrescaOS plus what the development VM needs.
 # Never published.
 # - Shared clipboard.
-# - Hot reload of image/src/.
+# - Hot reload of image/src/, with gettext to compile its translations.
 
 # The BrescaOS image, brescaos:<VERSION>-<ARCH>. Required, no default:
 # dev/vm/image.sh passes it.
@@ -13,6 +13,7 @@ FROM ${BASE_IMAGE}
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         spice-vdagent wl-clipboard xclip \
+        gettext \
     && systemctl enable spice-vdagentd.socket
 
 COPY --chmod=0755 hotreload.sh /usr/libexec/bresca-dev/hotreload

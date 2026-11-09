@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # bresca version: prints the running BrescaOS version.
 set -euo pipefail
+# shellcheck source=SCRIPTDIR/../lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
 
 print_usage() {
-    cat <<EOF
-Usage: bresca version [--short] [--format=json|text]
+    printf '%s\n' $"Usage: bresca version [--short] [--format=json|text]
 
 Prints the running BrescaOS version.
 
 Options:
   --short        Print only the version number
-  --format=json  Print {"version": ...}
-  -h, --help     Show this help
-EOF
+  --format=json  Print {version}
+  -h, --help     Show this help"
 }
 
 format=text
@@ -26,7 +26,8 @@ for argument in "$@"; do
             exit 0
             ;;
         *)
-            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_error $"unknown option: %s" "$argument"
+            echo >&2
             print_usage >&2
             exit 2
             ;;

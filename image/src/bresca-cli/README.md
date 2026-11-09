@@ -17,11 +17,18 @@
 | `services/bresca-updates.tmpfiles` | `/usr/lib/tmpfiles.d/bresca-updates.conf` |
 | `services/updates/<operation>` | `/usr/libexec/bresca/services/updates/<operation>` |
 | `lib/<name>.sh` | `/usr/libexec/bresca/lib/<name>.sh`, sourced by commands |
+| `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/bresca.mo` |
 
 `bresca` only dispatches: it runs `/usr/libexec/bresca/<command>` (or
 `<group>/<subcommand>`, e.g. `updates/status`) with the remaining arguments.
 Each command is its own script, with its own help and options. A group's help
 (`bresca updates`) is in `bresca`.
+
+Its messages are in the user's language
+([`docs/translations.md`](../../../docs/translations.md)): every script sources
+`lib/messages.sh` first, and its texts are `$"..."` strings printed with
+`print_message`, `print_warning` or `print_error`, values as `%s`. What
+`--format=json` prints isn't translated.
 
 ## Adding a command
 
@@ -30,6 +37,7 @@ Each command is its own script, with its own help and options. A group's help
    `case` lists the commands on purpose, so `bresca` never runs an arbitrary
    path.
 3. Add it and its options to `completion.bash`.
+4. Its messages in `$"..."` strings, then `make pot` and translate them.
 
 ## Update services
 
@@ -93,7 +101,8 @@ too). `tests/Containerfile` adds bats and two fakes ahead in `PATH`:
   `bresca-updates@.service` would, and records every call (so a test can
   check that nothing started, or that `reboot` was asked).
 
-They cover where each file is installed, the dispatcher and the help, and
+They cover where each file is installed (translations too), the dispatcher,
+the help and its language (Spanish, Catalan, English by default), and
 every `updates` command with its results and refusals (`--no-tls`,
 `--discard-staged`). The fakes behave as these scripts expect bootc to: only
 the VM shows that the real one does.

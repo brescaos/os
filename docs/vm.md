@@ -70,6 +70,12 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   updated (e.g. `bresca-cli`) and how many files.
 - What reloads is what `image/Containerfile` copies from `src/`, to the same
   places; a new `COPY` there reloads too.
+- Translations reload too: when a `po/*.po` or a `*.in` template of
+  `image/src/` changes, they're compiled again with
+  `image/build/translations.sh`, as the image's build does, and the result is
+  copied (shown as `translations` in the notification). The CLI uses them on
+  its next run; the applet's restart plasmashell. A `.po` that doesn't compile
+  leaves the last ones in place, with the error in the log.
 - A changed systemd unit (a service, a timer…) is reloaded (`systemctl
   daemon-reload`); a service that is already running keeps the old one until
   it restarts. A changed Plasma applet restarts plasmashell.
@@ -115,7 +121,7 @@ on macOS, KVM on Linux).
 - SELinux is disabled on its disk, because `bootc install` can't label files
   from a host without SELinux.
 - Its image is `brescaos-dev`, BrescaOS plus `spice-vdagent`, `wl-clipboard`,
-  `xclip` and two services: the hot reload
+  `xclip`, `gettext` (for the hot reload of translations) and two services: the hot reload
   ([`hotreload.sh`](../dev/vm/image/hotreload.sh)), which mounts this
   repository read-only at `/run/bresca-dev/src` (QEMU's 9p), and the
   clipboard bridge.

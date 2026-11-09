@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Hot reload for the development VM: copies the files image/Containerfile takes
-# from image/src/ onto the running system whenever they change on the host.
+# from image/src/ onto the running system whenever they change on the host, and
+# compiles their translations again when they change.
 # In the VM's image (dev/vm/image/Containerfile) as
 # /usr/libexec/bresca-dev/hotreload, run as root by bresca-dev-hotreload.service.
 # It reads the repository that dev/vm/start.sh shares read-only over 9p.
@@ -12,6 +13,8 @@
 set -euo pipefail
 
 SHARE=/run/bresca-dev/src
+# Where the translations are compiled, laid out as in the image.
+TRANSLATIONS=/run/bresca-dev/translations
 
 # Prints "<--chmod mode or empty>|<source>|<destination>" for each COPY whose
 # source is under src/, so what reloads is always what the image copies.
@@ -87,18 +90,57 @@ copy_if_different() {
 }
 
 # Counts the copy of $1 and notes what it needs to take effect: a systemd unit,
-# systemd's reload; a Plasma applet, plasmashell's restart (it loads applets
-# once). For copy_changed_files, whose variables it sets.
+# systemd's reload; a Plasma applet, its translations or its notifications,
+# plasmashell's restart (it loads them once). For copy_changed_files, whose
+# variables it sets.
 note_copied_file() {
     copied_count=$((copied_count + 1))
     case $1 in
         /usr/lib/systemd/system/* | /usr/lib/systemd/user/*) is_unit_changed=true ;;
-        /usr/share/plasma/*) is_plasma_changed=true ;;
+        /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/*)
+            is_plasma_changed=true
+            ;;
     esac
 }
 
+# Copies every file in the folder $1 into the folder $2, with the mode $3 (as
+# copy_if_different). For copy_changed_files.
+copy_folder() {
+    local source=$1 destination=${2%/} mode=$3 file
+    while IFS= read -r -d '' file; do
+        if copy_if_different "$source/$file" "$destination/$file" "$mode"; then
+            note_copied_file "$destination/$file"
+        fi
+    done < <(cd "$source" && find . -type f -printf '%P\0')
+}
+
+# Adds $1 to the projects the notification names, once. For
+# copy_changed_files.
+note_updated_project() {
+    if [[ ", $updated_projects, " != *", $1, "* ]]; then
+        updated_projects="${updated_projects:+$updated_projects, }$1"
+    fi
+}
+
+# The checksum of what the translations are compiled from, when last compiled.
+translation_sources_checksum=''
+
+# Compiles the translations into TRANSLATIONS when what they're compiled from
+# (po/*.po and the *.in templates of image/src/) changed; fails when it
+# didn't, or when they don't compile (the error is in the log, and it's tried
+# again on the next change).
+compile_changed_translations() {
+    local checksum
+    checksum=$(cd "$SHARE/image/src" && find . \( -path '*/po/*.po' -o -name '*.in' \) -type f -print0 \
+        | sort -z | xargs -0 sha256sum | sha256sum)
+    [[ $checksum != "$translation_sources_checksum" ]] || return 1
+    translation_sources_checksum=$checksum
+    rm -rf "$TRANSLATIONS"
+    bash "$SHARE/image/build/translations.sh" "$SHARE/image/src" "$TRANSLATIONS"
+}
+
 copy_changed_files() {
-    local mode source destination file project count_before
+    local mode source destination project count_before
     local is_unit_changed=false is_plasma_changed=false copied_count=0 updated_projects=''
 
     while IFS='|' read -r mode source destination; do
@@ -108,21 +150,25 @@ copy_changed_files() {
         count_before=$copied_count
         source=$SHARE/image/$source
         if [[ -d $source ]]; then
-            while IFS= read -r -d '' file; do
-                if copy_if_different "$source/$file" "${destination%/}/$file" "$mode"; then
-                    note_copied_file "${destination%/}/$file"
-                fi
-            done < <(cd "$source" && find . -type f -printf '%P\0')
+            copy_folder "$source" "$destination" "$mode"
         elif [[ -f $source ]]; then
             [[ $destination != */ ]] || destination=$destination${source##*/}
             if copy_if_different "$source" "$destination" "$mode"; then
                 note_copied_file "$destination"
             fi
         fi
-        if ((copied_count > count_before)) && [[ ", $updated_projects, " != *", $project, "* ]]; then
-            updated_projects="${updated_projects:+$updated_projects, }$project"
+        if ((copied_count > count_before)); then
+            note_updated_project "$project"
         fi
     done < <(print_copies)
+
+    count_before=$copied_count
+    if compile_changed_translations; then
+        copy_folder "$TRANSLATIONS" / ''
+    fi
+    if ((copied_count > count_before)); then
+        note_updated_project translations
+    fi
 
     if $is_unit_changed; then
         systemctl daemon-reload

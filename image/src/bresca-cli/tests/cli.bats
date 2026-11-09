@@ -37,6 +37,17 @@ load helpers
     [[ $status -eq 2 && $output == *"unknown option: --nonexistent"* ]]
 }
 
+@test "the help and the errors are in the user's language, English by default" {
+    run env LANG=es_ES.UTF-8 bresca --help
+    [[ $status -eq 0 && $output == *"Uso: bresca <comando>"* ]]
+    run env LANG=ca_ES.UTF-8 bresca --help
+    [[ $status -eq 0 && $output == *"Ús: bresca <ordre>"* ]]
+    run env LANG=es_ES.UTF-8 bresca updates status --nonexistent
+    [[ $status -eq 2 && $output == *"error: opción desconocida: --nonexistent"* ]]
+    run env LANG=C.UTF-8 bresca --help
+    [[ $status -eq 0 && $output == *"Usage: bresca <command>"* ]]
+}
+
 @test "bresca version prints the image's version" {
     local image_version
     image_version=$(. /usr/lib/os-release && echo "$IMAGE_VERSION")

@@ -1,0 +1,63 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-09 17:10+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: brescaos-updates.notifyrc.in
+msgid "A new BrescaOS version is available"
+msgstr ""
+
+#: brescaos-updates.notifyrc.in metadata.json.in package/contents/ui/main.qml
+msgid "BrescaOS Updates"
+msgstr ""
+
+#: brescaos-updates.notifyrc.in
+msgid "New BrescaOS versions"
+msgstr ""
+
+#: brescaos-updates.notifyrc.in
+msgid ""
+"When a check finds a newer version, and at every login until it's installed"
+msgstr ""
+
+#: metadata.json.in
+msgid "Tells when a new BrescaOS version is available"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "BrescaOS %1 is available"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "BrescaOS is up to date"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Check for Updates"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Checking for updates…"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Couldn't check for updates"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Install it with: %1"
+msgstr ""

@@ -2,18 +2,18 @@
 # bresca updates status: the current, staged and rollback versions, from
 # bootc status.
 set -euo pipefail
+# shellcheck source=SCRIPTDIR/../../lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
 
 print_usage() {
-    cat <<EOF
-Usage: sudo bresca updates status [--format=json|text]
+    printf '%s\n' $"Usage: sudo bresca updates status [--format=json|text]
 
 Shows the current version, the staged one (downloaded, booted next unless it
 was only downloaded) and the rollback one, and which boots next.
 
 Options:
   --format=json  Print {current, staged, rollback, rollback_queued, boots_next}
-  -h, --help     Show this help
-EOF
+  -h, --help     Show this help"
 }
 
 format=text
@@ -26,7 +26,8 @@ for argument in "$@"; do
             exit 0
             ;;
         *)
-            printf 'error: unknown option: %s\n\n' "$argument" >&2
+            print_error $"unknown option: %s" "$argument"
+            echo >&2
             print_usage >&2
             exit 2
             ;;
@@ -34,7 +35,7 @@ for argument in "$@"; do
 done
 
 if ((EUID != 0)); then
-    printf "error: 'bresca updates status' needs root: run it with sudo\n" >&2
+    print_error $"'%s' needs root: run it with sudo" "bresca updates status"
     exit 1
 fi
 
@@ -70,16 +71,23 @@ fi
 printf '%sBrescaOS%s\n\n' "$bold$accent" "$reset"
 jq -r '
     .boots_next as $next
-    | (["●", "Current", "current"], ["◐", "Staged", "staged"], ["○", "Rollback", "rollback"]) as [$symbol, $label, $key]
-    | [$symbol, $label,
-       (.[$key] | if . == null then "—"
-                  else "\(.version)  \(.image)" + (if .download_only then "  (downloaded, not installed)" else "" end)
-                  end),
+    | ("current", "staged", "rollback") as $key
+    | [$key,
+       (.[$key] | if . == null then "—" else "\(.version)  \(.image)" end),
+       (.[$key].download_only // false),
        ($key == $next)]
     | @tsv' <<<"$status" \
-    | while IFS=$'\t' read -r symbol label deployment boots_next; do
+    | while IFS=$'\t' read -r key deployment is_download_only boots_next; do
+        case $key in
+            current) symbol=● label=$"Current" ;;
+            staged) symbol=◐ label=$"Staged" ;;
+            rollback) symbol=○ label=$"Rollback" ;;
+        esac
+        if [[ $is_download_only == true ]]; then
+            printf -v deployment '%s  (%s)' "$deployment" $"downloaded, not installed"
+        fi
         if [[ $boots_next == true ]]; then
-            printf '  %s%s %-10s%s %s  %s← boots next%s\n' "$accent" "$symbol" "$label" "$reset" "$deployment" "$dim" "$reset"
+            printf '  %s%s %-10s%s %s  %s%s%s\n' "$accent" "$symbol" "$label" "$reset" "$deployment" "$dim" $"← boots next" "$reset"
         else
             printf '  %s%s %-10s%s %s\n' "$dim" "$symbol" "$label" "$reset" "$deployment"
         fi

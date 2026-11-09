@@ -30,6 +30,16 @@ load helpers
     done
 }
 
+@test "the translations are there" {
+    local lang
+    for lang in es ca; do
+        [[ -f /usr/share/locale/$lang/LC_MESSAGES/bresca.mo ]] || {
+            echo "missing: $lang"
+            return 1
+        }
+    done
+}
+
 @test "the periodic check is enabled" {
     [[ -e /etc/systemd/system/timers.target.wants/bresca-updates-check.timer ]]
 }
