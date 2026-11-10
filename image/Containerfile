@@ -11,13 +11,26 @@
 # scripts/settings/settings.sh. Without it the FROM line fails (empty tag).
 ARG FEDORA_VERSION
 
-# The translations of src/ (docs/translations.md), compiled with gettext.
+# The translations of src/ (docs/translations.md), compiled with gettext:
+# /out for the image, /metadata for the builds below.
 FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS translations
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True gettext jq
-COPY build/translations.sh /tmp/brescaos-build-translations.sh
+COPY build/compile_translations.sh /tmp/brescaos-build-compile_translations.sh
 RUN --mount=type=bind,source=src,target=/tmp/src \
-    bash /tmp/brescaos-build-translations.sh /tmp/src /out
+    bash /tmp/brescaos-build-compile_translations.sh /tmp/src /out /metadata
+
+# BrescaOS Updates KCM.
+FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS updates-kcm-build
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
+        cmake extra-cmake-modules gcc-c++ kf6-kcmutils-devel
+RUN --mount=type=bind,source=src/updates-kcm,target=/tmp/src \
+    --mount=type=bind,from=translations,source=/metadata/updates-kcm,target=/tmp/metadata \
+    cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTRANSLATED_METADATA_DIR=/tmp/metadata \
+    && cmake --build /tmp/build \
+    && DESTDIR=/out cmake --install /tmp/build
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
 
@@ -76,6 +89,8 @@ COPY src/bresca-cli/services/bresca-updates.tmpfiles /usr/lib/tmpfiles.d/bresca-
 COPY src/bresca-cli/services/bresca-updates-check.rules /usr/share/polkit-1/rules.d/50-brescaos-updates-check.rules
 # The tray icon and notification for a new version (src/updates-applet/README.md).
 COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
+# BrescaOS Updates KCM (src/updates-kcm/README.md).
+COPY --from=updates-kcm-build /out/ /
 RUN systemctl enable bresca-updates-check.timer
 
 # The translations of src/.

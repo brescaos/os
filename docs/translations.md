@@ -21,6 +21,7 @@ Each translated component has a `po/` folder:
 |---|---|---|
 | `bresca-cli` | `bresca` | Its scripts' `$"..."` strings |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |
+| `updates-kcm` | `kcm_brescaos_updates` | `i18n()` in its QML and `kcm_brescaos_updates.json.in` |
 
 ## Translating
 
@@ -46,9 +47,11 @@ In the development VM the change shows within a second
   `$variable` inside `$"..."`, and no `\n` at the end: they add it. A help
   text is one `$"..."` string. What `--format=json` prints is never
   translated.
-- The applet's QML uses `i18n("…")`, with `%1`, `%2` for values. Its
-  `.notifyrc` and `metadata.json` are English-only templates
-  (`*.notifyrc.in`, `metadata.json.in`): the build adds the translations.
+- The QML of the applet and of the System Settings module uses `i18n("…")`,
+  with `%1`, `%2` for values. The applet's `.notifyrc` and `metadata.json`
+  and the module's `kcm_brescaos_updates.json` are English-only templates
+  (`*.in`): the build adds the translations. The module's search keywords
+  (`X-KDE-Keywords`) are one string, translated as a whole, comma-separated.
 
 Then run `make pot`: it extracts the strings into the `.pot` and merges them
 into every `.po`, where the new ones are untranslated, and translate them.
@@ -83,13 +86,13 @@ runs both checks even when the scripts fail, as the CI does.
    [`scripts/translations.sh`](../scripts/translations.sh) (which files, which
    language, which keywords), and run `make pot`.
 3. Anything other than `.mo` files (a template the build fills in) goes in
-   [`image/build/translations.sh`](../image/build/translations.sh).
+   [`image/build/compile_translations.sh`](../image/build/compile_translations.sh).
 
 ## How it's built
 
 The first stage of `image/Containerfile` (`translations`, on
 `quay.io/fedora/fedora` with gettext and jq) runs
-[`image/build/translations.sh`](../image/build/translations.sh) with `src/`
+[`image/build/compile_translations.sh`](../image/build/compile_translations.sh) with `src/`
 mounted. It writes, laid out as in the image:
 
 - every `po/<lang>.po` compiled to
@@ -98,6 +101,11 @@ mounted. It writes, laid out as in the image:
   `Comment[<lang>]=` lines (`msgfmt --desktop`);
 - the applet's `metadata.json`, with `"Name[<lang>]"` and
   `"Description[<lang>]"` (jq).
+
+And, apart, the System Settings module's `kcm_brescaos_updates.json`, with
+`"Name[<lang>]"`, `"Description[<lang>]"` and `"X-KDE-Keywords[<lang>]"`:
+System Settings reads them from the module's own metadata, so the
+`updates-kcm-build` stage compiles it into the module.
 
 The image copies only that result: gettext isn't in it. The development VM's
 hot reload runs the same script.

@@ -70,9 +70,11 @@ host.
 
 ## Hot reload
 
-While the VM runs, what you change in `image/src/` reaches it within a second,
-without rebuilding the image: today, the whole `bresca` CLI
-(`image/src/bresca-cli/`). See what it copies with:
+While the VM runs, what you change in `image/src/` reaches it within a second
+(what's compiled, once it compiles), without rebuilding the image: today, the
+whole `bresca` CLI (`image/src/bresca-cli/`), the updates applet and the
+System Settings module.
+See what it copies with:
 
 ```bash
 journalctl -fu bresca-dev-hotreload   # in the VM
@@ -84,10 +86,19 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   places; a new `COPY` there reloads too.
 - Translations reload too: when a `po/*.po` or a `*.in` template of
   `image/src/` changes, they're compiled again with
-  `image/build/translations.sh`, as the image's build does, and the result is
+  `image/build/compile_translations.sh`, as the image's build does, and the result is
   copied (shown as `translations` in the notification). The CLI uses them on
   its next run; the applet's restart plasmashell. A `.po` that doesn't compile
   leaves the last ones in place, with the error in the log.
+- What `image/Containerfile` compiles (today, System Settings > BrescaOS
+  Updates, `image/src/updates-kcm/`: every `image/src/` component with a
+  `CMakeLists.txt`) is compiled again in the VM when its sources or its
+  translations change, as the image's stage does, into
+  `/var/cache/bresca-dev/build/<component>/`; it persists, so only what
+  changed recompiles. A notification says it's compiling and stays until it
+  finishes; if it doesn't compile, it says so, with the error in the log.
+  A changed System Settings module, or its translations, closes System
+  Settings if it's open and opens it again on that module.
 - A changed systemd unit (a service, a timer…) is reloaded (`systemctl
   daemon-reload`); a service that is already running keeps the old one until
   it restarts. A changed Plasma applet restarts plasmashell.
@@ -133,8 +144,9 @@ on macOS, KVM on Linux).
 - SELinux is disabled on its disk, because `bootc install` can't label files
   from a host without SELinux.
 - Its image is `brescaos-dev`, BrescaOS plus `spice-vdagent`, `wl-clipboard`,
-  `xclip`, `gettext` (for the hot reload of translations), `spectacle` (for
-  screenshots) and three services: the hot reload
+  `xclip`, `gettext` (for the hot reload of translations), `cmake`,
+  `extra-cmake-modules`, `gcc-c++` and `kf6-kcmutils-devel` (for the hot
+  reload of what's compiled), `spectacle` (for screenshots) and three services: the hot reload
   ([`hotreload.sh`](../dev/vm/image/hotreload.sh)), which mounts this
   repository read-only at `/run/bresca-dev/src` (QEMU's 9p), the clipboard
   bridge, and `bresca-dev-screenshots`, which mounts `.vm/screenshots/`

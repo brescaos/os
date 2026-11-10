@@ -1,0 +1,17 @@
+# For clangd in the editor, without a build: the include folders of the
+# headers kcm.cpp uses, as Fedora installs them. A new one goes here too.
+# pp_file_not_found: kcm.moc only exists once moc runs, in a build.
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -fPIC
+    - -isystem/usr/include/qt6
+    - -isystem/usr/include/qt6/QtCore
+    - -isystem/usr/include/qt6/QtQml
+    - -isystem/usr/include/qt6/QtQmlIntegration
+    - -isystem/usr/include/KF6/KCoreAddons
+    - -isystem/usr/include/KF6/KCMUtils
+    - -isystem/usr/include/KF6/KCMUtilsCore
+    - -isystem/usr/include/KF6/KCMUtilsQuick
+Diagnostics:
+  Suppress: pp_file_not_found

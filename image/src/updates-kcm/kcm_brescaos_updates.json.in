@@ -1,0 +1,10 @@
+{
+    "KPlugin": {
+        "Description": "Install new BrescaOS versions",
+        "Icon": "system-software-update",
+        "License": "GPL-3.0-or-later",
+        "Name": "BrescaOS Updates"
+    },
+    "X-KDE-Keywords": "BrescaOS,update,upgrade,version",
+    "X-KDE-System-Settings-Parent-Category": "system-administration"
+}

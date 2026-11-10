@@ -17,6 +17,23 @@ require_cmd jq "Install jq to work with translations."
 # changing them doesn't make the .pot stale.
 XGETTEXT_OPTIONS='--from-code=UTF-8 --add-location=file --sort-by-file --package-name=BrescaOS'
 
+# Adds the strings of the plugin metadata $1 (Name, Description and search
+# keywords) to the .pot $2. xgettext doesn't read JSON: they go in as a .po.
+extract_metadata_strings() {
+    local metadata=$1 pot=$2
+    {
+        printf 'msgid ""\nmsgstr "Content-Type: text/plain; charset=UTF-8\\n"\n\n'
+        jq -r --arg file "$metadata" '
+            (.KPlugin.Name, .KPlugin.Description
+             | "#: \($file)\nmsgid \(tojson)\nmsgstr \"\"\n"),
+            (."X-KDE-Keywords" // empty
+             | "#. Search keywords: comma-separated, no spaces after the commas\n#: \($file)\nmsgid \(tojson)\nmsgstr \"\"\n")' "$metadata"
+    } >"$pot.metadata.po"
+    # shellcheck disable=SC2086 # XGETTEXT_OPTIONS is a list of options
+    xgettext $XGETTEXT_OPTIONS -L PO -j -o "$pot" "$pot.metadata.po"
+    rm -f "$pot.metadata.po"
+}
+
 # Writes the strings of the component in the current folder to the .pot $1.
 extract_strings() {
     local pot=$1
@@ -36,14 +53,16 @@ extract_strings() {
                     --keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3 \
                     -o "$pot"
             xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" brescaos-updates.notifyrc.in
-            # xgettext doesn't read JSON: the strings of metadata.json.in as a .po.
-            {
-                printf 'msgid ""\nmsgstr "Content-Type: text/plain; charset=UTF-8\\n"\n\n'
-                jq -r '.KPlugin.Name, .KPlugin.Description
-                       | "#: metadata.json.in\nmsgid \(tojson)\nmsgstr \"\"\n"' metadata.json.in
-            } >"$pot.metadata.po"
-            xgettext $XGETTEXT_OPTIONS -L PO -j -o "$pot" "$pot.metadata.po"
-            rm -f "$pot.metadata.po"
+            extract_metadata_strings metadata.json.in "$pot"
+            ;;
+        updates-kcm)
+            # --force-po: the .pot even without strings in the QML, for the
+            # metadata's to join.
+            find ui -name '*.qml' | sort \
+                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript --force-po --keyword= \
+                    --keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3 \
+                    -o "$pot"
+            extract_metadata_strings kcm_brescaos_updates.json.in "$pot"
             ;;
         *) fail "no rule to extract the strings of ${PWD##*/} (scripts/translations.sh)" ;;
     esac
