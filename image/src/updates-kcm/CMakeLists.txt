@@ -10,6 +10,7 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 
+find_package(Qt6 6.6 REQUIRED COMPONENTS DBus)
 find_package(KF6 6.0 REQUIRED COMPONENTS KCMUtils)
 
 # image/build/compile_translations.sh writes it: kcm_brescaos_updates.json.in
@@ -25,7 +26,7 @@ endif()
 kcmutils_add_qml_kcm(kcm_brescaos_updates SOURCES kcm.cpp DISABLE_DESKTOP_FILE_GENERATION)
 # moc finds kcm.cpp's kcm_brescaos_updates.json in the include folders.
 target_include_directories(kcm_brescaos_updates PRIVATE "${TRANSLATED_METADATA_DIR}")
-target_link_libraries(kcm_brescaos_updates PRIVATE KF6::KCMUtilsQuick)
+target_link_libraries(kcm_brescaos_updates PRIVATE KF6::KCMUtilsQuick Qt6::DBus)
 
 # Its .desktop, which lets the launcher's search find it. What
 # kcmutils_add_qml_kcm would generate, but from the translated metadata: it

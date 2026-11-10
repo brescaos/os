@@ -13,7 +13,7 @@
 | `completion.bash` | `/usr/share/bash-completion/completions/bresca` |
 | `services/bresca-updates@.service` | `/usr/lib/systemd/system/bresca-updates@.service` |
 | `services/bresca-updates-check.timer` | `/usr/lib/systemd/system/bresca-updates-check.timer` |
-| `services/bresca-updates-check.rules` | `/usr/share/polkit-1/rules.d/50-brescaos-updates-check.rules` |
+| `services/bresca-updates.rules` | `/usr/share/polkit-1/rules.d/50-brescaos-updates.rules` |
 | `services/bresca-updates.tmpfiles` | `/usr/lib/tmpfiles.d/bresca-updates.conf` |
 | `services/updates/<operation>` | `/usr/libexec/bresca/services/updates/<operation>` |
 | `lib/<name>.sh` | `/usr/libexec/bresca/lib/<name>.sh`, sourced by commands |
@@ -68,8 +68,9 @@ TLS. Every `bresca updates` command warns on stderr when the registry updates co
 from is allowed without TLS (`insecure = true` in containers'
 `registries.conf`), e.g. the development VM's local registry. The commands
 that download (`download`, `install --download`) refuse it unless they're
-given `--no-tls`. That check is the client's (the CLI, later the KCM): the
-services don't make it, since `systemctl start` takes no parameters.
+given `--no-tls`. That check is the client's (the CLI, or System Settings >
+BrescaOS Updates, which asks first): the services don't make it, since
+`systemctl start` takes no parameters.
 
 `rollback` deletes a staged version (downloaded, or installed and not booted
 yet), as `bootc rollback` does, so it refuses unless it's given
@@ -81,9 +82,16 @@ and every 6 hours: it only checks, and the tray applet
 created at boot (`bresca-updates.tmpfiles`) so the applet can watch it before
 the first check. A successful install removes `check.json`: the version it
 announced is installed.
-`bresca-updates-check.rules` lets an administrator (group `wheel`) at the
-computer start `bresca-updates@check` without a password, for the tray
-applet's Check for Updates button: a check only reads. Nothing else.
+`status` writes what `bresca updates status --format=json` prints (the
+versions, which boots next and the image updates come from, as `registry`
+prints it) to `status.json`, for System Settings > BrescaOS Updates
+(`image/src/updates-kcm/`): `bresca updates status` needs root, for `bootc
+status`. Its last result stays until the next one replaces it.
+`bresca-updates.rules` lets an administrator (group `wheel`) at the computer
+start `bresca-updates@check` and `bresca-updates@status` without a password,
+for the tray applet's Check for Updates button and System Settings: both only
+read. Nothing else: downloading, installing and rolling back ask for an
+administrator's password.
 
 To add an operation, add its script to `services/updates/`: the template unit
 doesn't change.

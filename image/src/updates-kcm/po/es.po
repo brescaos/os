@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 17:07+0000\n"
+"POT-Creation-Date: 2026-11-10 18:28+0000\n"
 "PO-Revision-Date: 2026-11-10 17:07+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -29,3 +29,232 @@ msgstr "BrescaOS,actualización,actualizar,versión"
 #: kcm_brescaos_updates.json.in
 msgid "Install new BrescaOS versions"
 msgstr "Instala versiones nuevas de BrescaOS"
+
+#: ui/main.qml
+msgid "BrescaOS %1"
+msgstr "BrescaOS %1"
+
+#: ui/main.qml
+msgid "BrescaOS %1 (%2 after restarting)"
+msgstr "BrescaOS %1 (%2 después de reiniciar)"
+
+#: ui/main.qml
+msgid "BrescaOS %1 is available"
+msgstr "BrescaOS %1 está disponible"
+
+#: ui/main.qml
+msgid "BrescaOS %1 is downloaded"
+msgstr "BrescaOS %1 está descargada"
+
+#: ui/main.qml
+msgid "BrescaOS %1 is ready"
+msgstr "BrescaOS %1 está lista"
+
+#: ui/main.qml
+msgid "BrescaOS %1 starts after restarting"
+msgstr "BrescaOS %1 arranca después de reiniciar"
+
+#: ui/main.qml
+msgid "BrescaOS is up to date"
+msgstr "BrescaOS está al día"
+
+#: ui/main.qml
+msgid "Channel:"
+msgstr "Canal:"
+
+#: ui/main.qml
+msgid "Check for Updates"
+msgstr "Buscar actualizaciones"
+
+#: ui/main.qml
+msgid "Checking for updates…"
+msgstr "Buscando actualizaciones…"
+
+#: ui/main.qml
+msgid "Checking the new version…"
+msgstr "Comprobando la versión nueva…"
+
+#: ui/main.qml
+msgid "Couldn't check for updates: %1"
+msgstr "No se han podido buscar actualizaciones: %1"
+
+#: ui/main.qml
+msgid "Couldn't download the new version: %1"
+msgstr "No se ha podido descargar la versión nueva: %1"
+
+#: ui/main.qml
+msgid "Couldn't go back to the previous version: %1"
+msgstr "No se ha podido volver a la versión anterior: %1"
+
+#: ui/main.qml
+msgid "Couldn't install the new version: %1"
+msgstr "No se ha podido instalar la versión nueva: %1"
+
+#: ui/main.qml
+msgid "Download Anyway"
+msgstr "Descargar igualmente"
+
+#: ui/main.qml
+msgid "Download Only"
+msgstr "Solo descargar"
+
+#: ui/main.qml
+msgid "Download and Install"
+msgstr "Descargar e instalar"
+
+#: ui/main.qml
+msgid "Download without a secure connection?"
+msgstr "¿Descargar sin una conexión segura?"
+
+#: ui/main.qml
+msgid "Downloading BrescaOS %1"
+msgstr "Descargando BrescaOS %1"
+
+#: ui/main.qml
+msgid "Downloading the new version"
+msgstr "Descargando la versión nueva"
+
+#: ui/main.qml
+msgid "Downloading…"
+msgstr "Descargando…"
+
+#: ui/main.qml
+#, no-javascript-format
+msgctxt "Download progress"
+msgid "Downloading… %1%"
+msgstr "Descargando… %1 %"
+
+#: ui/main.qml
+msgid "Go Back"
+msgstr "Volver"
+
+#: ui/main.qml
+msgid "Go Back…"
+msgstr "Volver…"
+
+#: ui/main.qml
+msgid "Go back to BrescaOS %1?"
+msgstr "¿Volver a BrescaOS %1?"
+
+#: ui/main.qml
+msgid "Install"
+msgstr "Instalar"
+
+#: ui/main.qml
+msgid "Install it to start it the next time you restart."
+msgstr "Instálala para que arranque la próxima vez que reinicies."
+
+#: ui/main.qml
+msgid "Installed version:"
+msgstr "Versión instalada:"
+
+#: ui/main.qml
+msgid "Installing BrescaOS %1"
+msgstr "Instalando BrescaOS %1"
+
+#: ui/main.qml
+msgid "Installing the new version"
+msgstr "Instalando la versión nueva"
+
+#: ui/main.qml
+msgid "Installing…"
+msgstr "Instalando…"
+
+#: ui/main.qml
+msgid ""
+"It downloads in the background while you keep working, and starts the next "
+"time you restart."
+msgstr ""
+"Se descarga en segundo plano mientras sigues trabajando y arranca la próxima "
+"vez que reinicies."
+
+#: ui/main.qml
+msgid "Kept in case this version doesn't work well."
+msgstr "Se conserva por si esta versión no funciona bien."
+
+#: ui/main.qml
+msgid "Kept so you can go back to it if %1 doesn't work well."
+msgstr "Se conserva para que puedas volver a ella si %1 no funciona bien."
+
+#: ui/main.qml
+msgid "Last checked %1."
+msgstr "Última búsqueda: %1."
+
+#: ui/main.qml
+msgid "More install options"
+msgstr "Más opciones de instalación"
+
+#: ui/main.qml
+msgid "Not checked for updates yet."
+msgstr "Todavía no se han buscado actualizaciones."
+
+#: ui/main.qml
+msgid "Preparing the previous version…"
+msgstr "Preparando la versión anterior…"
+
+#: ui/main.qml
+msgid "Preparing…"
+msgstr "Preparando…"
+
+#: ui/main.qml
+#, no-javascript-format
+msgctxt "Download progress"
+msgid "Preparing… %1%"
+msgstr "Preparando… %1 %"
+
+#: ui/main.qml
+msgid "Previous version: BrescaOS %1"
+msgstr "Versión anterior: BrescaOS %1"
+
+#: ui/main.qml
+msgid "Previous version: BrescaOS %1 after restarting"
+msgstr "Versión anterior: BrescaOS %1 después de reiniciar"
+
+#: ui/main.qml
+msgid "Restart Now"
+msgstr "Reiniciar ahora"
+
+#: ui/main.qml
+msgid ""
+"Restart to start using it. Your files, apps and settings stay as they are."
+msgstr ""
+"Reinicia para empezar a usarla. Tus archivos, aplicaciones y ajustes se "
+"quedan como están."
+
+#: ui/main.qml
+msgid "Stable"
+msgstr "Estable"
+
+#: ui/main.qml
+msgid ""
+"The computer will start BrescaOS %1 the next time you restart. Your files, "
+"apps and settings stay as they are. You can update to a newer version again "
+"from here afterwards."
+msgstr ""
+"El ordenador arrancará BrescaOS %1 la próxima vez que reinicies. Tus "
+"archivos, aplicaciones y ajustes se quedan como están. Después podrás volver "
+"a actualizar a una versión más nueva desde aquí."
+
+#: ui/main.qml
+msgid "Try Again"
+msgstr "Reintentar"
+
+#: ui/main.qml
+msgid ""
+"Updates come from %1 without TLS: anyone on the network path could serve a "
+"different image."
+msgstr ""
+"Las actualizaciones llegan de %1 sin TLS: cualquiera en el camino de red "
+"podría servir otra imagen."
+
+#: ui/main.qml
+msgid ""
+"Updates come from %1 without TLS: anyone on the network path could serve a "
+"different image. Accept it only on a development install."
+msgstr ""
+"Las actualizaciones llegan de %1 sin TLS: cualquiera en el camino de red "
+"podría servir otra imagen. Acéptalo solo en una instalación de desarrollo."
+
+#: ui/main.qml
+msgid "Updates from:"
+msgstr "Actualizaciones desde:"

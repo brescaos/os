@@ -7,7 +7,7 @@ load helpers
     local path
     for path in /usr/bin/bresca /usr/libexec/bresca/version \
         /usr/libexec/bresca/updates/{status,check,download,install,rollback,registry} \
-        /usr/libexec/bresca/services/updates/{check,download,download-install,install,rollback}; do
+        /usr/libexec/bresca/services/updates/{check,download,download-install,install,rollback,status}; do
         [[ -x $path ]] || {
             echo "not executable: $path"
             return 1
@@ -17,11 +17,11 @@ load helpers
 
 @test "libraries, units, tmpfiles and the completion are there" {
     local path
-    for path in /usr/libexec/bresca/lib/{messages,registry-tls,download-progress}.sh \
+    for path in /usr/libexec/bresca/lib/{messages,registry,download-progress}.sh \
         /usr/lib/systemd/system/bresca-updates@.service \
         /usr/lib/systemd/system/bresca-updates-check.timer \
         /usr/lib/tmpfiles.d/bresca-updates.conf \
-        /usr/share/polkit-1/rules.d/50-brescaos-updates-check.rules \
+        /usr/share/polkit-1/rules.d/50-brescaos-updates.rules \
         /usr/share/bash-completion/completions/bresca; do
         [[ -f $path ]] || {
             echo "missing: $path"

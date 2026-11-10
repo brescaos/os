@@ -49,8 +49,8 @@ if ((EUID != 0)); then
     exit 1
 fi
 
-# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
-. /usr/libexec/bresca/lib/registry-tls.sh
+# shellcheck source=SCRIPTDIR/../../lib/registry.sh
+. /usr/libexec/bresca/lib/registry.sh
 warn_if_registry_without_tls
 
 # bootc rollback deletes a staged version: only once the user accepts it.

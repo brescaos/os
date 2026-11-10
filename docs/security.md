@@ -10,7 +10,7 @@ BrescaOS aims to be safe by default. Here are the list of changes from the base 
 | `rpm-ostree-countme.timer` | Disabled | It counts the system as a Fedora one | — |
 | LLMNR in `systemd-resolved` | Off | It answers name queries on every network, which anyone on it can spoof | — |
 | Firewall (`firewalld`) | On, zone `default` ("BrescaOS default") for every network without a zone of its own, as every new one is. Of Fedora's zones only `block`, `drop` and `trusted` (firewalld needs them) and `nm-shared` (Wi-Fi hotspot) are kept. Fedora's `gateway-*` policies, for routing other networks, are removed too: they name zones that are gone | Every incoming connection is dropped; only DHCPv6 replies get in | Open a service in Settings > Firewall, or `sudo firewall-cmd --permanent --add-service=<service> && sudo firewall-cmd --reload` (e.g. `ssh`, after enabling `sshd`) |
-| Checking for updates without a password (polkit, `50-brescaos-updates-check.rules`) | Only an administrator (group `wheel`) at the computer, only starting `bresca-updates@check` | A check only reads; downloading, installing and anything else with services still ask for a password | — |
+| Checking for updates and reading their status without a password (polkit, `50-brescaos-updates.rules`) | Only an administrator (group `wheel`) at the computer, only starting `bresca-updates@check` and `bresca-updates@status` | Both only read; downloading, installing, rolling back and anything else with services still ask for a password | — |
 
 The disabled units are also in
 `/usr/lib/systemd/system-preset/10-brescaos-disable.preset`, so a system's

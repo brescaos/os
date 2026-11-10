@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 17:10+0000\n"
+"POT-Creation-Date: 2026-11-10 18:31+0000\n"
 "PO-Revision-Date: 2026-11-09 17:08+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -69,7 +69,8 @@ msgstr ""
 "  download    Descarga la versión nueva sin instalarla (root)\n"
 "  install     Instala la versión descargada (root)\n"
 "  rollback    Arranca la versión anterior la próxima vez (root)\n"
-"  registry    De dónde llegan las actualizaciones: imagen, registro, TLS (root)\n"
+"  registry    De dónde llegan las actualizaciones: imagen, registro, TLS "
+"(root)\n"
 "  help        Muestra esta ayuda\n"
 "\n"
 "Opciones:\n"
@@ -91,7 +92,8 @@ msgid ""
 msgstr ""
 "Uso: sudo bresca updates check [--format=json|text]\n"
 "\n"
-"Comprueba si hay una versión más nueva de BrescaOS, sin descargar ni cambiar\n"
+"Comprueba si hay una versión más nueva de BrescaOS, sin descargar ni "
+"cambiar\n"
 "nada.\n"
 "\n"
 "Opciones:\n"
@@ -118,7 +120,8 @@ msgstr "Buscando actualizaciones..."
 
 #: commands/updates/check
 msgid "the check didn't finish: see journalctl -u bresca-updates@check"
-msgstr "la comprobación no terminó: consulta journalctl -u bresca-updates@check"
+msgstr ""
+"la comprobación no terminó: consulta journalctl -u bresca-updates@check"
 
 #: commands/updates/check
 #, sh-printf-format
@@ -168,7 +171,9 @@ msgstr "la descarga no terminó: consulta journalctl -u bresca-updates@download"
 #, sh-printf-format
 msgid ""
 "Downloaded BrescaOS %s. The next boot still uses %s until it's installed."
-msgstr "BrescaOS %s descargado. El próximo arranque sigue usando %s hasta que se instale."
+msgstr ""
+"BrescaOS %s descargado. El próximo arranque sigue usando %s hasta que se "
+"instale."
 
 #: commands/updates/download
 #, sh-printf-format
@@ -210,7 +215,8 @@ msgstr ""
 "  --download     Descarga antes la versión más nueva, si la hay\n"
 "  --no-tls       Con --download, acepta un registro permitido sin TLS\n"
 "  --reboot       Reinicia después de instalar\n"
-"  --format=json  Muestra {installed_at, current_version, installed_version}, o\n"
+"  --format=json  Muestra {installed_at, current_version, installed_version}, "
+"o\n"
 "                 el {..., error} de la descarga o de la instalación\n"
 "  -h, --help     Muestra esta ayuda"
 
@@ -283,7 +289,7 @@ msgstr "Imagen"
 msgid "Registry"
 msgstr "Registro"
 
-#: commands/updates/registry
+#: commands/updates/registry commands/updates/status
 msgid "without TLS"
 msgstr "sin TLS"
 
@@ -316,16 +322,20 @@ msgstr ""
 "Uso: sudo bresca updates rollback [--discard-staged] [--reboot]\n"
 "                                  [--format=json|text]\n"
 "\n"
-"Hace que la versión anterior de BrescaOS sea la que arranque la próxima vez.\n"
-"Las dos se quedan en el disco, así que volver a ejecutarlo antes de reiniciar\n"
+"Hace que la versión anterior de BrescaOS sea la que arranque la próxima "
+"vez.\n"
+"Las dos se quedan en el disco, así que volver a ejecutarlo antes de "
+"reiniciar\n"
 "vuelve a la actual.\n"
 "\n"
 "Opciones:\n"
-"  --discard-staged  Acepta que se borre una versión descargada o instalada que\n"
+"  --discard-staged  Acepta que se borre una versión descargada o instalada "
+"que\n"
 "                    aún no ha arrancado\n"
 "  --reboot          Reinicia después, cuando la próxima en arrancar sea la\n"
 "                    versión anterior\n"
-"  --format=json     Muestra {rolled_back_at, current_version, rollback_queued,\n"
+"  --format=json     Muestra {rolled_back_at, current_version, "
+"rollback_queued,\n"
 "                    boots_next_version}, o {rolled_back_at, error}\n"
 "  -h, --help        Muestra esta ayuda"
 
@@ -334,18 +344,24 @@ msgstr ""
 msgid ""
 "BrescaOS %s is downloaded: rolling back deletes it. Run it again with --"
 "discard-staged to accept it."
-msgstr "BrescaOS %s está descargado: volver a la versión anterior lo borra. Vuelve a ejecutarlo con --discard-staged para aceptarlo."
+msgstr ""
+"BrescaOS %s está descargado: volver a la versión anterior lo borra. Vuelve a "
+"ejecutarlo con --discard-staged para aceptarlo."
 
 #: commands/updates/rollback
 #, sh-printf-format
 msgid ""
 "BrescaOS %s is installed: rolling back deletes it. Run it again with --"
 "discard-staged to accept it."
-msgstr "BrescaOS %s está instalado: volver a la versión anterior lo borra. Vuelve a ejecutarlo con --discard-staged para aceptarlo."
+msgstr ""
+"BrescaOS %s está instalado: volver a la versión anterior lo borra. Vuelve a "
+"ejecutarlo con --discard-staged para aceptarlo."
 
 #: commands/updates/rollback
 msgid "the rollback didn't finish: see journalctl -u bresca-updates@rollback"
-msgstr "la vuelta a la versión anterior no terminó: consulta journalctl -u bresca-updates@rollback"
+msgstr ""
+"la vuelta a la versión anterior no terminó: consulta journalctl -u bresca-"
+"updates@rollback"
 
 #: commands/updates/rollback
 #, sh-printf-format
@@ -360,7 +376,9 @@ msgstr "BrescaOS %s arrancará la próxima vez. Reiniciando..."
 #: commands/updates/rollback
 #, sh-printf-format
 msgid "BrescaOS %s boots next. Restart to use it: sudo systemctl reboot"
-msgstr "BrescaOS %s arrancará la próxima vez. Reinicia para usarlo: sudo systemctl reboot"
+msgstr ""
+"BrescaOS %s arrancará la próxima vez. Reinicia para usarlo: sudo systemctl "
+"reboot"
 
 #: commands/updates/rollback
 msgid "Nothing to roll back to: there's no previous version."
@@ -377,21 +395,26 @@ msgid ""
 "\n"
 "Shows the current version, the staged one (downloaded, booted next unless "
 "it\n"
-"was only downloaded) and the rollback one, and which boots next.\n"
+"was only downloaded) and the rollback one, which boots next, and the image\n"
+"updates come from.\n"
 "\n"
 "Options:\n"
 "  --format=json  Print {current, staged, rollback, rollback_queued, "
-"boots_next}\n"
+"boots_next,\n"
+"                 registry}: registry as bresca updates registry prints it\n"
 "  -h, --help     Show this help"
 msgstr ""
 "Uso: sudo bresca updates status [--format=json|text]\n"
 "\n"
 "Muestra la versión actual, la preparada (descargada; arranca la próxima vez\n"
-"salvo que solo se haya descargado) y la anterior, y cuál arrancará la próxima\n"
-"vez.\n"
+"salvo que solo se haya descargado) y la anterior, cuál arrancará la próxima\n"
+"vez y la imagen de la que llegan las actualizaciones.\n"
 "\n"
 "Opciones:\n"
-"  --format=json  Muestra {current, staged, rollback, rollback_queued, boots_next}\n"
+"  --format=json  Muestra {current, staged, rollback, rollback_queued, "
+"boots_next,\n"
+"                 registry}: registry como lo muestra bresca updates "
+"registry\n"
 "  -h, --help     Muestra esta ayuda"
 
 #: commands/updates/status
@@ -413,6 +436,10 @@ msgstr "descargada, sin instalar"
 #: commands/updates/status
 msgid "← boots next"
 msgstr "← próximo arranque"
+
+#: commands/updates/status
+msgid "Updates from"
+msgstr "Actualizaciones desde"
 
 #: commands/version
 msgid ""
@@ -450,16 +477,20 @@ msgstr "aviso:"
 msgid "error:"
 msgstr "error:"
 
-#: lib/registry-tls.sh
+#: lib/registry.sh
 #, sh-printf-format
 msgid ""
 "updates come from %s without TLS: anyone on the network path could serve a "
 "different image."
-msgstr "las actualizaciones llegan de %s sin TLS: cualquiera en el camino de red podría servir otra imagen."
+msgstr ""
+"las actualizaciones llegan de %s sin TLS: cualquiera en el camino de red "
+"podría servir otra imagen."
 
-#: lib/registry-tls.sh
+#: lib/registry.sh
 #, sh-printf-format
 msgid ""
 "updates come from %s without TLS: anyone on the network path could serve a "
 "different image. Run it again with --no-tls to accept it."
-msgstr "las actualizaciones llegan de %s sin TLS: cualquiera en el camino de red podría servir otra imagen. Vuelve a ejecutarlo con --no-tls para aceptarlo."
+msgstr ""
+"las actualizaciones llegan de %s sin TLS: cualquiera en el camino de red "
+"podría servir otra imagen. Vuelve a ejecutarlo con --no-tls para aceptarlo."

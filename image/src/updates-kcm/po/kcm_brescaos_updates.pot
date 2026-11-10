@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 17:07+0000\n"
+"POT-Creation-Date: 2026-11-10 18:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,4 +28,222 @@ msgstr ""
 
 #: kcm_brescaos_updates.json.in
 msgid "Install new BrescaOS versions"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS %1 (%2 after restarting)"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS %1 is available"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS %1 is downloaded"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS %1 is ready"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS %1 starts after restarting"
+msgstr ""
+
+#: ui/main.qml
+msgid "BrescaOS is up to date"
+msgstr ""
+
+#: ui/main.qml
+msgid "Channel:"
+msgstr ""
+
+#: ui/main.qml
+msgid "Check for Updates"
+msgstr ""
+
+#: ui/main.qml
+msgid "Checking for updates…"
+msgstr ""
+
+#: ui/main.qml
+msgid "Checking the new version…"
+msgstr ""
+
+#: ui/main.qml
+msgid "Couldn't check for updates: %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Couldn't download the new version: %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Couldn't go back to the previous version: %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Couldn't install the new version: %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Download Anyway"
+msgstr ""
+
+#: ui/main.qml
+msgid "Download Only"
+msgstr ""
+
+#: ui/main.qml
+msgid "Download and Install"
+msgstr ""
+
+#: ui/main.qml
+msgid "Download without a secure connection?"
+msgstr ""
+
+#: ui/main.qml
+msgid "Downloading BrescaOS %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Downloading the new version"
+msgstr ""
+
+#: ui/main.qml
+msgid "Downloading…"
+msgstr ""
+
+#: ui/main.qml
+#, no-javascript-format
+msgctxt "Download progress"
+msgid "Downloading… %1%"
+msgstr ""
+
+#: ui/main.qml
+msgid "Go Back"
+msgstr ""
+
+#: ui/main.qml
+msgid "Go Back…"
+msgstr ""
+
+#: ui/main.qml
+msgid "Go back to BrescaOS %1?"
+msgstr ""
+
+#: ui/main.qml
+msgid "Install"
+msgstr ""
+
+#: ui/main.qml
+msgid "Install it to start it the next time you restart."
+msgstr ""
+
+#: ui/main.qml
+msgid "Installed version:"
+msgstr ""
+
+#: ui/main.qml
+msgid "Installing BrescaOS %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Installing the new version"
+msgstr ""
+
+#: ui/main.qml
+msgid "Installing…"
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"It downloads in the background while you keep working, and starts the next "
+"time you restart."
+msgstr ""
+
+#: ui/main.qml
+msgid "Kept in case this version doesn't work well."
+msgstr ""
+
+#: ui/main.qml
+msgid "Kept so you can go back to it if %1 doesn't work well."
+msgstr ""
+
+#: ui/main.qml
+msgid "Last checked %1."
+msgstr ""
+
+#: ui/main.qml
+msgid "More install options"
+msgstr ""
+
+#: ui/main.qml
+msgid "Not checked for updates yet."
+msgstr ""
+
+#: ui/main.qml
+msgid "Preparing the previous version…"
+msgstr ""
+
+#: ui/main.qml
+msgid "Preparing…"
+msgstr ""
+
+#: ui/main.qml
+#, no-javascript-format
+msgctxt "Download progress"
+msgid "Preparing… %1%"
+msgstr ""
+
+#: ui/main.qml
+msgid "Previous version: BrescaOS %1"
+msgstr ""
+
+#: ui/main.qml
+msgid "Previous version: BrescaOS %1 after restarting"
+msgstr ""
+
+#: ui/main.qml
+msgid "Restart Now"
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"Restart to start using it. Your files, apps and settings stay as they are."
+msgstr ""
+
+#: ui/main.qml
+msgid "Stable"
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"The computer will start BrescaOS %1 the next time you restart. Your files, "
+"apps and settings stay as they are. You can update to a newer version again "
+"from here afterwards."
+msgstr ""
+
+#: ui/main.qml
+msgid "Try Again"
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"Updates come from %1 without TLS: anyone on the network path could serve a "
+"different image."
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"Updates come from %1 without TLS: anyone on the network path could serve a "
+"different image. Accept it only on a development install."
+msgstr ""
+
+#: ui/main.qml
+msgid "Updates from:"
 msgstr ""

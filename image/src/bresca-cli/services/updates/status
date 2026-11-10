@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Runs as bresca-updates@status.service: writes what
+# `bresca updates status --format=json` prints to
+# /run/bresca/updates/status.json, for System Settings > BrescaOS Updates
+# (image/src/updates-kcm/), which can't run it without root. It only reads,
+# so an administrator starts it without a password (bresca-updates.rules).
+# The last result stays until the next one replaces it.
+set -euo pipefail
+
+result_file=/run/bresca/updates/status.json
+
+/usr/libexec/bresca/updates/status --format=json >"$result_file.tmp"
+mv "$result_file.tmp" "$result_file"

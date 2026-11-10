@@ -1,5 +1,6 @@
 #!/usr/bin/env bats
-# bresca updates status: the deployments and which boots next.
+# bresca updates status: the deployments, which boots next and the image
+# updates come from; bresca-updates@status, its result for System Settings.
 
 load helpers
 
@@ -33,4 +34,20 @@ load helpers
     run bresca updates status --format=json
     [[ $(jq -r .rollback.version <<<"$output") == 0.0.9 ]]
     [[ $(jq -r .boots_next <<<"$output") == rollback ]]
+}
+
+@test "the image updates come from, as bresca updates registry shows it" {
+    allow_without_tls registry.brescaos.com
+    run --separate-stderr bresca updates status --format=json
+    [[ $(jq -c .registry <<<"$output") == $(bresca updates registry --format=json 2>/dev/null) ]]
+    [[ $(jq -r .registry.tls <<<"$output") == false ]]
+    run --separate-stderr bresca updates status
+    [[ $output == *"Updates from"*"$IMAGE"*"(without TLS)"* ]]
+}
+
+@test "bresca-updates@status writes what status prints, readable without root" {
+    stage_version 0.2.0 downloaded
+    systemctl start bresca-updates@status.service
+    [[ $(stat -c %a /run/bresca/updates/status.json) == 644 ]]
+    [[ $(</run/bresca/updates/status.json) == $(bresca updates status --format=json 2>/dev/null) ]]
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 17:10+0000\n"
+"POT-Creation-Date: 2026-11-10 18:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -214,7 +214,7 @@ msgstr ""
 msgid "Registry"
 msgstr ""
 
-#: commands/updates/registry
+#: commands/updates/registry commands/updates/status
 msgid "without TLS"
 msgstr ""
 
@@ -293,11 +293,13 @@ msgid ""
 "\n"
 "Shows the current version, the staged one (downloaded, booted next unless "
 "it\n"
-"was only downloaded) and the rollback one, and which boots next.\n"
+"was only downloaded) and the rollback one, which boots next, and the image\n"
+"updates come from.\n"
 "\n"
 "Options:\n"
 "  --format=json  Print {current, staged, rollback, rollback_queued, "
-"boots_next}\n"
+"boots_next,\n"
+"                 registry}: registry as bresca updates registry prints it\n"
 "  -h, --help     Show this help"
 msgstr ""
 
@@ -319,6 +321,10 @@ msgstr ""
 
 #: commands/updates/status
 msgid "← boots next"
+msgstr ""
+
+#: commands/updates/status
+msgid "Updates from"
 msgstr ""
 
 #: commands/version
@@ -349,14 +355,14 @@ msgstr ""
 msgid "error:"
 msgstr ""
 
-#: lib/registry-tls.sh
+#: lib/registry.sh
 #, sh-printf-format
 msgid ""
 "updates come from %s without TLS: anyone on the network path could serve a "
 "different image."
 msgstr ""
 
-#: lib/registry-tls.sh
+#: lib/registry.sh
 #, sh-printf-format
 msgid ""
 "updates come from %s without TLS: anyone on the network path could serve a "

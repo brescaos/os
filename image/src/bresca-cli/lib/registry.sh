@@ -1,5 +1,7 @@
 # shellcheck shell=bash
-# Sourced by the bresca updates commands. Needs root, for bootc status.
+# Where updates come from: the image this system follows, its registry and
+# whether that registry is allowed without TLS. Sourced by the bresca updates
+# commands. Needs root, for bootc status.
 
 # shellcheck source=SCRIPTDIR/messages.sh
 . /usr/libexec/bresca/lib/messages.sh
@@ -8,6 +10,39 @@
 # bootc's spec names, which changes before the reboot, else the booted one.
 find_followed_image() {
     bootc status --format=json | jq -r '.spec.image.image // .status.booted.image.image.image // empty'
+}
+
+# Prints the image this system follows as JSON, {image, registry,
+# repository, tag, tls}: registry null when the image names none, tls false
+# when its registry is allowed without TLS. Fails when bootc status shows no
+# image.
+print_followed_image_json() {
+    local image last_component tag image_name registry='' repository has_tls=true
+
+    image=$(find_followed_image)
+    [[ -n $image ]] || return 1
+    # The tag is after the last ":" that follows the last "/", so a
+    # registry's port (10.0.2.2:5050) isn't taken for it. No tag means latest.
+    last_component=${image##*/}
+    if [[ $last_component == *:* ]]; then
+        tag=${last_component##*:}
+        image_name=${image%:*}
+    else
+        tag=latest
+        image_name=$image
+    fi
+    repository=$image_name
+    if [[ $image_name == */* ]]; then
+        registry=${image_name%%/*}
+        repository=${image_name#*/}
+    fi
+    if [[ -n $registry ]] && is_registry_allowed_without_tls "$registry"; then
+        has_tls=false
+    fi
+    jq -cn --arg image "$image" --arg registry "$registry" --arg repository "$repository" \
+        --arg tag "$tag" --argjson tls "$has_tls" \
+        '{image: $image, registry: (if $registry == "" then null else $registry end),
+          repository: $repository, tag: $tag, tls: $tls}'
 }
 
 # Whether containers' registries.conf allows <registry> without TLS

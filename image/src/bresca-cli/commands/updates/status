@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # bresca updates status: the current, staged and rollback versions, from
-# bootc status.
+# bootc status, and the image updates come from.
 set -euo pipefail
 # shellcheck source=SCRIPTDIR/../../lib/messages.sh
 . /usr/libexec/bresca/lib/messages.sh
@@ -9,10 +9,12 @@ print_usage() {
     printf '%s\n' $"Usage: sudo bresca updates status [--format=json|text]
 
 Shows the current version, the staged one (downloaded, booted next unless it
-was only downloaded) and the rollback one, and which boots next.
+was only downloaded) and the rollback one, which boots next, and the image
+updates come from.
 
 Options:
-  --format=json  Print {current, staged, rollback, rollback_queued, boots_next}
+  --format=json  Print {current, staged, rollback, rollback_queued, boots_next,
+                 registry}: registry as bresca updates registry prints it
   -h, --help     Show this help"
 }
 
@@ -39,12 +41,15 @@ if ((EUID != 0)); then
     exit 1
 fi
 
-# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
-. /usr/libexec/bresca/lib/registry-tls.sh
+# shellcheck source=SCRIPTDIR/../../lib/registry.sh
+. /usr/libexec/bresca/lib/registry.sh
 warn_if_registry_without_tls
 
 # A staged deployment that was only downloaded doesn't boot until installed.
-status=$(bootc status --format=json | jq -c '
+# null when bootc status shows no image this system follows.
+followed_image=$(print_followed_image_json) || followed_image=null
+
+status=$(bootc status --format=json | jq -c --argjson registry "$followed_image" '
     def deployment(key):
         .status[key]
         | if . == null then null
@@ -55,7 +60,8 @@ status=$(bootc status --format=json | jq -c '
      rollback_queued: (.status.rollbackQueued // false),
      boots_next: (if .status.rollbackQueued == true then "rollback"
                   elif .status.staged != null and .status.staged.downloadOnly != true then "staged"
-                  else "current" end)}')
+                  else "current" end),
+     registry: $registry}')
 
 if [[ $format == json ]]; then
     printf '%s\n' "$status"
@@ -63,9 +69,9 @@ if [[ $format == json ]]; then
 fi
 
 if [[ -t 1 ]]; then
-    bold=$'\e[1m' dim=$'\e[2m' accent=$'\e[38;5;111m' reset=$'\e[0m'
+    bold=$'\e[1m' dim=$'\e[2m' accent=$'\e[38;5;111m' yellow=$'\e[33m' reset=$'\e[0m'
 else
-    bold='' dim='' accent='' reset=''
+    bold='' dim='' accent='' yellow='' reset=''
 fi
 
 printf '%sBrescaOS%s\n\n' "$bold$accent" "$reset"
@@ -92,4 +98,10 @@ jq -r '
             printf '  %s%s %-10s%s %s\n' "$dim" "$symbol" "$label" "$reset" "$deployment"
         fi
     done
+if [[ $followed_image != null ]]; then
+    IFS=$'\t' read -r image has_tls < <(jq -r '[.image, .tls] | @tsv' <<<"$followed_image")
+    printf '\n  %s%s%s %s' "$dim" $"Updates from" "$reset" "$image"
+    $has_tls || printf '  %s(%s)%s' "$yellow" $"without TLS" "$reset"
+    printf '\n'
+fi
 printf '\n'

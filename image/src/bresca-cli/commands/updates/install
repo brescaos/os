@@ -53,8 +53,8 @@ if ((EUID != 0)); then
     exit 1
 fi
 
-# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
-. /usr/libexec/bresca/lib/registry-tls.sh
+# shellcheck source=SCRIPTDIR/../../lib/registry.sh
+. /usr/libexec/bresca/lib/registry.sh
 # Without --download nothing comes from the registry: only a warning.
 if $should_download; then
     stop_if_registry_without_tls "$is_no_tls_accepted"

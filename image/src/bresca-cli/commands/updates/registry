@@ -39,44 +39,22 @@ if ((EUID != 0)); then
     exit 1
 fi
 
-# shellcheck source=SCRIPTDIR/../../lib/registry-tls.sh
-. /usr/libexec/bresca/lib/registry-tls.sh
+# shellcheck source=SCRIPTDIR/../../lib/registry.sh
+. /usr/libexec/bresca/lib/registry.sh
 warn_if_registry_without_tls
 
-image=$(find_followed_image)
-if [[ -z $image ]]; then
+if ! followed_image=$(print_followed_image_json); then
     print_error $"bootc status shows no image this system follows"
     exit 1
 fi
 
-# The tag is after the last ":" that follows the last "/", so a registry's
-# port (10.0.2.2:5050) isn't taken for it. No tag means latest.
-last_component=${image##*/}
-if [[ $last_component == *:* ]]; then
-    tag=${last_component##*:}
-    image_name=${image%:*}
-else
-    tag=latest
-    image_name=$image
-fi
-registry=''
-repository=$image_name
-if [[ $image_name == */* ]]; then
-    registry=${image_name%%/*}
-    repository=${image_name#*/}
-fi
-has_tls=true
-if [[ -n $registry ]] && is_registry_allowed_without_tls "$registry"; then
-    has_tls=false
-fi
-
 if [[ $format == json ]]; then
-    jq -cn --arg image "$image" --arg registry "$registry" --arg repository "$repository" \
-        --arg tag "$tag" --argjson tls "$has_tls" \
-        '{image: $image, registry: (if $registry == "" then null else $registry end),
-          repository: $repository, tag: $tag, tls: $tls}'
+    printf '%s\n' "$followed_image"
     exit 0
 fi
+
+IFS=$'\t' read -r image registry repository tag has_tls \
+    < <(jq -r '[.image, (.registry // "—"), .repository, .tag, .tls] | @tsv' <<<"$followed_image")
 
 if [[ -t 1 ]]; then
     bold=$'\e[1m' dim=$'\e[2m' accent=$'\e[38;5;111m' yellow=$'\e[33m' reset=$'\e[0m'
@@ -86,7 +64,7 @@ fi
 
 printf '%s%s%s\n\n' "$bold$accent" $"BrescaOS updates" "$reset"
 printf '  %s%-11s%s %s\n' "$dim" $"Image" "$reset" "$image"
-printf '  %s%-11s%s %s' "$dim" $"Registry" "$reset" "${registry:-—}"
+printf '  %s%-11s%s %s' "$dim" $"Registry" "$reset" "$registry"
 $has_tls || printf '  %s(%s)%s' "$yellow" $"without TLS" "$reset"
 printf '\n'
 printf '  %s%-11s%s %s\n' "$dim" $"Repository" "$reset" "$repository"

@@ -1,0 +1,18 @@
+// Lets an administrator (group wheel) at the computer start, without a
+// password, the update operations that only read:
+// - bresca-updates@check.service: the tray applet's "Check for Updates"
+//   (image/src/updates-applet/) and System Settings > BrescaOS Updates
+//   (image/src/updates-kcm/);
+// - bresca-updates@status.service: the versions and the image updates come
+//   from, which System Settings > BrescaOS Updates shows.
+// Downloading, installing and rolling back still ask for a password.
+// ES5 only: polkit runs rules with Duktape.
+polkit.addRule(function (action, subject) {
+    var unit = action.lookup("unit");
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        (unit == "bresca-updates@check.service" || unit == "bresca-updates@status.service") &&
+        action.lookup("verb") == "start" &&
+        subject.local && subject.active && subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+});
