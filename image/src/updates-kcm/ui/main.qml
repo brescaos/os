@@ -335,7 +335,7 @@ KCM.SimpleKCM {
                     case "available":
                         return i18n("It downloads in the background while you keep working, and starts the next time you restart.");
                     case "downloaded":
-                        return i18n("Install it to start it the next time you restart.");
+                        return i18n("Install it before restarting: restarting discards the download.");
                     case "installed":
                     case "rollbackQueued":
                         return i18n("Restart to start using it. Your files, apps and settings stay as they are.");

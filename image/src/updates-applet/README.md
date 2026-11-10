@@ -33,6 +33,18 @@ translations of `po/`.
   a check finds it, and at every login while it isn't installed, as a
   reminder. It stays until closed. Settings > Notifications > Applications >
   BrescaOS Updates configures or mutes it.
+- Two more notifications, from the results of a download and an install,
+  started from System Settings > BrescaOS Updates or the CLI. They're watched
+  as `check.json` is, and notified only when they change while the applet
+  runs, never one from before it started:
+  - `updateDownloaded`: a version downloaded without installing it
+    (`download.json` with `download_only`; Download and Install's isn't).
+    Its **Install** opens System Settings > BrescaOS Updates. It says that
+    restarting first discards the download: bootc doesn't keep a version
+    only downloaded across a reboot.
+  - `updateInstalled`: a version installed (`install.json` with
+    `installed_version`). Its **Restart Now** opens Plasma's restart prompt
+    (`org.kde.LogoutPrompt`, with `gdbus`).
 
 The system tray loads it on its own: `X-Plasma-NotificationArea` and
 `EnabledByDefault` in `metadata.json.in`. In the development VM hot reload copies

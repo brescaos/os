@@ -7,3 +7,13 @@ Comment=New BrescaOS versions
 Name=A new BrescaOS version is available
 Comment=When a check finds a newer version, and at every login until it's installed
 Action=Popup
+
+[Event/updateDownloaded]
+Name=A new BrescaOS version is downloaded
+Comment=When a version downloaded without installing it is ready to install
+Action=Popup
+
+[Event/updateInstalled]
+Name=A new BrescaOS version is installed
+Comment=When a new version is installed and starts after restarting
+Action=Popup

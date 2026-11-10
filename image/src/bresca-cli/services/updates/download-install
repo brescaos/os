@@ -8,5 +8,5 @@ set -euo pipefail
 # Not left from an earlier install if the download fails.
 rm -f /run/bresca/updates/install.json
 
-/usr/libexec/bresca/services/updates/download
+BRESCA_INSTALLS_NEXT=true /usr/libexec/bresca/services/updates/download
 exec /usr/libexec/bresca/services/updates/install

@@ -10,13 +10,15 @@ set -euo pipefail
 print_usage() {
     printf '%s\n' $"Usage: sudo bresca updates download [--no-tls] [--format=json|text]
 
-Downloads the newer BrescaOS version, if there is one, without installing it:
-the next boot still uses the current version until it's installed.
+Downloads the newer BrescaOS version, if there is one, without installing it.
+Install it with 'sudo bresca updates install' before restarting: restarting
+discards it (bootc keeps the downloaded data, so downloading it again is fast).
 
 Options:
   --no-tls       Accept a registry allowed without TLS
-  --format=json  Print {downloaded_at, update_available, current_version,
-                 downloaded_version}, or {downloaded_at, error}
+  --format=json  Print {downloaded_at, download_only, update_available,
+                 current_version, downloaded_version}, or {downloaded_at,
+                 error}
   -h, --help     Show this help"
 }
 
@@ -73,8 +75,8 @@ if [[ $format == json ]]; then
 elif [[ -z $download_error ]]; then
     current_version=$(jq -r '.current_version' <<<"$download_result")
     if [[ $(jq -r '.update_available' <<<"$download_result") == true ]]; then
-        print_message $"Downloaded BrescaOS %s. The next boot still uses %s until it's installed." \
-            "$(jq -r '.downloaded_version' <<<"$download_result")" "$current_version"
+        print_message $"Downloaded BrescaOS %s. Install it with 'sudo bresca updates install' before restarting: restarting discards it." \
+            "$(jq -r '.downloaded_version' <<<"$download_result")"
     else
         print_message $"BrescaOS is up to date (%s): nothing to download." "$current_version"
     fi

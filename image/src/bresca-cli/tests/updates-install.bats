@@ -39,6 +39,8 @@ load helpers
     run bresca updates install --download
     [[ $status -eq 0 && $output == *"Installed BrescaOS 0.2.0."* ]]
     [[ $(staged_field image.version) == 0.2.0 && $(staged_field downloadOnly) == false ]]
+    # The install follows: the tray applet doesn't say it's only downloaded.
+    [[ $(jq -r .download_only /run/bresca/updates/download.json) == false ]]
 }
 
 @test "--download with no newer version: up to date" {

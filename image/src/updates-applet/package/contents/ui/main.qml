@@ -1,11 +1,13 @@
 // The system tray's icon for a new BrescaOS version (../../../README.md): what
-// the last check (bresca-updates@check) left in check.json. The file is read
-// only when it changes: inotifywait waits for that asleep in the kernel, no
-// polling.
+// the last check (bresca-updates@check) left in check.json; and the
+// notifications for a version downloaded (download.json) or installed
+// (install.json). The files are read only when they change: inotifywait waits
+// for that asleep in the kernel, no polling.
 pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
 import org.kde.notification
 import org.kde.plasma.components as PlasmaComponents3
@@ -22,10 +24,15 @@ PlasmoidItem {
     readonly property string resultsFolder: "/run/bresca/updates"
     readonly property string checkResultPath: resultsFolder + "/check.json"
     readonly property string readCommand: "cat " + checkResultPath
-    // Ends when check.json is moved into place (a check) or removed (an
-    // install); not on download-progress.json, which a download replaces
-    // all the time.
-    readonly property string waitForChangeCommand: "inotifywait -qq -e moved_to,delete --include 'check\\.json$' " + resultsFolder
+    readonly property string readDownloadResultCommand: "cat " + resultsFolder + "/download.json"
+    readonly property string readInstallResultCommand: "cat " + resultsFolder + "/install.json"
+    // Ends when check.json, download.json or install.json is moved into place
+    // (an operation's result) or removed (as the operation starts; check.json
+    // by an install too); not on download-progress.json, which a download
+    // replaces all the time.
+    readonly property string waitForChangeCommand: "inotifywait -qq -e moved_to,delete --include '(check|download|install)\\.json$' " + resultsFolder
+    // Plasma's restart prompt, as Restart in its menu.
+    readonly property string promptRestartCommand: "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptReboot"
     readonly property string installCommand: "sudo bresca updates install --download"
     // A user without a polkit rule for it (not in wheel) is asked for an
     // administrator's password; cancelling makes it fail.
@@ -48,6 +55,14 @@ PlasmoidItem {
     // So each version is notified once per session: at every login while it
     // isn't installed, the reminder, and when a check finds it.
     property string notifiedVersion: ""
+    // When the download and the install read last finished (downloaded_at,
+    // installed_at; empty with no result), undefined until the first read: a
+    // result is notified only when it changes, so not one from before the
+    // applet started (a login, a restarted plasmashell).
+    property var lastDownloadedAt: undefined
+    property var lastInstalledAt: undefined
+    property string downloadedVersion: ""
+    property string installedVersion: ""
 
     Plasmoid.icon: "system-software-update"
     // Hidden among the tray's idle items while there's nothing to install.
@@ -111,6 +126,12 @@ PlasmoidItem {
             executable.disconnectSource(command);
             if (command.startsWith(root.readCommand)) {
                 root.showCheckResult(output["stdout"]);
+            } else if (command.startsWith(root.readDownloadResultCommand)) {
+                root.notifyDownloadResult(output["stdout"]);
+            } else if (command.startsWith(root.readInstallResultCommand)) {
+                root.notifyInstallResult(output["stdout"]);
+            } else if (command.startsWith(root.promptRestartCommand)) {
+                // Nothing to do with its output.
             } else if (command.startsWith(root.isCheckRunningCommand)) {
                 const isCheckRunning = output["stdout"].trim() === "activating";
                 // A check that ended while no watcher was listening: its result.
@@ -125,7 +146,7 @@ PlasmoidItem {
                     root.isChecking = false;
                 }
             } else if (output["exit code"] === 0) {
-                root.readCheckResult();
+                root.readResults();
                 // Later, never from inside this handler.
                 Qt.callLater(root.waitForChange);
             } else {
@@ -153,7 +174,7 @@ PlasmoidItem {
     }
 
     Component.onCompleted: {
-        readCheckResult();
+        readResults();
         waitForChange();
     }
 
@@ -168,6 +189,41 @@ PlasmoidItem {
         flags: Notification.Persistent
     }
 
+    // Persistent: restarting discards a version only downloaded.
+    Notification {
+        id: downloadedNotification
+
+        componentName: "brescaos-updates"
+        eventId: "updateDownloaded"
+        iconName: "run-install"
+        title: i18n("BrescaOS %1 is downloaded", root.downloadedVersion)
+        text: i18n("Install it before restarting: restarting discards the download.")
+        flags: Notification.Persistent
+        actions: [
+            NotificationAction {
+                label: i18n("Install")
+                onActivated: KCM.KCMLauncher.openSystemSettings("kcm_brescaos_updates")
+            }
+        ]
+    }
+
+    Notification {
+        id: installedNotification
+
+        componentName: "brescaos-updates"
+        eventId: "updateInstalled"
+        iconName: "system-reboot"
+        title: i18n("BrescaOS %1 is installed", root.installedVersion)
+        text: i18n("Restart to start using it.")
+        flags: Notification.Persistent
+        actions: [
+            NotificationAction {
+                label: i18n("Restart Now")
+                onActivated: root.runCommand(root.promptRestartCommand)
+            }
+        ]
+    }
+
     function runCommand(command) {
         commandRuns++;
         executable.connectSource(command + " #" + commandRuns);
@@ -175,6 +231,45 @@ PlasmoidItem {
 
     function readCheckResult() {
         runCommand(readCommand);
+    }
+
+    function readResults() {
+        readCheckResult();
+        runCommand(readDownloadResultCommand);
+        runCommand(readInstallResultCommand);
+    }
+
+    // The result in resultJson, null when there's none (cat found no file).
+    function parseResult(resultJson) {
+        try {
+            return JSON.parse(resultJson);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    // A version downloaded without installing it: download-install's isn't
+    // (download_only false), its install follows.
+    function notifyDownloadResult(resultJson) {
+        const result = parseResult(resultJson);
+        const downloadedAt = result?.downloaded_at ?? "";
+        if (lastDownloadedAt !== undefined && downloadedAt !== lastDownloadedAt
+                && result?.download_only && result.update_available && !result.error) {
+            downloadedVersion = result.downloaded_version;
+            downloadedNotification.sendEvent();
+        }
+        lastDownloadedAt = downloadedAt;
+    }
+
+    function notifyInstallResult(resultJson) {
+        const result = parseResult(resultJson);
+        const installedAt = result?.installed_at ?? "";
+        if (lastInstalledAt !== undefined && installedAt !== lastInstalledAt
+                && result?.installed_version && !result.error) {
+            installedVersion = result.installed_version;
+            installedNotification.sendEvent();
+        }
+        lastInstalledAt = installedAt;
     }
 
     function waitForChange() {

@@ -6,8 +6,9 @@ load helpers
 @test "a newer version is downloaded, not installed" {
     publish_version 0.2.0
     run bresca updates download
-    [[ $status -eq 0 && $output == *"Downloaded BrescaOS 0.2.0."* ]]
+    [[ $status -eq 0 && $output == *"Downloaded BrescaOS 0.2.0."*"restarting discards it"* ]]
     [[ $(staged_field image.version) == 0.2.0 && $(staged_field downloadOnly) == true ]]
+    [[ $(jq -r .download_only /run/bresca/updates/download.json) == true ]]
     [[ ! -e /run/bresca/updates/download-progress.json ]]
 }
 

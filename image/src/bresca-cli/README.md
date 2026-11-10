@@ -60,7 +60,14 @@ An operation can run others: `download-install` (`bresca updates install
 --download`) runs `download` and then `install` in one unit, so the install
 still happens if whoever started it goes away after the download; their
 progress and results are the usual `download-progress.json`, `download.json`
-and `install.json`.
+and `install.json`. `download.json`'s `download_only` is false then, so the
+tray applet doesn't announce a version as only downloaded when its install
+follows.
+
+A version only downloaded (`bresca updates download`) is discarded if the
+system restarts before it's installed: bootc's download-only deployments
+don't survive a reboot. bootc keeps the downloaded data, so downloading it
+again is fast.
 
 `bresca updates registry` shows where updates come from: the followed image,
 its registry, repository and tag, and whether the registry is allowed without

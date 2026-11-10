@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 17:10+0000\n"
+"POT-Creation-Date: 2026-11-10 19:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,14 @@ msgstr ""
 
 #: brescaos-updates.notifyrc.in
 msgid "A new BrescaOS version is available"
+msgstr ""
+
+#: brescaos-updates.notifyrc.in
+msgid "A new BrescaOS version is downloaded"
+msgstr ""
+
+#: brescaos-updates.notifyrc.in
+msgid "A new BrescaOS version is installed"
 msgstr ""
 
 #: brescaos-updates.notifyrc.in metadata.json.in package/contents/ui/main.qml
@@ -34,12 +42,28 @@ msgid ""
 "When a check finds a newer version, and at every login until it's installed"
 msgstr ""
 
+#: brescaos-updates.notifyrc.in
+msgid "When a new version is installed and starts after restarting"
+msgstr ""
+
+#: brescaos-updates.notifyrc.in
+msgid "When a version downloaded without installing it is ready to install"
+msgstr ""
+
 #: metadata.json.in
 msgid "Tells when a new BrescaOS version is available"
 msgstr ""
 
 #: package/contents/ui/main.qml
 msgid "BrescaOS %1 is available"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "BrescaOS %1 is downloaded"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "BrescaOS %1 is installed"
 msgstr ""
 
 #: package/contents/ui/main.qml
@@ -59,5 +83,21 @@ msgid "Couldn't check for updates"
 msgstr ""
 
 #: package/contents/ui/main.qml
+msgid "Install"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Install it before restarting: restarting discards the download."
+msgstr ""
+
+#: package/contents/ui/main.qml
 msgid "Install it with: %1"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Restart Now"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Restart to start using it."
 msgstr ""

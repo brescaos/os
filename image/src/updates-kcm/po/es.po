@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 18:28+0000\n"
+"POT-Creation-Date: 2026-11-10 19:10+0000\n"
 "PO-Revision-Date: 2026-11-10 17:07+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -141,8 +141,8 @@ msgid "Install"
 msgstr "Instalar"
 
 #: ui/main.qml
-msgid "Install it to start it the next time you restart."
-msgstr "Instálala para que arranque la próxima vez que reinicies."
+msgid "Install it before restarting: restarting discards the download."
+msgstr "Instálala antes de reiniciar: reiniciar descarta la descarga."
 
 #: ui/main.qml
 msgid "Installed version:"
