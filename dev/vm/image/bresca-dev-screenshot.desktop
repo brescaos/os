@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Development VM screenshot
+Comment=Saves the screen into the host's .vm/screenshots/ (dev/vm/image/)
+Exec=/usr/libexec/bresca-dev/screenshot
+NoDisplay=true
+X-KDE-Shortcuts=Ctrl+Shift+S

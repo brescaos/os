@@ -4,6 +4,7 @@
 # Never published.
 # - Shared clipboard.
 # - Hot reload of image/src/, with gettext to compile its translations.
+# - Screenshots on Ctrl+Shift+S, saved into the host's .vm/screenshots/.
 
 # The BrescaOS image, brescaos:<VERSION>-<ARCH>. Required, no default:
 # dev/vm/image.sh passes it.
@@ -14,13 +15,18 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         spice-vdagent wl-clipboard xclip \
         gettext \
+        spectacle \
     && systemctl enable spice-vdagentd.socket
 
 COPY --chmod=0755 hotreload.sh /usr/libexec/bresca-dev/hotreload
 COPY --chmod=0755 clipboard-bridge.sh /usr/libexec/bresca-dev/clipboard-bridge
-COPY bresca-dev-hotreload.service /usr/lib/systemd/system/
-COPY bresca-dev-hotreload.desktop /usr/share/applications/
+COPY --chmod=0755 screenshot.sh /usr/libexec/bresca-dev/screenshot
+COPY bresca-dev-hotreload.service bresca-dev-screenshots.service /usr/lib/systemd/system/
+COPY bresca-dev-hotreload.desktop bresca-dev-screenshot.desktop /usr/share/applications/
 COPY bresca-dev-clipboard.desktop /etc/xdg/autostart/
-RUN systemctl enable bresca-dev-hotreload.service
+# kglobalaccel registers the shortcuts of the .desktop files linked here.
+RUN mkdir -p /usr/share/kglobalaccel \
+    && ln -s ../applications/bresca-dev-screenshot.desktop /usr/share/kglobalaccel/ \
+    && systemctl enable bresca-dev-hotreload.service bresca-dev-screenshots.service
 
 RUN bootc container lint

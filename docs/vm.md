@@ -56,6 +56,18 @@ It needs QEMU 8.1 or newer (`make vm-start` warns otherwise): QEMU's
 only reads X11's clipboard, so `clipboard-bridge`, started at login, copies
 Plasma's (Wayland) clipboard to it. Text only.
 
+## Screenshots
+
+Press `Ctrl+Shift+S` in the VM to save the whole screen, including the pointer
+and any menu, tooltip or dialog open at that moment, on the host as
+`.vm/screenshots/<YYYY-MM-DD_HH-MM-SS>.png`. Spectacle takes the capture.
+`make vm-clean` deletes the screenshots along with the rest of `.vm/`.
+
+`make vm-start` creates the folder with mode `0703`. 9p keeps the host's
+modes, and the VM's user, who counts as "others" there, needs `w` and `x` to
+create files. It can't list the folder, and neither can other users on the
+host.
+
 ## Hot reload
 
 While the VM runs, what you change in `image/src/` reaches it within a second,
@@ -121,10 +133,12 @@ on macOS, KVM on Linux).
 - SELinux is disabled on its disk, because `bootc install` can't label files
   from a host without SELinux.
 - Its image is `brescaos-dev`, BrescaOS plus `spice-vdagent`, `wl-clipboard`,
-  `xclip`, `gettext` (for the hot reload of translations) and two services: the hot reload
+  `xclip`, `gettext` (for the hot reload of translations), `spectacle` (for
+  screenshots) and three services: the hot reload
   ([`hotreload.sh`](../dev/vm/image/hotreload.sh)), which mounts this
-  repository read-only at `/run/bresca-dev/src` (QEMU's 9p), and the
-  clipboard bridge.
+  repository read-only at `/run/bresca-dev/src` (QEMU's 9p), the clipboard
+  bridge, and `bresca-dev-screenshots`, which mounts `.vm/screenshots/`
+  writable at `/run/bresca-dev/screenshots`.
 - Its sound card (Intel HDA) plays through the host's sound and records from
   the host's microphone (on macOS, QEMU asks for it the first time).
 - It allows the local registry over plain HTTP, in

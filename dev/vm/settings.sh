@@ -4,7 +4,8 @@
 # shellcheck shell=bash
 # shellcheck disable=SC2034 # used by the scripts in dev/vm/
 
-# The VM's disk, UEFI variables and boot log; make vm-clean deletes it.
+# The VM's disk, UEFI variables, boot log and screenshots; make vm-clean
+# deletes it.
 VM_DIR=$REPO_ROOT/.vm
 
 # The VM's image (dev/vm/image/): BrescaOS plus what only the VM needs. The VM

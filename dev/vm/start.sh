@@ -127,16 +127,25 @@ else
     warn "QEMU older than 8.1: no shared clipboard with the VM"
 fi
 
+# Where the VM's Ctrl+Shift+S saves (dev/vm/image/screenshot.sh), shared over
+# 9p. 9p keeps the host's modes and the VM's user is "others" here: -wx lets it
+# create files without listing the folder.
+mkdir -p "$VM_DIR/screenshots"
+chmod 0703 "$VM_DIR/screenshots"
+
 step "Booting .vm/disk.qcow2 ($ARCH) in a QEMU window. Boot log: .vm/serial.log; close the window or Ctrl-C to quit."
 # usb-tablet: absolute pointer, the cursor follows the host's without a grab.
 # Sound: an Intel HDA card that plays and records (hda-duplex): the VM gets
 # the host's microphone too.
 # The repository goes read-only to the VM over 9p, for its hot reload
 # (dev/vm/image/hotreload.sh): QEMU serves it itself, no daemon on the host.
+# .vm/screenshots/ goes writable, for the VM's screenshots.
 # shellcheck disable=SC2086 # clipboard_options is empty or whole options
 "$(print_qemu_binary)" $clipboard_options \
     -fsdev "local,id=src,path=$REPO_ROOT,security_model=none,readonly=on" \
     -device "virtio-9p-pci,fsdev=src,mount_tag=bresca-src" \
+    -fsdev "local,id=screenshots,path=$VM_DIR/screenshots,security_model=none" \
+    -device "virtio-9p-pci,fsdev=screenshots,mount_tag=bresca-screenshots" \
     -machine "$machine,accel=$accelerator" \
     -cpu "$cpu" \
     -smp "$VM_CPUS" \

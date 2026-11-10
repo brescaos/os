@@ -1,0 +1,13 @@
+# Development VM: mounts the host's .vm/screenshots/ (dev/vm/start.sh) where
+# Ctrl+Shift+S saves (dev/vm/image/screenshot.sh).
+[Unit]
+Description=BrescaOS development VM: screenshots folder
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=mkdir -p /run/bresca-dev/screenshots
+ExecStart=mount -t 9p -o trans=virtio,version=9p2000.L bresca-screenshots /run/bresca-dev/screenshots
+
+[Install]
+WantedBy=multi-user.target
