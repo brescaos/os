@@ -1,0 +1,15 @@
+<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+    <style type="text/css" id="current-color-scheme">
+        .ColorScheme-Text {
+            color:#232629;
+        }
+    </style>
+    <g class="ColorScheme-Text" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-linecap="round">
+        <!-- A container: a cube, its top face open towards the viewer. -->
+        <path d="m11 2.5 7.5 4.25v8.5l-7.5 4.25-7.5-4.25v-8.5z"/>
+        <path d="m3.5 6.75 7.5 4.25 7.5-4.25m-7.5 4.25v8.5"/>
+        <!-- A prompt on its front faces: ">" on the left one, "_" on the right one. -->
+        <path d="m5.75 11.25 2.5 2-2.5 1.5"/>
+        <path d="m13 16.25 3.5-2"/>
+    </g>
+</svg>

@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 14:38+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: applet/metadata.json.in
+msgid "Distrobox"
+msgstr ""
+
+#: applet/metadata.json.in
+msgid "Start, stop and remove your distroboxes"
+msgstr ""
+
+#. Search keywords: each one followed by a semicolon, no spaces
+#: applet/metadata.json.in
+msgid "distrobox;container;podman;"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "%1 distrobox running"
+msgid_plural "%1 distroboxes running"
+msgstr[0] ""
+msgstr[1] ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Cancel"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't remove it."
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't start it."
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't stop it."
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Create one with “distrobox create <name>” in a terminal."
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "No distroboxes"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Remove"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid ""
+"Remove the distrobox “%1”? Everything installed in it will be lost. Your "
+"home folder is not affected."
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Start"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Stop"
+msgstr ""

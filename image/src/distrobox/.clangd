@@ -10,6 +10,8 @@ CompileFlags:
     - -isystem/usr/include/qt6
     - -isystem/usr/include/qt6/QtCore
     - -isystem/usr/include/qt6/QtGui
+    - -isystem/usr/include/qt6/QtQml
+    - -isystem/usr/include/qt6/QtQmlIntegration
     - -isystem/usr/include/qt6/QtTest
     - -isystem/usr/include/KF6/KColorScheme
     - -isystem/usr/include/KF6/KConfig
@@ -17,10 +19,11 @@ CompileFlags:
 Diagnostics:
   Suppress: pp_file_not_found
 ---
-# The tests include terminalcolors.h from the folder above (the compile
-# command's folder is the file's).
+# The tests include the headers from the folder above (the compile command's
+# folder is the file's), and FAKES_DIR comes from tests/CMakeLists.txt.
 If:
   PathMatch: tests/.*
 CompileFlags:
   Add:
     - -I..
+    - -DFAKES_DIR="fakes"

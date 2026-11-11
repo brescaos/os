@@ -56,11 +56,13 @@ RUN --mount=type=bind,source=src/welcome,target=/tmp/src \
     && cmake --build /tmp/build \
     && DESTDIR=/out cmake --install /tmp/build
 
-# The distroboxes' terminal colors (bresca-distrobox-colors).
+# The distroboxes' terminal colors (bresca-distrobox-colors) and the tray
+# applet's QML module.
 FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS distrobox-build
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake gcc-c++ qt6-qtbase-devel kf6-kcolorscheme-devel kf6-kconfig-devel
+        cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
+        kf6-kcolorscheme-devel kf6-kconfig-devel
 RUN --mount=type=bind,source=src/distrobox,target=/tmp/src \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
     && cmake --build /tmp/build \
@@ -134,10 +136,16 @@ COPY src/autotile/applet/package/ /usr/share/plasma/plasmoids/com.brescaos.autot
 # Bresca Welcome (src/welcome/README.md); its .desktop files come with the
 # translations.
 COPY --from=welcome-build /out/ /
-# Each distrobox's terminal colors and prompt (src/distrobox/README.md).
+# Each distrobox's terminal colors and prompt, and the Distrobox tray applet
+# with its QML module (src/distrobox/README.md); the applet's metadata.json
+# comes with the translations.
 COPY --from=distrobox-build /out/ /
 COPY src/distrobox/distrobox.conf /usr/share/defaults/distrobox/distrobox.conf
 COPY src/distrobox/profile.sh /usr/libexec/bresca/distrobox/profile.sh
+COPY src/distrobox/applet/package/ /usr/share/plasma/plasmoids/com.brescaos.distrobox/
+# The applet's symbol as a theme icon, for its metadata: About and the tray's
+# settings show only an icon name, not a path.
+COPY src/distrobox/applet/package/contents/icons/distrobox-symbolic.svg /usr/share/icons/hicolor/scalable/apps/com.brescaos.distrobox.svg
 RUN systemctl enable bresca-updates-check.timer
 
 # The translations of src/.

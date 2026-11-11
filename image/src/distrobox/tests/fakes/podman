@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Fake podman for DistroboxModel's tests, on $FAKE_STATE (a folder): logs each
+# call in calls; ps prints ps.json, events a line for each line appended to
+# events, inspect prints inspect.
+set -euo pipefail
+
+printf 'podman %s\n' "$*" >>"$FAKE_STATE/calls"
+
+case $1 in
+    ps) cat "$FAKE_STATE/ps.json" ;;
+    events) exec tail -n 0 -F "$FAKE_STATE/events" 2>/dev/null ;;
+    inspect) cat "$FAKE_STATE/inspect" ;;
+    *)
+        echo "fake podman: unexpected command: $*" >&2
+        exit 2
+        ;;
+esac

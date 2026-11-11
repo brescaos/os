@@ -52,6 +52,13 @@ extract_strings() {
             extract_metadata_strings applet/metadata.json.in "$pot"
             extract_metadata_strings script/metadata.json.in "$pot"
             ;;
+        distrobox)
+            # The applet's QML: Plasma gives it its domain (i18n).
+            find applet -name '*.qml' | sort \
+                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript --keyword= \
+                    --keyword=i18n:1 --keyword=i18np:1,2 -o "$pot"
+            extract_metadata_strings applet/metadata.json.in "$pot"
+            ;;
         bresca-cli)
             # xgettext warns about every $"...": bash used to expand what a
             # translation has, which lib/messages.sh turns off

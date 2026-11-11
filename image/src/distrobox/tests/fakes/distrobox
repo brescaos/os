@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Fake distrobox for DistroboxModel's tests, on $FAKE_STATE (a folder): logs
+# each call in calls, and fails, with its content as the error, when there's a
+# <command>.fails (e.g. stop.fails).
+set -euo pipefail
+
+printf 'distrobox %s\n' "$*" >>"$FAKE_STATE/calls"
+
+if [[ -f $FAKE_STATE/$1.fails ]]; then
+    cat "$FAKE_STATE/$1.fails" >&2
+    exit 1
+fi

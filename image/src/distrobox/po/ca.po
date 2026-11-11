@@ -1,0 +1,81 @@
+# Catalan translations for BrescaOS package.
+# Copyright (C) 2026 THE BrescaOS'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 14:38+0000\n"
+"PO-Revision-Date: 2026-11-11 14:38+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ca\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: applet/metadata.json.in
+msgid "Distrobox"
+msgstr "Distrobox"
+
+#: applet/metadata.json.in
+msgid "Start, stop and remove your distroboxes"
+msgstr "Inicia, atura i elimina els teus distroboxes"
+
+#. Search keywords: each one followed by a semicolon, no spaces
+#: applet/metadata.json.in
+msgid "distrobox;container;podman;"
+msgstr "distrobox;contenidor;podman;"
+
+#: applet/package/contents/ui/main.qml
+msgid "%1 distrobox running"
+msgid_plural "%1 distroboxes running"
+msgstr[0] "%1 distrobox en marxa"
+msgstr[1] "%1 distroboxes en marxa"
+
+#: applet/package/contents/ui/main.qml
+msgid "Cancel"
+msgstr "Cancel·la"
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't remove it."
+msgstr "No s'ha pogut eliminar."
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't start it."
+msgstr "No s'ha pogut iniciar."
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't stop it."
+msgstr "No s'ha pogut aturar."
+
+#: applet/package/contents/ui/main.qml
+msgid "Create one with “distrobox create <name>” in a terminal."
+msgstr "Crea'n un amb «distrobox create <nom>» en un terminal."
+
+#: applet/package/contents/ui/main.qml
+msgid "No distroboxes"
+msgstr "No hi ha cap distrobox"
+
+#: applet/package/contents/ui/main.qml
+msgid "Remove"
+msgstr "Elimina"
+
+#: applet/package/contents/ui/main.qml
+msgid ""
+"Remove the distrobox “%1”? Everything installed in it will be lost. Your "
+"home folder is not affected."
+msgstr ""
+"Vols eliminar el distrobox «%1»? Es perdrà tot el que hi tinguis instal·lat. "
+"La teva carpeta personal no es veu afectada."
+
+#: applet/package/contents/ui/main.qml
+msgid "Start"
+msgstr "Inicia"
+
+#: applet/package/contents/ui/main.qml
+msgid "Stop"
+msgstr "Atura"

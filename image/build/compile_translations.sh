@@ -8,6 +8,7 @@
 #     and "Name[<lang>]" from its .po files;
 #   - the welcome's .desktop files (menu and autostart), with Name[<lang>]=...;
 #   - the autotiling KWin script's and tray applet's metadata.json;
+#   - the Distrobox tray applet's metadata.json;
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
 #   autotile/kcm_brescaos_autotile.json, with "Name[<lang>]" and the like.
@@ -88,3 +89,7 @@ translate_desktop_file "$welcome_dir/com.brescaos.welcome.desktop.in" "$welcome_
     "$out_dir/usr/share/applications/com.brescaos.welcome.desktop"
 translate_desktop_file "$welcome_dir/com.brescaos.welcome-autostart.desktop.in" "$welcome_dir/po" \
     "$out_dir/etc/xdg/autostart/com.brescaos.welcome-autostart.desktop"
+
+distrobox_dir=$src_dir/distrobox
+translate_metadata "$distrobox_dir/applet/metadata.json.in" "$distrobox_dir/po" \
+    "$out_dir/usr/share/plasma/plasmoids/com.brescaos.distrobox/metadata.json"
