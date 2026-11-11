@@ -145,13 +145,16 @@ note_updated_project() {
 translation_sources_checksum=''
 
 # Compiles the translations into TRANSLATIONS when what they're compiled from
-# (po/*.po and the *.in templates of image/src/) changed; fails when it
-# didn't, or when they don't compile (the error is in the log, and it's tried
-# again on the next change).
+# (po/*.po, the *.in templates and the VERSION.txt files of image/src/) or
+# image/build/compile_translations.sh changed; fails when it didn't, or when
+# they don't compile (the error is in the log, and it's tried again on the
+# next change).
 compile_changed_translations() {
     local checksum
-    checksum=$(cd "$SHARE/image/src" && find . \( -path '*/po/*.po' -o -name '*.in' \) -type f -print0 \
-        | sort -z | xargs -0 sha256sum | sha256sum)
+    checksum=$(cd "$SHARE/image" && {
+        find src \( -path '*/po/*.po' -o -name '*.in' -o -name VERSION.txt \) -type f -print0
+        printf '%s\0' build/compile_translations.sh
+    } | sort -z | xargs -0 sha256sum | sha256sum)
     [[ $checksum != "$translation_sources_checksum" ]] || return 1
     translation_sources_checksum=$checksum
     rm -rf "$TRANSLATIONS" "$METADATA"

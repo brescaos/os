@@ -57,7 +57,8 @@ In the development VM the change shows within a second
   its metadata files are `*.in` templates too. The applet's `.notifyrc` and `metadata.json`
   and the module's `kcm_brescaos_updates.json` are English-only templates
   (`*.in`): the build adds the translations. The module's search keywords
-  (`X-KDE-Keywords`) are one string, translated as a whole, comma-separated.
+  (`X-KDE-Keywords`) are one string, translated as a whole, comma-separated;
+  the applets' (`Keywords`), the same with each keyword followed by a semicolon.
 
 Then run `make pot`: it extracts the strings into the `.pot` and merges them
 into every `.po`, where the new ones are untranslated, and translate them.
@@ -105,8 +106,8 @@ mounted. It writes, laid out as in the image:
   `/usr/share/locale/<lang>/LC_MESSAGES/<domain>.mo`;
 - the applet's `brescaos-updates.notifyrc`, with `Name[<lang>]=` and
   `Comment[<lang>]=` lines (`msgfmt --desktop`);
-- the applet's `metadata.json`, with `"Name[<lang>]"` and
-  `"Description[<lang>]"` (jq);
+- the applet's `metadata.json`, with `"Name[<lang>]"`,
+  `"Description[<lang>]"` and `"Keywords[<lang>]"` (jq);
 - the welcome's `.desktop` files, for the application menu and autostart,
   with `Name[<lang>]=`, `Comment[<lang>]=` and `Keywords[<lang>]=` lines
   (`msgfmt --desktop`);
@@ -118,6 +119,9 @@ And, apart, the System Settings modules' `kcm_brescaos_updates.json` and
 and `"X-KDE-Keywords[<lang>]"`: System Settings reads them from the module's
 own metadata, so the `updates-kcm-build` and `autotile-build` stages compile
 them into the modules.
+
+Every one of those metadata files also gets the version in its
+component's `VERSION.txt`.
 
 The image copies only that result: gettext isn't in it. The development VM's
 hot reload runs the same script.

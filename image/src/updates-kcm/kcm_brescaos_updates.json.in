@@ -1,9 +1,18 @@
 {
     "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
+            }
+        ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Copyright": "© 2026 BrescaOS",
         "Description": "Install new BrescaOS versions",
         "Icon": "system-software-update",
         "License": "GPL-3.0-or-later",
-        "Name": "BrescaOS Updates"
+        "Name": "BrescaOS Updates",
+        "Website": "https://www.brescaos.com"
     },
     "X-KDE-Keywords": "BrescaOS,update,upgrade,version",
     "X-KDE-System-Settings-Parent-Category": "system-administration"

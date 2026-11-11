@@ -11,6 +11,8 @@ one.
 | `kcm_brescaos_updates.json.in`, translated | `/usr/share/applications/kcm_brescaos_updates.desktop` |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/kcm_brescaos_updates.mo` |
 
+Its version is in `VERSION.txt`: the build writes it into the module's metadata.
+
 It's C++ (KF6 KCMUtils) because System Settings only loads modules compiled
 as a plugin; the page is `ui/main.qml`, compiled in. `image/Containerfile`
 compiles it in its own stage, `updates-kcm-build`, so the compilers and

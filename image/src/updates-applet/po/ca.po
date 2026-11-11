@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 05:41+0000\n"
+"POT-Creation-Date: 2026-11-11 07:55+0000\n"
 "PO-Revision-Date: 2026-11-09 17:10+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -51,6 +51,11 @@ msgstr "Quan s'instal·la una versió nova, que arrenca després de reiniciar"
 #: brescaos-updates.notifyrc.in
 msgid "When a version downloaded without installing it is ready to install"
 msgstr "Quan una versió baixada sense instal·lar està a punt per instal·lar-se"
+
+#. Search keywords: each one followed by a semicolon, no spaces
+#: metadata.json.in
+msgid "BrescaOS;update;upgrade;version;"
+msgstr "BrescaOS;actualització;actualitzar;versió;"
 
 #: metadata.json.in
 msgid "Tells when a new BrescaOS version is available"

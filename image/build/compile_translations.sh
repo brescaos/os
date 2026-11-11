@@ -11,6 +11,8 @@
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
 #   autotile/kcm_brescaos_autotile.json, with "Name[<lang>]" and the like.
+# Every metadata.json and KCM JSON also gets the version in its component's
+# VERSION.txt.
 # Runs in image/Containerfile's translations stage and in the development VM's
 # hot reload, with gettext and jq.
 # Usage: compile_translations.sh <src dir> <out dir> <metadata dir>
@@ -21,10 +23,11 @@ out_dir=$2
 metadata_dir=$3
 
 # Writes the plugin metadata $1 to $3 with the translations of its Name,
-# Description and X-KDE-Keywords from the .po files in the folder $2.
+# Description and search keywords (Keywords, X-KDE-Keywords) from the .po
+# files in the folder $2, and the version in the component's VERSION.txt ($2/..).
 translate_metadata() {
     local template=$1 po_dir=$2 output=$3 metadata po lang translations
-    metadata=$(<"$template")
+    metadata=$(jq --arg version "$(<"$po_dir/../VERSION.txt")" '.KPlugin.Version = $version' "$template")
     for po in "$po_dir"/*.po; do
         lang=$(basename "$po" .po)
         # {msgid: msgstr} of every translated message.
@@ -35,7 +38,7 @@ translate_metadata() {
             def translated(key): {("\(key)[\($lang)]"): $translations[.[key] // ""]}
                                  | with_entries(select(.value != null));
             (.KPlugin |= . + translated("Name") + translated("Description"))
-            + translated("X-KDE-Keywords")' <<<"$metadata")
+            + translated("Keywords") + translated("X-KDE-Keywords")' <<<"$metadata")
     done
     mkdir -p "$(dirname "$output")"
     printf '%s\n' "$metadata" >"$output"

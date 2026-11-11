@@ -10,6 +10,8 @@ available, and downloads and installs it from its popup.
 | `brescaos-updates.notifyrc.in`, translated | `/usr/share/knotifications6/brescaos-updates.notifyrc` |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/plasma_applet_com.brescaos.updates.mo` |
 
+Its version is in `VERSION.txt`: the build writes it into `metadata.json`.
+
 Its texts are translated ([`docs/translations.md`](../../../docs/translations.md)):
 `i18n()` in the QML, and the English-only templates `metadata.json.in` and
 `brescaos-updates.notifyrc.in`, which the build fills in with the

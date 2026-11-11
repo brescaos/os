@@ -3,16 +3,19 @@
     "KPlugin": {
         "Authors": [
             {
-                "Name": "BrescaOS"
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
             }
         ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Copyright": "© 2026 BrescaOS",
         "Description": "Arranges windows automatically so they fill the screen",
         "EnabledByDefault": false,
         "Icon": "view-grid",
         "Id": "com.brescaos.autotile",
         "License": "GPL-3.0-or-later",
         "Name": "Autotiling",
-        "Version": "1.0"
+        "Website": "https://www.brescaos.com"
     },
     "X-Plasma-API": "javascript",
     "X-Plasma-MainScript": "code/main.js"

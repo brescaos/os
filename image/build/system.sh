@@ -83,6 +83,7 @@ left=$(rpm -qa 'fedora-release*' fedora-logos)
     printf 'IMAGE_ID=brescaos\n'
     [[ -z $support_end ]] || printf 'SUPPORT_END=%s\n' "$support_end"
     printf 'HOME_URL="https://www.brescaos.com"\n'
+    printf 'BUG_REPORT_URL="https://github.com/brescaos/os/issues"\n'
 } >/usr/lib/os-release
 
 # --- Kernel arguments --------------------------------------------------------------

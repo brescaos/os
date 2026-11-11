@@ -27,7 +27,9 @@ extract_metadata_strings() {
             (.KPlugin.Name, .KPlugin.Description
              | "#: \($file)\nmsgid \(tojson)\nmsgstr \"\"\n"),
             (."X-KDE-Keywords" // empty
-             | "#. Search keywords: comma-separated, no spaces after the commas\n#: \($file)\nmsgid \(tojson)\nmsgstr \"\"\n")' "$metadata"
+             | "#. Search keywords: comma-separated, no spaces after the commas\n#: \($file)\nmsgid \(tojson)\nmsgstr \"\"\n"),
+            (.Keywords // empty
+             | "#. Search keywords: each one followed by a semicolon, no spaces\n#: \($file)\nmsgid \(tojson)\nmsgstr \"\"\n")' "$metadata"
     } >"$pot.metadata.po"
     # shellcheck disable=SC2086 # XGETTEXT_OPTIONS is a list of options
     xgettext $XGETTEXT_OPTIONS -L PO -j -o "$pot" "$pot.metadata.po"

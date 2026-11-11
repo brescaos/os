@@ -16,6 +16,9 @@ they are.
 | `applet/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.autotile/metadata.json` |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/kcm_brescaos_autotile.mo` |
 
+Its version is in `VERSION.txt`: the build writes it into the script's,
+the KCM's and the applet's metadata.
+
 `image/Containerfile` compiles the script, the QML module and the KCM in its
 own stage, `autotile-build`, so the compilers and `-devel` packages stay out
 of the image; it copies the applet as it is. It all runs as the user: no
