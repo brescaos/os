@@ -54,7 +54,8 @@ To try the image in a QEMU virtual machine, see [Development VM](vm.md).
 ## Tests
 
 ```bash
-make test   # builds the image as 0.0.0 and runs every component's tests in it
+make test            # builds the image as 0.0.0 and runs every component's tests in it
+make check-welcome   # compiles Welcome and runs its unit and QML tests, without the image (part of make check)
 ```
 
 A component of `image/src/` has tests when it has `tests/Containerfile`:

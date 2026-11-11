@@ -1,0 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 06:16+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: com.brescaos.welcome-autostart.desktop.in com.brescaos.welcome.desktop.in
+#: qml/Main.qml
+msgid "Welcome to BrescaOS"
+msgstr ""
+
+#: com.brescaos.welcome-autostart.desktop.in
+msgid "Opens at the first login, and again after some updates"
+msgstr ""
+
+#: com.brescaos.welcome.desktop.in main.cpp
+msgid "First steps on BrescaOS"
+msgstr ""
+
+#: com.brescaos.welcome.desktop.in
+msgid "welcome;setup;first steps;"
+msgstr ""
+
+#: main.cpp
+msgid ""
+"Open only if this version of BrescaOS has a welcome the user hasn't been "
+"shown (at login)."
+msgstr ""
+
+#: qml/DonePage.qml
+msgid ""
+"Enjoy BrescaOS. You can open this welcome again at any time from the "
+"application menu."
+msgstr ""
+
+#: qml/DonePage.qml
+msgid "You're all set"
+msgstr ""
+
+#: qml/Main.qml
+msgid "Back"
+msgstr ""
+
+#: qml/Main.qml
+msgid "Next"
+msgstr ""
+
+#: qml/Main.qml
+msgid "Skip"
+msgstr ""
+
+#: qml/Main.qml
+msgid "Start using BrescaOS"
+msgstr ""
+
+#: qml/WelcomePage.qml
+msgid ""
+"BrescaOS is a desktop operating system built on Fedora and KDE Plasma. The "
+"whole system is a single versioned image: an update installs a complete new "
+"version in one step, and if something goes wrong you can go back to the "
+"previous one. Your files and apps are kept across updates."
+msgstr ""
+
+#: qml/WelcomePage.qml
+msgid ""
+"BrescaOS is in alpha. Expect bugs and changes between versions, and keep a "
+"backup of anything important."
+msgstr ""
+
+#: qml/WelcomePage.qml
+msgid ""
+"BrescaOS is not provided or supported by the Fedora Project. Official, "
+"unmodified Fedora software is available at <a href=\"%1\">%1</a>."
+msgstr ""
+
+#: qml/WelcomePage.qml
+msgid "Welcome to BrescaOS %1"
+msgstr ""

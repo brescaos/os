@@ -91,8 +91,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   its next run; the applet's restart plasmashell. A `.po` that doesn't compile
   leaves the last ones in place, with the error in the log.
 - What `image/Containerfile` compiles (today, System Settings > BrescaOS
-  Updates, `image/src/updates-kcm/`: every `image/src/` component with a
-  `CMakeLists.txt`) is compiled again in the VM when its sources or its
+  Updates, `image/src/updates-kcm/`, and Welcome, `image/src/welcome/`:
+  every `image/src/` component with a `CMakeLists.txt`) is compiled again in the VM when its sources or its
   translations change, as the image's stage does, into
   `/var/cache/bresca-dev/build/<component>/`; it persists, so only what
   changed recompiles. A notification says it's compiling and stays until it

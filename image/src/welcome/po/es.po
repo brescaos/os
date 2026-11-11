@@ -1,0 +1,107 @@
+# Spanish translations for BrescaOS package.
+# Copyright (C) 2026 THE BrescaOS'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 06:16+0000\n"
+"PO-Revision-Date: 2026-11-11 06:16+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: com.brescaos.welcome-autostart.desktop.in com.brescaos.welcome.desktop.in
+#: qml/Main.qml
+msgid "Welcome to BrescaOS"
+msgstr "Bienvenido a BrescaOS"
+
+#: com.brescaos.welcome-autostart.desktop.in
+msgid "Opens at the first login, and again after some updates"
+msgstr ""
+"Se abre al iniciar sesión por primera vez, y de nuevo tras algunas "
+"actualizaciones"
+
+#: com.brescaos.welcome.desktop.in main.cpp
+msgid "First steps on BrescaOS"
+msgstr "Primeros pasos en BrescaOS"
+
+#: com.brescaos.welcome.desktop.in
+msgid "welcome;setup;first steps;"
+msgstr "bienvenida;configuración;primeros pasos;"
+
+#: main.cpp
+msgid ""
+"Open only if this version of BrescaOS has a welcome the user hasn't been "
+"shown (at login)."
+msgstr ""
+"Abrir solo si esta versión de BrescaOS tiene una bienvenida que no se ha "
+"mostrado al usuario (al iniciar sesión)."
+
+#: qml/DonePage.qml
+msgid ""
+"Enjoy BrescaOS. You can open this welcome again at any time from the "
+"application menu."
+msgstr ""
+"Disfruta de BrescaOS. Puedes volver a abrir esta bienvenida cuando quieras "
+"desde el menú de aplicaciones."
+
+#: qml/DonePage.qml
+msgid "You're all set"
+msgstr "Todo listo"
+
+#: qml/Main.qml
+msgid "Back"
+msgstr "Atrás"
+
+#: qml/Main.qml
+msgid "Next"
+msgstr "Siguiente"
+
+#: qml/Main.qml
+msgid "Skip"
+msgstr "Omitir"
+
+#: qml/Main.qml
+msgid "Start using BrescaOS"
+msgstr "Empezar a usar BrescaOS"
+
+#: qml/WelcomePage.qml
+msgid ""
+"BrescaOS is a desktop operating system built on Fedora and KDE Plasma. The "
+"whole system is a single versioned image: an update installs a complete new "
+"version in one step, and if something goes wrong you can go back to the "
+"previous one. Your files and apps are kept across updates."
+msgstr ""
+"BrescaOS es un sistema operativo de escritorio basado en Fedora y KDE "
+"Plasma. Todo el sistema es una única imagen versionada: una actualización "
+"instala una versión nueva completa en un solo paso y, si algo falla, puedes "
+"volver a la anterior. Tus archivos y aplicaciones se conservan entre "
+"actualizaciones."
+
+#: qml/WelcomePage.qml
+msgid ""
+"BrescaOS is in alpha. Expect bugs and changes between versions, and keep a "
+"backup of anything important."
+msgstr ""
+"BrescaOS está en fase alfa. Habrá errores y cambios entre versiones: guarda "
+"una copia de seguridad de todo lo importante."
+
+#: qml/WelcomePage.qml
+msgid ""
+"BrescaOS is not provided or supported by the Fedora Project. Official, "
+"unmodified Fedora software is available at <a href=\"%1\">%1</a>."
+msgstr ""
+"BrescaOS no está proporcionado ni respaldado por el Proyecto Fedora. El "
+"software oficial y sin modificar de Fedora está disponible en <a "
+"href=\"%1\">%1</a>."
+
+#: qml/WelcomePage.qml
+msgid "Welcome to BrescaOS %1"
+msgstr "Bienvenido a BrescaOS %1"

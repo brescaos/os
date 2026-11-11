@@ -6,6 +6,7 @@
 #     of the component's .pot;
 #   - the updates applet's notifyrc and metadata.json, with Name[<lang>]=...
 #     and "Name[<lang>]" from its .po files;
+#   - the welcome's .desktop files (menu and autostart), with Name[<lang>]=...;
 # - into <metadata dir>, what a build compiles in: the updates KCM's
 #   updates-kcm/kcm_brescaos_updates.json, with "Name[<lang>]" and the like.
 # Runs in image/Containerfile's translations stage and in the development VM's
@@ -38,6 +39,19 @@ translate_metadata() {
     printf '%s\n' "$metadata" >"$output"
 }
 
+# Writes the .desktop-style file $1 to $3 with the translations of its Name,
+# Comment and Keywords from the .po files in the folder $2.
+translate_desktop_file() {
+    local template=$1 po_dir=$2 output=$3 po
+    mkdir -p "$(dirname "$output")"
+    cp "$template" "$output"
+    for po in "$po_dir"/*.po; do
+        # Adds this language's Name[<lang>]= lines and the like.
+        msgfmt --desktop -l "$(basename "$po" .po)" --template="$output" -o "$output.new" "$po"
+        mv "$output.new" "$output"
+    done
+}
+
 for pot in "$src_dir"/*/po/*.pot; do
     domain=$(basename "$pot" .pot)
     for po in "$(dirname "$pot")"/*.po; do
@@ -48,16 +62,16 @@ for pot in "$src_dir"/*/po/*.pot; do
 done
 
 applet_dir=$src_dir/updates-applet
-notifyrc=$out_dir/usr/share/knotifications6/brescaos-updates.notifyrc
-mkdir -p "$(dirname "$notifyrc")"
-cp "$applet_dir/brescaos-updates.notifyrc.in" "$notifyrc"
-for po in "$applet_dir"/po/*.po; do
-    # Adds this language's Name[<lang>]= and Comment[<lang>]= lines.
-    msgfmt --desktop -l "$(basename "$po" .po)" --template="$notifyrc" -o "$notifyrc.new" "$po"
-    mv "$notifyrc.new" "$notifyrc"
-done
+translate_desktop_file "$applet_dir/brescaos-updates.notifyrc.in" "$applet_dir/po" \
+    "$out_dir/usr/share/knotifications6/brescaos-updates.notifyrc"
 translate_metadata "$applet_dir/metadata.json.in" "$applet_dir/po" \
     "$out_dir/usr/share/plasma/plasmoids/com.brescaos.updates/metadata.json"
 
 translate_metadata "$src_dir/updates-kcm/kcm_brescaos_updates.json.in" "$src_dir/updates-kcm/po" \
     "$metadata_dir/updates-kcm/kcm_brescaos_updates.json"
+
+welcome_dir=$src_dir/welcome
+translate_desktop_file "$welcome_dir/com.brescaos.welcome.desktop.in" "$welcome_dir/po" \
+    "$out_dir/usr/share/applications/com.brescaos.welcome.desktop"
+translate_desktop_file "$welcome_dir/com.brescaos.welcome-autostart.desktop.in" "$welcome_dir/po" \
+    "$out_dir/etc/xdg/autostart/com.brescaos.welcome-autostart.desktop"

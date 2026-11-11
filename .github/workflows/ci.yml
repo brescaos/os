@@ -16,8 +16,15 @@ jobs:
     container: quay.io/fedora/fedora:44
     timeout-minutes: 10
     steps:
+      # cmake ... kf6-kconfig-devel: compile Bresca Welcome and its tests (make check-welcome).
+      # kf6-kirigami, kf6-qqc2-desktop-style: its tests load its QML offscreen.
       - name: Install dependencies
-        run: dnf -y install --setopt=install_weak_deps=False ShellCheck shfmt make findutils gettext jq
+        run: |
+          dnf -y install --setopt=install_weak_deps=False \
+              ShellCheck shfmt make findutils gettext jq \
+              cmake extra-cmake-modules gcc-c++ \
+              qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel \
+              kf6-kirigami kf6-qqc2-desktop-style
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to BrescaOS
+Comment=Opens at the first login, and again after some updates
+Exec=bresca-welcome --login
+Icon=help-about
+OnlyShowIn=KDE;

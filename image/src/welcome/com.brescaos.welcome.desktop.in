@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to BrescaOS
+Comment=First steps on BrescaOS
+Exec=bresca-welcome
+Icon=help-about
+Categories=Qt;KDE;System;
+Keywords=welcome;setup;first steps;

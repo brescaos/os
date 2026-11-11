@@ -2,3 +2,5 @@
 /image/LICENSE
 # The development VM (make vm): disk, UEFI variables, boot log.
 /.vm/
+# make check-welcome's build.
+/build/

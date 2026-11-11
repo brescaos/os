@@ -64,6 +64,15 @@ extract_strings() {
                     -o "$pot"
             extract_metadata_strings kcm_brescaos_updates.json.in "$pot"
             ;;
+        welcome)
+            xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 -o "$pot" main.cpp
+            find qml -name '*.qml' | sort \
+                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript -j --keyword= \
+                    --keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3 \
+                    -o "$pot"
+            xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" com.brescaos.welcome.desktop.in \
+                com.brescaos.welcome-autostart.desktop.in
+            ;;
         *) fail "no rule to extract the strings of ${PWD##*/} (scripts/translations.sh)" ;;
     esac
 }

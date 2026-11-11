@@ -1,0 +1,17 @@
+# check=skip=InvalidDefaultArgInFrom;error=true
+
+# Tests of Bresca Welcome in the BrescaOS image (scripts/test.sh, make test):
+# bats, run in the image, so the program, its .desktop files and its
+# translations are where image/Containerfile installs them, and it starts with
+# the image's libraries. Its unit and QML tests run with make check-welcome.
+
+# The BrescaOS image to test. Required, no default: scripts/test.sh passes it.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True bats
+
+COPY *.bats /usr/lib/bresca-tests/
+
+CMD ["bats", "--print-output-on-failure", "/usr/lib/bresca-tests"]
