@@ -32,6 +32,20 @@ RUN --mount=type=bind,source=src/updates-kcm,target=/tmp/src \
     && cmake --build /tmp/build \
     && DESTDIR=/out cmake --install /tmp/build
 
+# Autotiling: its KWin script, its KCM and the QML module the KCM and the tray
+# applet share.
+FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS autotile-build
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
+        cmake extra-cmake-modules gcc-c++ kf6-kcmutils-devel kf6-kconfig-devel kf6-kcoreaddons-devel \
+        kf6-ki18n-devel qt6-qtdeclarative-devel
+RUN --mount=type=bind,source=src/autotile,target=/tmp/src \
+    --mount=type=bind,from=translations,source=/metadata/autotile,target=/tmp/metadata \
+    cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTRANSLATED_METADATA_DIR=/tmp/metadata \
+    && cmake --build /tmp/build \
+    && DESTDIR=/out cmake --install /tmp/build
+
 # Bresca Welcome.
 FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS welcome-build
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
@@ -101,6 +115,10 @@ COPY src/bresca-cli/services/bresca-updates.rules /usr/share/polkit-1/rules.d/50
 COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
 # BrescaOS Updates KCM (src/updates-kcm/README.md).
 COPY --from=updates-kcm-build /out/ /
+# Autotiling (src/autotile/README.md): the KWin script, its KCM and the QML
+# module, and the tray applet; both metadata.json come with the translations.
+COPY --from=autotile-build /out/ /
+COPY src/autotile/applet/package/ /usr/share/plasma/plasmoids/com.brescaos.autotile/
 # Bresca Welcome (src/welcome/README.md); its .desktop files come with the
 # translations.
 COPY --from=welcome-build /out/ /

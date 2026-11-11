@@ -1,0 +1,122 @@
+# Spanish translations for BrescaOS package.
+# Copyright (C) 2026 THE BrescaOS'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 07:14+0000\n"
+"PO-Revision-Date: 2026-11-11 07:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: applet/metadata.json.in script/metadata.json.in
+msgid "Autotiling"
+msgstr "Mosaico automático"
+
+#: applet/metadata.json.in
+msgid "Switch the autotiling layout"
+msgstr "Cambia la disposición del mosaico automático"
+
+#: applet/package/contents/ui/main.qml
+msgid "Automatic tiling"
+msgstr "Mosaicos automáticos"
+
+#: applet/package/contents/ui/main.qml
+msgid "Manage in System Settings…"
+msgstr "Gestionar en Ajustes del sistema…"
+
+#: applet/package/contents/ui/main.qml
+msgid "Off"
+msgstr "Desactivado"
+
+#: common/autotilelayout.cpp
+msgid "All windows the same size, in rows"
+msgstr "Todas las ventanas del mismo tamaño, en filas"
+
+#: common/autotilelayout.cpp
+msgid "Binary tree"
+msgstr "Árbol binario"
+
+#: common/autotilelayout.cpp
+msgid "Each new window splits the active one in two"
+msgstr "Cada ventana nueva divide en dos la ventana activa"
+
+#: common/autotilelayout.cpp
+msgid "Grid"
+msgstr "Rejilla"
+
+#: common/autotilelayout.cpp
+msgid "Master"
+msgstr "Principal"
+
+#: common/autotilelayout.cpp
+msgid "One main window on the left, the others stacked on the right"
+msgstr "Una ventana principal a la izquierda y las demás apiladas a la derecha"
+
+#: kcm_brescaos_autotile.json.in
+msgid "Arrange windows automatically so they fill the screen"
+msgstr "Organiza las ventanas automáticamente para que llenen la pantalla"
+
+#: kcm_brescaos_autotile.json.in
+msgid "Automatic Tiling"
+msgstr "Mosaicos automáticos"
+
+#. Search keywords: comma-separated, no spaces after the commas
+#: kcm_brescaos_autotile.json.in
+msgid "tiling,autotiling,layout,windows,binary tree,KWin"
+msgstr "mosaico,mosaico automático,disposición,ventanas,árbol binario,KWin"
+
+#: script/metadata.json.in
+msgid "Arranges windows automatically so they fill the screen"
+msgstr "Organiza las ventanas automáticamente para que llenen la pantalla"
+
+#: ui/main.qml
+msgid "%1 px"
+msgstr "%1 px"
+
+#: ui/main.qml
+msgid "Arrange windows automatically"
+msgstr "Organizar las ventanas automáticamente"
+
+#: ui/main.qml
+msgid "Automatic tiling:"
+msgstr "Mosaicos automáticos:"
+
+#: ui/main.qml
+msgid "Gap between windows:"
+msgstr "Espacio entre ventanas:"
+
+#: ui/main.qml
+msgid "Layout:"
+msgstr "Disposición:"
+
+#: ui/main.qml
+msgid "Show the icon"
+msgstr "Mostrar el icono"
+
+#: ui/main.qml
+msgid "System tray:"
+msgstr "Bandeja del sistema:"
+
+#: ui/main.qml
+msgid ""
+"Turn tiling on and off and change its layout without opening System Settings."
+msgstr ""
+"Activa o desactiva el mosaico y cambia su disposición sin abrir los Ajustes "
+"del sistema."
+
+#: ui/main.qml
+msgid ""
+"Windows take their place on their own and fill the screen. Turned off, they "
+"behave as usual."
+msgstr ""
+"Las ventanas se colocan solas y llenan la pantalla. Si lo desactivas, se "
+"comportan como siempre."

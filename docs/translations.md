@@ -19,6 +19,7 @@ Each translated component has a `po/` folder:
 
 | Component | Domain | Strings from |
 |---|---|---|
+| `autotile` | `kcm_brescaos_autotile` | `i18n()` in `common/autotilelayout.cpp` and the KCM's QML, `i18nd()` in the applet's, and its three `*.json.in` (script, applet, KCM) |
 | `bresca-cli` | `bresca` | Its scripts' `$"..."` strings |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |
 | `updates-kcm` | `kcm_brescaos_updates` | `i18n()` in its QML and `kcm_brescaos_updates.json.in` |
@@ -51,7 +52,9 @@ In the development VM the change shows within a second
 - The QML of the applet and of the System Settings module uses `i18n("…")`,
   with `%1`, `%2` for values; the welcome's, `KI18n.i18n("…")` (`import
   org.kde.ki18n`), and its C++ `i18n("…")`. Its `.desktop` files are
-  `*.in` templates too. The applet's `.notifyrc` and `metadata.json`
+  `*.in` templates too. Autotiling has one domain for its KCM and its
+  applet: the applet names it, `i18nd("kcm_brescaos_autotile", "…")`, and
+  its metadata files are `*.in` templates too. The applet's `.notifyrc` and `metadata.json`
   and the module's `kcm_brescaos_updates.json` are English-only templates
   (`*.in`): the build adds the translations. The module's search keywords
   (`X-KDE-Keywords`) are one string, translated as a whole, comma-separated.
@@ -106,12 +109,15 @@ mounted. It writes, laid out as in the image:
   `"Description[<lang>]"` (jq);
 - the welcome's `.desktop` files, for the application menu and autostart,
   with `Name[<lang>]=`, `Comment[<lang>]=` and `Keywords[<lang>]=` lines
-  (`msgfmt --desktop`).
+  (`msgfmt --desktop`);
+- the autotiling KWin script's and tray applet's `metadata.json`, as the
+  updates applet's.
 
-And, apart, the System Settings module's `kcm_brescaos_updates.json`, with
-`"Name[<lang>]"`, `"Description[<lang>]"` and `"X-KDE-Keywords[<lang>]"`:
-System Settings reads them from the module's own metadata, so the
-`updates-kcm-build` stage compiles it into the module.
+And, apart, the System Settings modules' `kcm_brescaos_updates.json` and
+`kcm_brescaos_autotile.json`, with `"Name[<lang>]"`, `"Description[<lang>]"`
+and `"X-KDE-Keywords[<lang>]"`: System Settings reads them from the module's
+own metadata, so the `updates-kcm-build` and `autotile-build` stages compile
+them into the modules.
 
 The image copies only that result: gettext isn't in it. The development VM's
 hot reload runs the same script.

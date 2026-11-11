@@ -104,8 +104,18 @@ note_copied_file() {
     copied_count=$((copied_count + 1))
     case $1 in
         /usr/lib/systemd/system/* | /usr/lib/systemd/user/*) is_unit_changed=true ;;
-        /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/*)
+        /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/* | \
+            /usr/lib64/qt6/qml/*)
             is_plasma_changed=true
+            ;;
+        # The autotiling applet's translations too.
+        /usr/share/locale/*/LC_MESSAGES/kcm_brescaos_autotile.mo)
+            is_plasma_changed=true
+            changed_settings_module=kcm_brescaos_autotile
+            ;;
+        /usr/share/kwin/scripts/*)
+            changed_kwin_script=${1#/usr/share/kwin/scripts/}
+            changed_kwin_script=${changed_kwin_script%%/*}
             ;;
         /usr/lib64/qt6/plugins/plasma/kcms/systemsettings/*.so) changed_settings_module=$(basename "$1" .so) ;;
         /usr/share/locale/*/LC_MESSAGES/kcm_*.mo) changed_settings_module=$(basename "$1" .mo) ;;
@@ -194,6 +204,17 @@ build_changed_component() {
     fi
 }
 
+# Unloads the KWin script $1 and has KWin load the enabled ones again, so
+# that it runs its new files; one turned off stays off.
+reload_kwin_script() {
+    run_in_user_session gdbus call --session --timeout 5 --dest org.kde.KWin --object-path /Scripting \
+        --method org.kde.kwin.Scripting.unloadScript "$1" >/dev/null || return 0
+    if run_in_user_session gdbus call --session --timeout 5 --dest org.kde.KWin --object-path /Scripting \
+        --method org.kde.kwin.Scripting.start >/dev/null; then
+        echo "reloaded the KWin script $1"
+    fi
+}
+
 # Closes System Settings, if it's open, and opens it again on the module $1,
 # so that it loads the module's new build and translations.
 reopen_settings() {
@@ -206,7 +227,8 @@ reopen_settings() {
 
 copy_changed_files() {
     local mode source destination project count_before cmake_lists
-    local is_unit_changed=false is_plasma_changed=false changed_settings_module='' copied_count=0
+    local is_unit_changed=false is_plasma_changed=false changed_settings_module='' changed_kwin_script=''
+    local copied_count=0
     local updated_projects=''
 
     while IFS='|' read -r mode source destination; do
@@ -247,6 +269,9 @@ copy_changed_files() {
     fi
     if $is_plasma_changed && run_in_user_session systemctl --user restart plasma-plasmashell.service; then
         echo "restarted plasmashell"
+    fi
+    if [[ -n $changed_kwin_script ]]; then
+        reload_kwin_script "$changed_kwin_script"
     fi
     if [[ -n $changed_settings_module ]]; then
         reopen_settings "$changed_settings_module"

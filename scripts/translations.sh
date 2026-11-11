@@ -39,6 +39,17 @@ extract_strings() {
     local pot=$1
     # shellcheck disable=SC2086 # XGETTEXT_OPTIONS is a list of options
     case ${PWD##*/} in
+        autotile)
+            # The applet's QML names the domain (i18nd), the KCM's and the C++
+            # take it from their context (i18n).
+            xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 -o "$pot" common/autotilelayout.cpp
+            find applet ui -name '*.qml' | sort \
+                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript -j --keyword= \
+                    --keyword=i18n:1 --keyword=i18nd:2 -o "$pot"
+            extract_metadata_strings kcm_brescaos_autotile.json.in "$pot"
+            extract_metadata_strings applet/metadata.json.in "$pot"
+            extract_metadata_strings script/metadata.json.in "$pot"
+            ;;
         bresca-cli)
             # xgettext warns about every $"...": bash used to expand what a
             # translation has, which lib/messages.sh turns off

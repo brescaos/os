@@ -12,13 +12,13 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help check check-scripts check-translations check-welcome format pot image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
+.PHONY: help check check-scripts check-translations check-welcome check-autotile format pot image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[38;5;111m%-19s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 # make -k check runs every one even when one fails (the CI does).
-check: check-scripts check-translations check-welcome ## check-scripts, check-translations and check-welcome
+check: check-scripts check-translations check-welcome check-autotile ## check-scripts, check-translations, check-welcome and check-autotile
 
 check-scripts: ## shellcheck, shfmt and syntax on every script
 	@scripts/check.sh
@@ -28,6 +28,9 @@ check-translations: ## The translations of image/src/ are complete and in sync w
 
 check-welcome: ## Compile Bresca Welcome and run its tests (offscreen)
 	@scripts/check_welcome.sh
+
+check-autotile: ## Compile autotiling (KWin script, KCM, applet's QML module) and run its tests (offscreen)
+	@scripts/check_autotile.sh
 
 pot: ## Extract the strings of image/src/ into each po/*.pot and merge them into every .po
 	@scripts/translations.sh pot

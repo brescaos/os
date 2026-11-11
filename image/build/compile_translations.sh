@@ -7,8 +7,10 @@
 #   - the updates applet's notifyrc and metadata.json, with Name[<lang>]=...
 #     and "Name[<lang>]" from its .po files;
 #   - the welcome's .desktop files (menu and autostart), with Name[<lang>]=...;
-# - into <metadata dir>, what a build compiles in: the updates KCM's
-#   updates-kcm/kcm_brescaos_updates.json, with "Name[<lang>]" and the like.
+#   - the autotiling KWin script's and tray applet's metadata.json;
+# - into <metadata dir>, what a build compiles in: the KCMs'
+#   updates-kcm/kcm_brescaos_updates.json and
+#   autotile/kcm_brescaos_autotile.json, with "Name[<lang>]" and the like.
 # Runs in image/Containerfile's translations stage and in the development VM's
 # hot reload, with gettext and jq.
 # Usage: compile_translations.sh <src dir> <out dir> <metadata dir>
@@ -69,6 +71,14 @@ translate_metadata "$applet_dir/metadata.json.in" "$applet_dir/po" \
 
 translate_metadata "$src_dir/updates-kcm/kcm_brescaos_updates.json.in" "$src_dir/updates-kcm/po" \
     "$metadata_dir/updates-kcm/kcm_brescaos_updates.json"
+
+autotile_dir=$src_dir/autotile
+translate_metadata "$autotile_dir/script/metadata.json.in" "$autotile_dir/po" \
+    "$out_dir/usr/share/kwin/scripts/com.brescaos.autotile/metadata.json"
+translate_metadata "$autotile_dir/applet/metadata.json.in" "$autotile_dir/po" \
+    "$out_dir/usr/share/plasma/plasmoids/com.brescaos.autotile/metadata.json"
+translate_metadata "$autotile_dir/kcm_brescaos_autotile.json.in" "$autotile_dir/po" \
+    "$metadata_dir/autotile/kcm_brescaos_autotile.json"
 
 welcome_dir=$src_dir/welcome
 translate_desktop_file "$welcome_dir/com.brescaos.welcome.desktop.in" "$welcome_dir/po" \

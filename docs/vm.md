@@ -91,7 +91,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   its next run; the applet's restart plasmashell. A `.po` that doesn't compile
   leaves the last ones in place, with the error in the log.
 - What `image/Containerfile` compiles (today, System Settings > BrescaOS
-  Updates, `image/src/updates-kcm/`, and Welcome, `image/src/welcome/`:
+  Updates, `image/src/updates-kcm/`, autotiling, `image/src/autotile/`, and
+  Welcome, `image/src/welcome/`:
   every `image/src/` component with a `CMakeLists.txt`) is compiled again in the VM when its sources or its
   translations change, as the image's stage does, into
   `/var/cache/bresca-dev/build/<component>/`; it persists, so only what
@@ -101,7 +102,9 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   Settings if it's open and opens it again on that module.
 - A changed systemd unit (a service, a timer…) is reloaded (`systemctl
   daemon-reload`); a service that is already running keeps the old one until
-  it restarts. A changed Plasma applet restarts plasmashell.
+  it restarts. A changed Plasma applet, or a QML module it imports, restarts
+  plasmashell. A changed KWin script is unloaded and KWin loads it again if
+  it's on.
 - `/usr` is only writable until the next boot (`bootc usr-overlay`): after a
   reboot the image's files come back and the changed ones are copied again.
   Files you delete on the host stay in the VM until then.

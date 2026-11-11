@@ -1,0 +1,118 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-11 07:14+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applet/metadata.json.in script/metadata.json.in
+msgid "Autotiling"
+msgstr ""
+
+#: applet/metadata.json.in
+msgid "Switch the autotiling layout"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Automatic tiling"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Manage in System Settings…"
+msgstr ""
+
+#: applet/package/contents/ui/main.qml
+msgid "Off"
+msgstr ""
+
+#: common/autotilelayout.cpp
+msgid "All windows the same size, in rows"
+msgstr ""
+
+#: common/autotilelayout.cpp
+msgid "Binary tree"
+msgstr ""
+
+#: common/autotilelayout.cpp
+msgid "Each new window splits the active one in two"
+msgstr ""
+
+#: common/autotilelayout.cpp
+msgid "Grid"
+msgstr ""
+
+#: common/autotilelayout.cpp
+msgid "Master"
+msgstr ""
+
+#: common/autotilelayout.cpp
+msgid "One main window on the left, the others stacked on the right"
+msgstr ""
+
+#: kcm_brescaos_autotile.json.in
+msgid "Arrange windows automatically so they fill the screen"
+msgstr ""
+
+#: kcm_brescaos_autotile.json.in
+msgid "Automatic Tiling"
+msgstr ""
+
+#. Search keywords: comma-separated, no spaces after the commas
+#: kcm_brescaos_autotile.json.in
+msgid "tiling,autotiling,layout,windows,binary tree,KWin"
+msgstr ""
+
+#: script/metadata.json.in
+msgid "Arranges windows automatically so they fill the screen"
+msgstr ""
+
+#: ui/main.qml
+msgid "%1 px"
+msgstr ""
+
+#: ui/main.qml
+msgid "Arrange windows automatically"
+msgstr ""
+
+#: ui/main.qml
+msgid "Automatic tiling:"
+msgstr ""
+
+#: ui/main.qml
+msgid "Gap between windows:"
+msgstr ""
+
+#: ui/main.qml
+msgid "Layout:"
+msgstr ""
+
+#: ui/main.qml
+msgid "Show the icon"
+msgstr ""
+
+#: ui/main.qml
+msgid "System tray:"
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"Turn tiling on and off and change its layout without opening System Settings."
+msgstr ""
+
+#: ui/main.qml
+msgid ""
+"Windows take their place on their own and fill the screen. Turned off, they "
+"behave as usual."
+msgstr ""

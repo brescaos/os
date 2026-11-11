@@ -1,0 +1,10 @@
+{
+    "KPlugin": {
+        "Description": "Arrange windows automatically so they fill the screen",
+        "Icon": "view-grid",
+        "License": "GPL-3.0-or-later",
+        "Name": "Automatic Tiling"
+    },
+    "X-KDE-Keywords": "tiling,autotiling,layout,windows,binary tree,KWin",
+    "X-KDE-System-Settings-Parent-Category": "windowmanagement"
+}

@@ -1,0 +1,19 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS"
+            }
+        ],
+        "Description": "Arranges windows automatically so they fill the screen",
+        "EnabledByDefault": false,
+        "Icon": "view-grid",
+        "Id": "com.brescaos.autotile",
+        "License": "GPL-3.0-or-later",
+        "Name": "Autotiling",
+        "Version": "1.0"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

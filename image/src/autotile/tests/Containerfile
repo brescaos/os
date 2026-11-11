@@ -1,0 +1,17 @@
+# check=skip=InvalidDefaultArgInFrom;error=true
+
+# Tests of autotiling in the image (scripts/test.sh, make test): bats, run in
+# the BrescaOS image, so its files are where image/Containerfile installs them.
+# The script and AutotileLayout have their own tests (make check-autotile); the
+# rest only runs in KWin and Plasma: the development VM tries that.
+
+# The BrescaOS image to test. Required, no default: scripts/test.sh passes it.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True bats
+
+COPY *.bats /usr/lib/bresca-tests/
+
+CMD ["bats", "--print-output-on-failure", "/usr/lib/bresca-tests"]
