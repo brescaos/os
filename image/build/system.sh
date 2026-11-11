@@ -46,8 +46,11 @@ install -D -m 644 /usr/share/licenses/fedora-release-common/LICENSE \
     /usr/share/licenses/brescaos/fedora-release-common-LICENSE \
     || die "fedora-release-common's LICENSE missing, check its file list"
 
-# The end of Fedora's support for this release, kept in os-release below.
+# The end of Fedora's support for this release, kept in os-release below, and
+# its version, for Distrobox's default image below (os-release's VERSION_ID
+# becomes BrescaOS's).
 support_end=$(. /usr/lib/os-release && echo "${SUPPORT_END:-}")
+fedora_version=$(. /usr/lib/os-release && echo "$VERSION_ID")
 
 # Installed packages that need fedora-release-common and must be removed too.
 fedora_only=$(rpm -qa --qf '%{NAME}\n' console-login-helper-messages-issuegen)
@@ -149,3 +152,11 @@ policies=$(cd /usr/lib/firewalld/policies && ls)
 firewall-offline-cmd --check-config \
     || die "firewalld's configuration doesn't load (firewall-offline-cmd --check-config)"
 systemctl enable firewalld.service
+
+# --- Distrobox -------------------------------------------------------------------------
+# Distrobox's default image is Fedora's toolbox image at :latest: use this
+# system's Fedora release instead. In /usr, so it follows the image; Distrobox
+# reads /etc/distrobox/distrobox.conf and the user's after it.
+mkdir -p /usr/share/distrobox
+printf 'container_image_default="registry.fedoraproject.org/fedora-toolbox:%s"\n' "$fedora_version" \
+    >/usr/share/distrobox/distrobox.conf

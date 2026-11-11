@@ -16,6 +16,13 @@ The disabled units are also in
 `/usr/lib/systemd/system-preset/10-brescaos-disable.preset`, so a system's
 first boot, which applies the presets, doesn't turn them back on.
 
+Distrobox (`distrobox create`) is not a sandbox: a distrobox shares the
+user's home, desktop and devices, and its container is privileged, without
+SELinux, with the system's root at `/run/host`. It runs rootless, so it can do
+what the user can, not more. It opens no port and runs no service. The first
+`distrobox create` downloads `registry.fedoraproject.org/fedora-toolbox` (the
+system's Fedora release) over TLS.
+
 Kept from Fedora: SELinux enforcing, Secure Boot with Fedora's signed kernel and shim,
 a locked root account, and administrators in `wheel` with a password for
 `sudo`.

@@ -61,6 +61,7 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
 ARG FEDORA_VERSION
 
 # Fedora packages used by BrescaOS.
+# podman: named so dnf doesn't pick docker for distrobox's "podman or docker".
 # libglvnd-gles: KWin draws with OpenGL ES through libepoxy, which dlopens
 # libGLESv2 (so no package requires it) and aborts without it.
 # TODO: boot.automount: systemd-gpt-auto-generator stacks a boot.automount on top of
@@ -86,6 +87,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         qt6-qttranslations qt6-qtimageformats \
         inotify-tools \
         plasma-milou \
+        distrobox podman \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
