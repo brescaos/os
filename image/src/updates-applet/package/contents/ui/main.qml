@@ -82,6 +82,10 @@ PlasmoidItem {
     property string runningOperation: ""
     // Its systemctl start hasn't returned: the password dialog may be open.
     property bool isOperationStartPending: false
+    // The popup was open when a start was asked: the system tray closes it
+    // when the password dialog takes the focus, and it opens again once the
+    // dialog is gone.
+    property bool shouldReopenPopup: false
     // download-progress.json while a download runs, null otherwise.
     property var progress: null
     // The download waiting for the user to accept a registry without TLS
@@ -337,12 +341,18 @@ PlasmoidItem {
                 root.isChecking = isCheckRunning;
             } else if (command.startsWith(root.startCheckCommand)) {
                 root.isStartPending = false;
+                if (root.shouldReopenPopup) {
+                    root.expanded = true;
+                }
                 // Not started (the password dialog cancelled): as before.
                 if (output["exit code"] !== 0) {
                     root.isChecking = false;
                 }
             } else if (command.startsWith(root.startOperationCommand)) {
                 root.isOperationStartPending = false;
+                if (root.shouldReopenPopup) {
+                    root.expanded = true;
+                }
                 if (output["exit code"] !== 0) {
                     root.runningOperation = "";
                 }
@@ -495,6 +505,7 @@ PlasmoidItem {
         downloadResult = parseResult(resultJson);
         const downloadedAt = downloadResult?.downloaded_at ?? "";
         if (lastDownloadedAt !== undefined && downloadedAt !== lastDownloadedAt && downloadedVersion) {
+            updateNotification.close();
             downloadedNotification.sendEvent();
         }
         lastDownloadedAt = downloadedAt;
@@ -504,6 +515,8 @@ PlasmoidItem {
         installResult = parseResult(resultJson);
         const installedAt = installResult?.installed_at ?? "";
         if (lastInstalledAt !== undefined && installedAt !== lastInstalledAt && restartVersion) {
+            updateNotification.close();
+            downloadedNotification.close();
             installedNotification.sendEvent();
         }
         lastInstalledAt = installedAt;
@@ -549,6 +562,7 @@ PlasmoidItem {
             downloadResult = null;
         }
         isOperationStartPending = true;
+        shouldReopenPopup = expanded;
         runCommand(startOperationCommand + operation + ".service");
     }
 
@@ -559,6 +573,7 @@ PlasmoidItem {
     function startCheck() {
         isChecking = true;
         isStartPending = true;
+        shouldReopenPopup = expanded;
         runCommand(startCheckCommand);
     }
 

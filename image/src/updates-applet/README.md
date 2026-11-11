@@ -51,6 +51,11 @@ translations of `po/`.
   - A version downloaded: **Install** (`bresca-updates@install`).
   - A version installed: **Restart Now**.
   - A failed download or install: bootc's error, above the buttons.
+
+  The system tray closes the popup when a button's password dialog takes
+  the focus (only its own **Keep Open** pin keeps it): once the dialog is
+  gone (its `systemctl start` returned), the applet opens it again
+  (`expanded`). Not for a start from a notification, with the popup closed.
 - Its configure action (the popup header's button and the context menu's
   **Configure BrescaOS Updates…**) opens System Settings > BrescaOS Updates
   too (`KCMLauncher`).
@@ -72,6 +77,9 @@ translations of `po/`.
   - `updateInstalled`: a version installed (`install.json` with
     `installed_version`). Its **Restart Now** opens Plasma's restart prompt
     (`org.kde.LogoutPrompt`, with `gdbus`).
+
+  Each closes the ones it leaves behind: `updateDownloaded` the version
+  available, `updateInstalled` that one and the version downloaded.
 
 The system tray loads it on its own: `X-Plasma-NotificationArea` and
 `EnabledByDefault` in `metadata.json.in`. In the development VM hot reload copies
