@@ -1,0 +1,26 @@
+# For clangd in the editor, without a build: the include folders of the
+# headers the sources and tests use, as Fedora installs them. A new one goes
+# here too.
+# pp_file_not_found: terminalcolorstest.moc only exists once moc runs, in a
+# build.
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -fPIC
+    - -isystem/usr/include/qt6
+    - -isystem/usr/include/qt6/QtCore
+    - -isystem/usr/include/qt6/QtGui
+    - -isystem/usr/include/qt6/QtTest
+    - -isystem/usr/include/KF6/KColorScheme
+    - -isystem/usr/include/KF6/KConfig
+    - -isystem/usr/include/KF6/KConfigCore
+Diagnostics:
+  Suppress: pp_file_not_found
+---
+# The tests include terminalcolors.h from the folder above (the compile
+# command's folder is the file's).
+If:
+  PathMatch: tests/.*
+CompileFlags:
+  Add:
+    - -I..

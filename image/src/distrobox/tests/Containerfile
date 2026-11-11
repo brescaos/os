@@ -1,0 +1,17 @@
+# check=skip=InvalidDefaultArgInFrom;error=true
+
+# Tests of the distroboxes' colors and prompt in the image (scripts/test.sh,
+# make test): bats, run in the BrescaOS image, so the files are where
+# image/Containerfile installs them. bresca-distrobox-colors has its own tests
+# (make check-distrobox); entering a distrobox only runs in the development VM.
+
+# The BrescaOS image to test. Required, no default: scripts/test.sh passes it.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True bats
+
+COPY *.bats /usr/lib/bresca-tests/
+
+CMD ["bats", "--print-output-on-failure", "/usr/lib/bresca-tests"]
