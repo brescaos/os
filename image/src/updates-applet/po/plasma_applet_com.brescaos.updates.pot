@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 19:10+0000\n"
+"POT-Creation-Date: 2026-11-11 05:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,10 @@ msgid "Tells when a new BrescaOS version is available"
 msgstr ""
 
 #: package/contents/ui/main.qml
+msgid "&Configure BrescaOS Updates…"
+msgstr ""
+
+#: package/contents/ui/main.qml
 msgid "BrescaOS %1 is available"
 msgstr ""
 
@@ -71,6 +75,10 @@ msgid "BrescaOS is up to date"
 msgstr ""
 
 #: package/contents/ui/main.qml
+msgid "Cancel"
+msgstr ""
+
+#: package/contents/ui/main.qml
 msgid "Check for Updates"
 msgstr ""
 
@@ -79,7 +87,53 @@ msgid "Checking for updates…"
 msgstr ""
 
 #: package/contents/ui/main.qml
+msgid "Checking the new version…"
+msgstr ""
+
+#: package/contents/ui/main.qml
 msgid "Couldn't check for updates"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Couldn't download the new version: %1"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Couldn't find out whether updates come with a secure connection (TLS)."
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Couldn't install the new version: %1"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Download"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Download & Install"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Download Anyway"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Downloading BrescaOS %1"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Downloading the new version"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Downloading…"
+msgstr ""
+
+#: package/contents/ui/main.qml
+#, no-javascript-format
+msgctxt "Download progress"
+msgid "Downloading… %1%"
 msgstr ""
 
 #: package/contents/ui/main.qml
@@ -91,7 +145,29 @@ msgid "Install it before restarting: restarting discards the download."
 msgstr ""
 
 #: package/contents/ui/main.qml
-msgid "Install it with: %1"
+msgid "Install it from System Settings."
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Installing BrescaOS %1"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Installing the new version"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Installing…"
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid "Preparing…"
+msgstr ""
+
+#: package/contents/ui/main.qml
+#, no-javascript-format
+msgctxt "Download progress"
+msgid "Preparing… %1%"
 msgstr ""
 
 #: package/contents/ui/main.qml
@@ -100,4 +176,10 @@ msgstr ""
 
 #: package/contents/ui/main.qml
 msgid "Restart to start using it."
+msgstr ""
+
+#: package/contents/ui/main.qml
+msgid ""
+"Updates come from %1 without TLS: anyone on the network path could serve a "
+"different image."
 msgstr ""
