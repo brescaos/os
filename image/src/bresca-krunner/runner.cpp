@@ -26,6 +26,22 @@ struct Command {
 
 const QString commandPrefix = QStringLiteral("bresca ");
 
+// Each typed word is the start of the command's word in the same place:
+// "b u c", "bre upd" or the whole command.
+bool isTypedAs(const QStringList &typedWords, const QString &command)
+{
+    const QStringList commandWords = command.split(u' ');
+    if (typedWords.size() > commandWords.size()) {
+        return false;
+    }
+    for (qsizetype i = 0; i < typedWords.size(); ++i) {
+        if (!commandWords.at(i).startsWith(typedWords.at(i))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 const std::array commands{
     Command{QStringLiteral("bresca updates check"), kli18n("Check for BrescaOS updates"),
             kli18n("Checks whether a newer BrescaOS version is available"), QStringLiteral("check")},
@@ -67,8 +83,8 @@ public:
         }
     }
 
-    // Each command the query is, or is the start of, in any case and with
-    // any spaces. Its results come first: it's KRunner's first favorite
+    // Each command the query is typed as (isTypedAs()), in any case. Its
+    // results come first: it's KRunner's first favorite
     // (krunnerrc). With only this plugin (Ctrl+Alt+B,
     // com.brescaos.bresca-krunner.desktop), also without "bresca ", every
     // command for "?" (KRunner's help button types it, and its help plugin
@@ -82,11 +98,12 @@ public:
             return;
         }
         const bool isHelp = isOnlyPlugin && query == QLatin1String("?");
+        const QStringList typedWords = query.split(u' ');
         bool isCommandFound = false;
         for (const Command &command : commands) {
             // What can be typed of it: without "bresca " too with only this plugin.
             const QString shortCommand = command.command.mid(commandPrefix.size());
-            if (!isHelp && !command.command.startsWith(query) && !(isOnlyPlugin && shortCommand.startsWith(query))) {
+            if (!isHelp && !isTypedAs(typedWords, command.command) && !(isOnlyPlugin && isTypedAs(typedWords, shortCommand))) {
                 continue;
             }
             const bool isWholeCommand = query == command.command || (isOnlyPlugin && query == shortCommand);

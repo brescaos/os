@@ -30,6 +30,10 @@ private Q_SLOTS:
         QTest::newRow("install, being typed") << QStringLiteral("bresca updates inst") << QStringList{install};
         QTest::newRow("both, their common start") << QStringLiteral("bresca upd") << QStringList{check, install};
         QTest::newRow("both, the start of their first word") << QStringLiteral("bre") << QStringList{check, install};
+        QTest::newRow("check, initials") << QStringLiteral("b u c") << QStringList{check};
+        QTest::newRow("install, initials") << QStringLiteral("b u i") << QStringList{install};
+        QTest::newRow("check, the start of each word") << QStringLiteral("bre upd ch") << QStringList{check};
+        QTest::newRow("both, two initials") << QStringLiteral("b u") << QStringList{check, install};
     }
 
     void testFindsTheCommands()
@@ -55,6 +59,8 @@ private Q_SLOTS:
         QTest::newRow("without bresca") << QStringLiteral("updates") << QStringList{check, install};
         QTest::newRow("without bresca, being typed") << QStringLiteral("updates ch") << QStringList{check};
         QTest::newRow("with bresca") << QStringLiteral("bresca updates install") << QStringList{install};
+        QTest::newRow("initials without bresca") << QStringLiteral("u c") << QStringList{check};
+        QTest::newRow("initials with bresca") << QStringLiteral("b u i") << QStringList{install};
         QTest::newRow("another command")
             << QStringLiteral("firefox") << QStringList{QStringLiteral("“firefox” isn't a BrescaOS command: search all of KRunner")};
     }
@@ -78,6 +84,8 @@ private Q_SLOTS:
         QTest::newRow("one of its words, not first") << QStringLiteral("updates");
         QTest::newRow("its words in another order") << QStringLiteral("bresca check");
         QTest::newRow("more than a command") << QStringLiteral("bresca updates check now");
+        QTest::newRow("initials in another order") << QStringLiteral("b c u");
+        QTest::newRow("initials without bresca") << QStringLiteral("u c");
     }
 
     void testFindsNothing()
