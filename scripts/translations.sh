@@ -60,7 +60,8 @@ extract_strings() {
             extract_metadata_strings applet/metadata.json.in "$pot"
             ;;
         bresca-krunner)
-            xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 -o "$pot" runner.cpp
+            xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=kli18n:1 -o "$pot" runner.cpp
+            xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" com.brescaos.bresca-krunner.desktop.in
             extract_metadata_strings krunner_brescaos.json.in "$pot"
             ;;
         bresca-cli)

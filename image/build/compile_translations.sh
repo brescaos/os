@@ -9,6 +9,7 @@
 #   - the welcome's .desktop files (menu and autostart), with Name[<lang>]=...;
 #   - the autotiling KWin script's and tray applet's metadata.json;
 #   - the Distrobox tray applet's metadata.json;
+#   - the KRunner plugin's .desktop file (its shortcut);
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
 #   autotile/kcm_brescaos_autotile.json, and the KRunner plugin's
@@ -97,3 +98,5 @@ translate_metadata "$distrobox_dir/applet/metadata.json.in" "$distrobox_dir/po" 
 
 translate_metadata "$src_dir/bresca-krunner/krunner_brescaos.json.in" "$src_dir/bresca-krunner/po" \
     "$metadata_dir/bresca-krunner/krunner_brescaos.json"
+translate_desktop_file "$src_dir/bresca-krunner/com.brescaos.bresca-krunner.desktop.in" "$src_dir/bresca-krunner/po" \
+    "$out_dir/usr/share/applications/com.brescaos.bresca-krunner.desktop"

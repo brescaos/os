@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 18:58+0000\n"
+"POT-Creation-Date: 2026-11-12 19:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: com.brescaos.bresca-krunner.desktop.in
+msgid "BrescaOS in KRunner"
+msgstr ""
+
+#: com.brescaos.bresca-krunner.desktop.in
+msgid "Opens KRunner with only BrescaOS's commands"
+msgstr ""
 
 #: krunner_brescaos.json.in
 msgid "BrescaOS"
@@ -27,4 +35,16 @@ msgstr ""
 
 #: runner.cpp
 msgid "Checks whether a newer BrescaOS version is available"
+msgstr ""
+
+#: runner.cpp
+msgid "Downloads and installs a newer BrescaOS version, if there's one"
+msgstr ""
+
+#: runner.cpp
+msgid "Install the new BrescaOS version"
+msgstr ""
+
+#: runner.cpp
+msgid "“%1” isn't a BrescaOS command: search all of KRunner"
 msgstr ""

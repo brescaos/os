@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-# The plugin and KRunner's defaults are where image/Containerfile installs
-# them, the plugin translated.
+# The plugin, its shortcut and KRunner's defaults are where
+# image/Containerfile installs them, translated.
 
 PLUGIN=/usr/lib64/qt6/plugins/kf6/krunner/krunner_brescaos.so
 
@@ -13,6 +13,13 @@ PLUGIN=/usr/lib64/qt6/plugins/kf6/krunner/krunner_brescaos.so
 
 @test "KRunner's first favorite is the plugin" {
     grep -q "^plugins=krunner_brescaos," /etc/xdg/krunnerrc
+}
+
+@test "Ctrl+Alt+B opens KRunner with only the plugin" {
+    local desktop_file=/usr/share/applications/com.brescaos.bresca-krunner.desktop
+    grep -q "^X-KDE-Shortcuts=Ctrl+Alt+B$" "$desktop_file"
+    grep -q "querySingleRunner krunner_brescaos" "$desktop_file"
+    grep -q "^Name\[es\]=" "$desktop_file"
 }
 
 @test "the plugin and its name are translated" {

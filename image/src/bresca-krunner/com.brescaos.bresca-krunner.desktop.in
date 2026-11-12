@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=BrescaOS in KRunner
+Comment=Opens KRunner with only BrescaOS's commands
+Exec=gdbus call --session --dest org.kde.krunner --object-path /App --method org.kde.krunner.App.querySingleRunner krunner_brescaos ""
+Icon=system-search
+NoDisplay=true
+X-KDE-Shortcuts=Ctrl+Alt+B

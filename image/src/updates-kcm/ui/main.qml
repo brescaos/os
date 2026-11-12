@@ -63,6 +63,33 @@ KCM.SimpleKCM {
         return new Date(isoTime).toLocaleString(Qt.locale(), Locale.ShortFormat);
     }
 
+    // install asked for (installRequested): done once the page knows what
+    // to show, with the TLS question when it applies.
+    property bool isInstallPending: false
+
+    function installIfPending() {
+        if (!isInstallPending || view === "loading" || view === "checking") {
+            return;
+        }
+        isInstallPending = false;
+        if (view === "available") {
+            download("download-install");
+        } else if (view === "downloaded") {
+            module.start("install");
+        }
+    }
+
+    onViewChanged: installIfPending()
+
+    Connections {
+        target: page.module
+
+        function onInstallRequested() {
+            page.isInstallPending = true;
+            page.installIfPending();
+        }
+    }
+
     // The CLI only downloads from a registry without TLS with --no-tls: here,
     // once the user accepts it.
     function download(operation) {

@@ -23,7 +23,9 @@ class UpdatesKcm : public KQuickConfigModule
     Q_PROPERTY(QStringList runningOperations READ runningOperations NOTIFY runningOperationsChanged)
 
 public:
-    UpdatesKcm(QObject *parent, const KPluginMetaData &metaData);
+    // arguments: what was asked for when opening it (systemsettings
+    // kcm_brescaos_updates --args <action>), as requestAction().
+    UpdatesKcm(QObject *parent, const KPluginMetaData &metaData, const QVariantList &arguments);
 
     QVariantMap results() const
     {
@@ -40,8 +42,15 @@ public:
 Q_SIGNALS:
     void resultsChanged();
     void runningOperationsChanged();
+    // The check that install asked for ended: the page downloads and
+    // installs the version it found, or installs the one downloaded.
+    void installRequested();
 
 private:
+    // From the KRunner plugin (image/src/bresca-krunner/): check, a new
+    // check even if there's a result already, or install, the same and then
+    // installRequested(). Anything else is ignored.
+    void requestAction(const QVariantList &arguments);
     void readResults();
     void readRunningUnits();
 
@@ -57,4 +66,6 @@ private:
     QSet<QString> m_startedOperations;
     // Running as systemd says, started from anywhere.
     QSet<QString> m_runningUnits;
+    // install was asked for, and its check hasn't ended yet.
+    bool m_isInstallRequested = false;
 };

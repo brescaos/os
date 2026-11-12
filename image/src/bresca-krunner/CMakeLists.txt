@@ -17,7 +17,7 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core DBus)
 find_package(KF6 6.0 REQUIRED COMPONENTS CoreAddons I18n Runner)
 
 # image/build/compile_translations.sh writes it: krunner_brescaos.json.in with
@@ -33,7 +33,7 @@ add_compile_definitions(TRANSLATION_DOMAIN="krunner_brescaos")
 kcoreaddons_add_plugin(krunner_brescaos SOURCES runner.cpp INSTALL_NAMESPACE "kf6/krunner")
 # moc finds runner.cpp's krunner_brescaos.json in the include folders.
 target_include_directories(krunner_brescaos PRIVATE "${TRANSLATED_METADATA_DIR}")
-target_link_libraries(krunner_brescaos PRIVATE KF6::I18n KF6::Runner)
+target_link_libraries(krunner_brescaos PRIVATE KF6::I18n KF6::Runner Qt6::DBus)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

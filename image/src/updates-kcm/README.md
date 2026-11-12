@@ -40,6 +40,15 @@ the CLI (`image/src/bresca-cli/`) and shows the results they leave in
   come from: `bresca updates status --format=json`), and `check` only if
   there's no check since the boot. `status` runs again whenever a download,
   an install or a rollback leaves a new result.
+- Opened with an action (`systemsettings kcm_brescaos_updates --args
+  <action>`, from the KRunner plugin, `image/src/bresca-krunner/`), or
+  asked again while open (`activationRequested`), it does it: `check` runs
+  a new check even if there's a result already; `install` does the same
+  and then, once the page knows what to show, Download and Install for a
+  version found, or Install for one already downloaded, with the same
+  password and TLS question as the buttons. Up to date, a failed check or
+  a version waiting for a restart: it only shows it. Anything else is
+  ignored.
 - From a registry allowed without TLS, downloading (Download and Install,
   Download Only) asks first, as the CLI's `--no-tls` does: the services
   don't check it.

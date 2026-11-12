@@ -35,7 +35,7 @@ const QStringList versionChangingResults = {
 };
 }
 
-UpdatesKcm::UpdatesKcm(QObject *parent, const KPluginMetaData &metaData)
+UpdatesKcm::UpdatesKcm(QObject *parent, const KPluginMetaData &metaData, const QVariantList &arguments)
     : KQuickConfigModule(parent, metaData)
 {
     // Everything applies at once: no Apply, Reset or Defaults.
@@ -54,10 +54,24 @@ UpdatesKcm::UpdatesKcm(QObject *parent, const KPluginMetaData &metaData)
     readResults();
     readRunningUnits();
     start(QStringLiteral("status"));
+    requestAction(arguments);
     // None since the boot: the timer's first one is minutes away.
     if (!m_results.contains(QStringLiteral("check"))) {
         start(QStringLiteral("check"));
     }
+    // System Settings, already open, asked again.
+    connect(this, &KAbstractConfigModule::activationRequested, this, &UpdatesKcm::requestAction);
+}
+
+void UpdatesKcm::requestAction(const QVariantList &arguments)
+{
+    const QString action = arguments.value(0).toString();
+    if (action != QLatin1String("check") && action != QLatin1String("install")) {
+        return;
+    }
+    m_isInstallRequested = action == QLatin1String("install");
+    // One already running started here: its end does as well.
+    start(QStringLiteral("check"));
 }
 
 QStringList UpdatesKcm::runningOperations() const
@@ -80,6 +94,10 @@ void UpdatesKcm::start(const QString &operation)
         Q_EMIT runningOperationsChanged();
         readResults();
         readRunningUnits();
+        if (operation == QLatin1String("check") && m_isInstallRequested) {
+            m_isInstallRequested = false;
+            Q_EMIT installRequested();
+        }
     });
     systemctl->start(QStringLiteral("/usr/bin/systemctl"),
                      {QStringLiteral("start"), QStringLiteral("bresca-updates@%1.service").arg(operation)});
