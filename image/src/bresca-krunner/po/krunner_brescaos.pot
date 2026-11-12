@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 19:17+0000\n"
+"POT-Creation-Date: 2026-11-12 19:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,6 +43,14 @@ msgstr ""
 
 #: runner.cpp
 msgid "Install the new BrescaOS version"
+msgstr ""
+
+#: runner.cpp
+msgid "Open BrescaOS Updates"
+msgstr ""
+
+#: runner.cpp
+msgid "Opens System Settings > BrescaOS Updates"
 msgstr ""
 
 #: runner.cpp

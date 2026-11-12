@@ -5,6 +5,8 @@
 
 #include <QTest>
 
+#include <algorithm>
+
 using namespace KRunner;
 
 class RunnerTest : public AbstractRunnerTest
@@ -21,6 +23,7 @@ private Q_SLOTS:
     {
         QTest::addColumn<QString>("query");
         QTest::addColumn<QStringList>("texts");
+        const QString open = QStringLiteral("Open BrescaOS Updates");
         const QString check = QStringLiteral("Check for BrescaOS updates");
         const QString install = QStringLiteral("Install the new BrescaOS version");
         QTest::newRow("check, whole") << QStringLiteral("bresca updates check") << QStringList{check};
@@ -28,12 +31,13 @@ private Q_SLOTS:
         QTest::newRow("check, being typed") << QStringLiteral("bresca updates ch") << QStringList{check};
         QTest::newRow("install, whole") << QStringLiteral("bresca updates install") << QStringList{install};
         QTest::newRow("install, being typed") << QStringLiteral("bresca updates inst") << QStringList{install};
-        QTest::newRow("both, their common start") << QStringLiteral("bresca upd") << QStringList{check, install};
-        QTest::newRow("both, the start of their first word") << QStringLiteral("bre") << QStringList{check, install};
+        QTest::newRow("all, their common start") << QStringLiteral("bresca upd") << QStringList{check, install, open};
+        QTest::newRow("all, the start of their first word") << QStringLiteral("bre") << QStringList{check, install, open};
         QTest::newRow("check, initials") << QStringLiteral("b u c") << QStringList{check};
         QTest::newRow("install, initials") << QStringLiteral("b u i") << QStringList{install};
         QTest::newRow("check, the start of each word") << QStringLiteral("bre upd ch") << QStringList{check};
-        QTest::newRow("both, two initials") << QStringLiteral("b u") << QStringList{check, install};
+        QTest::newRow("open, whole") << QStringLiteral("bresca updates") << QStringList{check, install, open};
+        QTest::newRow("all, two initials") << QStringLiteral("b u") << QStringList{check, install, open};
     }
 
     void testFindsTheCommands()
@@ -53,10 +57,11 @@ private Q_SLOTS:
     {
         QTest::addColumn<QString>("query");
         QTest::addColumn<QStringList>("texts");
+        const QString open = QStringLiteral("Open BrescaOS Updates");
         const QString check = QStringLiteral("Check for BrescaOS updates");
         const QString install = QStringLiteral("Install the new BrescaOS version");
-        QTest::newRow("KRunner's help") << QStringLiteral("?") << QStringList{check, install};
-        QTest::newRow("without bresca") << QStringLiteral("updates") << QStringList{check, install};
+        QTest::newRow("KRunner's help") << QStringLiteral("?") << QStringList{check, install, open};
+        QTest::newRow("without bresca") << QStringLiteral("updates") << QStringList{check, install, open};
         QTest::newRow("without bresca, being typed") << QStringLiteral("updates ch") << QStringList{check};
         QTest::newRow("with bresca") << QStringLiteral("bresca updates install") << QStringList{install};
         QTest::newRow("initials without bresca") << QStringLiteral("u c") << QStringList{check};
@@ -75,6 +80,28 @@ private Q_SLOTS:
         }
         foundTexts.sort();
         QCOMPARE(foundTexts, texts);
+    }
+
+    // The command whose every word is typed, even if only their start, comes
+    // ahead of the longer ones it's the start of.
+    void testWholeCommandFirst_data()
+    {
+        QTest::addColumn<QString>("query");
+        QTest::addColumn<QString>("text");
+        QTest::newRow("open") << QStringLiteral("bresca updates") << QStringLiteral("Open BrescaOS Updates");
+        QTest::newRow("open, initials") << QStringLiteral("b u") << QStringLiteral("Open BrescaOS Updates");
+    }
+
+    void testWholeCommandFirst()
+    {
+        QFETCH(QString, query);
+        QFETCH(QString, text);
+        QList<QueryMatch> matches = launchQuery(query);
+        std::ranges::sort(matches, [](const QueryMatch &a, const QueryMatch &b) {
+            return a.relevance() > b.relevance();
+        });
+        QVERIFY(!matches.isEmpty());
+        QCOMPARE(matches.first().text(), text);
     }
 
     void testFindsNothing_data()

@@ -1,11 +1,12 @@
 # bresca KRunner plugin
 
 A KRunner plugin, **BrescaOS**: the `bresca` CLI's commands in KRunner
-(Alt+Space) and in Plasma's search (the launcher). Today two, both in
+(Alt+Space) and in Plasma's search (the launcher). Today three, all in
 System Settings > BrescaOS Updates (`image/src/updates-kcm/`):
 
 | Command | Entry | What it does |
 | --- | --- | --- |
+| `bresca updates` | **Open BrescaOS Updates** | Opens it, as from System Settings |
 | `bresca updates check` | **Check for BrescaOS updates** | Checks again, and shows the result |
 | `bresca updates install` | **Install the new BrescaOS version** | The same, then downloads and installs the version it finds, or installs the one already downloaded |
 
@@ -29,9 +30,10 @@ gcc-c++, kf6-ki18n-devel and kf6-krunner-devel.
 
 - Each entry shows when every word typed is the start of the command's
   word in the same place, in any case: the whole command, while it's typed
-  (`bresca updates inst`) or abbreviated (`b u i`, `bre upd ch`); both for
-  their common start (`bre`, `b u`). The whole command comes first. It
-  never runs what's typed.
+  (`bresca updates inst`) or abbreviated (`b u i`, `bre upd ch`); all of
+  them for their common start (`bre`). The command with every word typed,
+  even if only their start, comes first: `b u` is **Open BrescaOS
+  Updates**, ahead of the two longer ones. It never runs what's typed.
 - Its results come first: `krunnerrc` makes it KRunner's first favorite,
   ahead of applications (`krunner_services`, KRunner's own default). It only
   has results for the `bresca` commands, so it never gets ahead of anything
@@ -47,8 +49,8 @@ gcc-c++, kf6-ki18n-devel and kf6-krunner-devel.
   KRunner shows the plugin's icon. Its **?** types `?`, which lists every
   command: KRunner's own help plugin isn't there. It shows nothing until
   something is typed: KRunner doesn't ask a plugin for an empty query.
-- Choosing one only opens the module with what to do:
-  `systemsettings kcm_brescaos_updates --args check|install`. The module
+- Choosing one only opens the module, with what to do for check and
+  install: `systemsettings kcm_brescaos_updates [--args check|install]`. The module
   does it as its own buttons do, so it keeps their checks: polkit's
   password for downloading and installing, and the question before
   downloading from a registry without TLS.

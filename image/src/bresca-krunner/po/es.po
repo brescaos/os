@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 19:17+0000\n"
+"POT-Creation-Date: 2026-11-12 19:27+0000\n"
 "PO-Revision-Date: 2026-11-12 18:38+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -44,6 +44,14 @@ msgstr "Descarga e instala una versión más reciente de BrescaOS, si la hay"
 #: runner.cpp
 msgid "Install the new BrescaOS version"
 msgstr "Instalar la nueva versión de BrescaOS"
+
+#: runner.cpp
+msgid "Open BrescaOS Updates"
+msgstr "Abrir Actualizaciones de BrescaOS"
+
+#: runner.cpp
+msgid "Opens System Settings > BrescaOS Updates"
+msgstr "Abre Preferencias del sistema > Actualizaciones de BrescaOS"
 
 #: runner.cpp
 msgid "“%1” isn't a BrescaOS command: search all of KRunner"

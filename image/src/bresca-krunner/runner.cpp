@@ -20,7 +20,7 @@ struct Command {
     KLazyLocalizedString text;
     KLazyLocalizedString description;
     // What the module does (--args): check, or install, which also downloads
-    // and installs a new version.
+    // and installs a new version. None: it only opens.
     QString moduleAction;
 };
 
@@ -43,6 +43,7 @@ bool isTypedAs(const QStringList &typedWords, const QString &command)
 }
 
 const std::array commands{
+    Command{QStringLiteral("bresca updates"), kli18n("Open BrescaOS Updates"), kli18n("Opens System Settings > BrescaOS Updates"), QString()},
     Command{QStringLiteral("bresca updates check"), kli18n("Check for BrescaOS updates"),
             kli18n("Checks whether a newer BrescaOS version is available"), QStringLiteral("check")},
     Command{QStringLiteral("bresca updates install"), kli18n("Install the new BrescaOS version"),
@@ -57,7 +58,11 @@ const QString searchEverywhereKind = QStringLiteral("search-everywhere");
 // before downloading from a registry without TLS.
 void openUpdatesSettings(const QString &moduleAction)
 {
-    QProcess::startDetached(QStringLiteral("systemsettings"), {QStringLiteral("kcm_brescaos_updates"), QStringLiteral("--args"), moduleAction});
+    QStringList arguments{QStringLiteral("kcm_brescaos_updates")};
+    if (!moduleAction.isEmpty()) {
+        arguments << QStringLiteral("--args") << moduleAction;
+    }
+    QProcess::startDetached(QStringLiteral("systemsettings"), arguments);
 }
 
 // KRunner again, with every plugin and query typed.
@@ -106,7 +111,10 @@ public:
             if (!isHelp && !isTypedAs(typedWords, command.command) && !(isOnlyPlugin && isTypedAs(typedWords, shortCommand))) {
                 continue;
             }
-            const bool isWholeCommand = query == command.command || (isOnlyPlugin && query == shortCommand);
+            // Each of its words typed, if only their start ("b u c"): ahead of
+            // the longer commands it's the start of.
+            const qsizetype typedCommandWordCount = (isTypedAs(typedWords, command.command) ? command.command : shortCommand).count(u' ') + 1;
+            const bool isWholeCommand = typedWords.size() == typedCommandWordCount;
             isCommandFound = true;
             KRunner::QueryMatch match(this);
             match.setId(command.command);
