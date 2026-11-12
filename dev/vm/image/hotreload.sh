@@ -113,6 +113,11 @@ note_copied_file() {
             is_plasma_changed=true
             changed_settings_module=kcm_brescaos_autotile
             ;;
+        # Loaded by KRunner and by plasmashell's search.
+        /usr/lib64/qt6/plugins/kf6/krunner/* | /usr/share/locale/*/LC_MESSAGES/krunner_*.mo | /etc/xdg/krunnerrc)
+            is_plasma_changed=true
+            is_krunner_changed=true
+            ;;
         /usr/share/kwin/scripts/*)
             changed_kwin_script=${1#/usr/share/kwin/scripts/}
             changed_kwin_script=${changed_kwin_script%%/*}
@@ -230,7 +235,7 @@ reopen_settings() {
 
 copy_changed_files() {
     local mode source destination project count_before cmake_lists
-    local is_unit_changed=false is_plasma_changed=false changed_settings_module='' changed_kwin_script=''
+    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false changed_settings_module='' changed_kwin_script=''
     local copied_count=0
     local updated_projects=''
 
@@ -272,6 +277,10 @@ copy_changed_files() {
     fi
     if $is_plasma_changed && run_in_user_session systemctl --user restart plasma-plasmashell.service; then
         echo "restarted plasmashell"
+    fi
+    # D-Bus starts it again on the next Alt+Space.
+    if $is_krunner_changed && run_in_user_session kquitapp6 krunner; then
+        echo "quit KRunner"
     fi
     if [[ -n $changed_kwin_script ]]; then
         reload_kwin_script "$changed_kwin_script"

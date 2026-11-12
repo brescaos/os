@@ -1,0 +1,6 @@
+# KRunner's defaults; each user's own krunnerrc (KRunner's settings) wins.
+#
+# Favorite plugins' results come first, in this order: BrescaOS's (only for a
+# query starting with "bresca"), then KRunner's own default, applications.
+[Plugins][Favorites]
+plugins=krunner_brescaos,krunner_services

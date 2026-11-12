@@ -22,6 +22,7 @@ Each translated component has a `po/` folder:
 | `autotile` | `kcm_brescaos_autotile` | `i18n()` in `common/autotilelayout.cpp` and the KCM's QML, `i18nd()` in the applet's, and its three `*.json.in` (script, applet, KCM) |
 | `bresca-cli` | `bresca` | Its scripts' `$"..."` strings |
 | `distrobox` | `plasma_applet_com.brescaos.distrobox` | `i18n()` in its tray applet's QML and `applet/metadata.json.in` |
+| `bresca-krunner` | `krunner_brescaos` | `i18n()` in its C++ and `krunner_brescaos.json.in` |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |
 | `updates-kcm` | `kcm_brescaos_updates` | `i18n()` in its QML and `kcm_brescaos_updates.json.in` |
 | `welcome` | `bresca-welcome` | `i18n()` in `main.cpp`, `KI18n.i18n()` in its QML, and its `.desktop.in` files |
@@ -116,10 +117,11 @@ mounted. It writes, laid out as in the image:
   updates applet's.
 
 And, apart, the System Settings modules' `kcm_brescaos_updates.json` and
-`kcm_brescaos_autotile.json`, with `"Name[<lang>]"`, `"Description[<lang>]"`
-and `"X-KDE-Keywords[<lang>]"`: System Settings reads them from the module's
-own metadata, so the `updates-kcm-build` and `autotile-build` stages compile
-them into the modules.
+`kcm_brescaos_autotile.json`, and the KRunner plugin's
+`krunner_brescaos.json`, with `"Name[<lang>]"`, `"Description[<lang>]"`
+and `"X-KDE-Keywords[<lang>]"`: System Settings and KRunner read them from
+the plugin's own metadata, so the `updates-kcm-build`, `autotile-build` and
+`bresca-krunner-build` stages compile them into the plugins.
 
 Every one of those metadata files also gets the version in its
 component's `VERSION.txt`.

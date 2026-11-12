@@ -11,7 +11,8 @@
 #   - the Distrobox tray applet's metadata.json;
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
-#   autotile/kcm_brescaos_autotile.json, with "Name[<lang>]" and the like.
+#   autotile/kcm_brescaos_autotile.json, and the KRunner plugin's
+#   bresca-krunner/krunner_brescaos.json, with "Name[<lang>]" and the like.
 # Every metadata.json and KCM JSON also gets the version in its component's
 # VERSION.txt.
 # Runs in image/Containerfile's translations stage and in the development VM's
@@ -93,3 +94,6 @@ translate_desktop_file "$welcome_dir/com.brescaos.welcome-autostart.desktop.in" 
 distrobox_dir=$src_dir/distrobox
 translate_metadata "$distrobox_dir/applet/metadata.json.in" "$distrobox_dir/po" \
     "$out_dir/usr/share/plasma/plasmoids/com.brescaos.distrobox/metadata.json"
+
+translate_metadata "$src_dir/bresca-krunner/krunner_brescaos.json.in" "$src_dir/bresca-krunner/po" \
+    "$metadata_dir/bresca-krunner/krunner_brescaos.json"

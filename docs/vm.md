@@ -92,8 +92,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   leaves the last ones in place, with the error in the log.
 - What `image/Containerfile` compiles (today, System Settings > BrescaOS
   Updates, `image/src/updates-kcm/`, autotiling, `image/src/autotile/`,
-  Welcome, `image/src/welcome/`, and the distroboxes' terminal colors,
-  `image/src/distrobox/`:
+  Welcome, `image/src/welcome/`, the distroboxes' terminal colors,
+  `image/src/distrobox/`, and the KRunner plugin, `image/src/bresca-krunner/`:
   every `image/src/` component with a `CMakeLists.txt`) is compiled again in the VM when its sources or its
   translations change, as the image's stage does, into
   `/var/cache/bresca-dev/build/<component>/`; it persists, so only what
@@ -104,7 +104,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
 - A changed systemd unit (a service, a timer…) is reloaded (`systemctl
   daemon-reload`); a service that is already running keeps the old one until
   it restarts. A changed Plasma applet, or a QML module it imports, restarts
-  plasmashell. A changed KWin script is unloaded and KWin loads it again if
+  plasmashell. A changed KRunner plugin, its translations or `krunnerrc` restarts
+  plasmashell and quits KRunner, which starts again on the next Alt+Space. A changed KWin script is unloaded and KWin loads it again if
   it's on.
 - `/usr` is only writable until the next boot (`bootc usr-overlay`): after a
   reboot the image's files come back and the changed ones are copied again.

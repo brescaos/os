@@ -68,6 +68,18 @@ RUN --mount=type=bind,source=src/distrobox,target=/tmp/src \
     && cmake --build /tmp/build \
     && DESTDIR=/out cmake --install /tmp/build
 
+# KRunner plugin for BrescaOS.
+FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS bresca-krunner-build
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
+        cmake extra-cmake-modules gcc-c++ kf6-ki18n-devel kf6-krunner-devel
+RUN --mount=type=bind,source=src/bresca-krunner,target=/tmp/src \
+    --mount=type=bind,from=translations,source=/metadata/bresca-krunner,target=/tmp/metadata \
+    cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTRANSLATED_METADATA_DIR=/tmp/metadata \
+    && cmake --build /tmp/build \
+    && DESTDIR=/out cmake --install /tmp/build
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
 
 ARG FEDORA_VERSION
@@ -146,6 +158,10 @@ COPY src/distrobox/applet/package/ /usr/share/plasma/plasmoids/com.brescaos.dist
 # The applet's symbol as a theme icon, for its metadata: About and the tray's
 # settings show only an icon name, not a path.
 COPY src/distrobox/applet/package/contents/icons/distrobox-symbolic.svg /usr/share/icons/hicolor/scalable/apps/com.brescaos.distrobox.svg
+# KRunner plugin for BrescaOS (src/bresca-krunner/README.md), and KRunner's
+# defaults that put its results first.
+COPY --from=bresca-krunner-build /out/ /
+COPY src/bresca-krunner/krunnerrc /etc/xdg/krunnerrc
 RUN systemctl enable bresca-updates-check.timer
 
 # The translations of src/.

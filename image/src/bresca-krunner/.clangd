@@ -1,0 +1,29 @@
+# For clangd in the editor, without a build: the include folders of the
+# headers the sources and tests use, as Fedora installs them. A new one goes
+# here too.
+# pp_file_not_found: runner.moc, runnertest.moc and krunner_brescaos.json
+# only exist in a build.
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -fPIC
+    - -isystem/usr/include/qt6
+    - -isystem/usr/include/qt6/QtCore
+    - -isystem/usr/include/qt6/QtDBus
+    - -isystem/usr/include/qt6/QtGui
+    - -isystem/usr/include/qt6/QtTest
+    - -isystem/usr/include/KF6/KCoreAddons
+    - -isystem/usr/include/KF6/KI18n
+    - -isystem/usr/include/KF6/KRunner
+    - -DTRANSLATION_DOMAIN="krunner_brescaos"
+Diagnostics:
+  Suppress: pp_file_not_found
+---
+# What krunner_configure_test (tests/CMakeLists.txt) defines for
+# AbstractRunnerTest: where the built plugin is.
+If:
+  PathMatch: tests/.*
+CompileFlags:
+  Add:
+    - -DKRUNNER_TEST_RUNNER_PLUGIN_NAME="krunner_brescaos.so"
+    - -DKRUNNER_TEST_RUNNER_PLUGIN_DIR="bin/kf6/krunner"

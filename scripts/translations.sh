@@ -59,6 +59,10 @@ extract_strings() {
                     --keyword=i18n:1 --keyword=i18np:1,2 -o "$pot"
             extract_metadata_strings applet/metadata.json.in "$pot"
             ;;
+        bresca-krunner)
+            xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 -o "$pot" runner.cpp
+            extract_metadata_strings krunner_brescaos.json.in "$pot"
+            ;;
         bresca-cli)
             # xgettext warns about every $"...": bash used to expand what a
             # translation has, which lib/messages.sh turns off

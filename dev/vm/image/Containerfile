@@ -17,6 +17,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         gettext \
         cmake extra-cmake-modules gcc-c++ kf6-kcmutils-devel \
         qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel kf6-kcolorscheme-devel \
+        kf6-krunner-devel \
         spectacle \
     && systemctl enable spice-vdagentd.socket
 

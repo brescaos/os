@@ -20,6 +20,7 @@ jobs:
       # kf6-kirigami, kf6-qqc2-desktop-style: its tests load its QML offscreen.
       # kf6-kcmutils-devel, kf6-kcoreaddons-devel: autotiling and its tests (make check-autotile).
       # kf6-kcolorscheme-devel: the distroboxes' terminal colors (make check-distrobox).
+      # kf6-krunner-devel: the KRunner plugin (make check-bresca-krunner).
       - name: Install dependencies
         run: |
           dnf -y install --setopt=install_weak_deps=False \
@@ -27,6 +28,7 @@ jobs:
               cmake extra-cmake-modules gcc-c++ \
               qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel \
               kf6-kcmutils-devel kf6-kcoreaddons-devel kf6-kcolorscheme-devel \
+              kf6-krunner-devel \
               kf6-kirigami kf6-qqc2-desktop-style
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
