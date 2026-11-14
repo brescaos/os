@@ -1,0 +1,4 @@
+[KDE]
+LookAndFeelPackage=com.brescaos.hexa.light.desktop
+DefaultLightLookAndFeel=com.brescaos.hexa.light.desktop
+DefaultDarkLookAndFeel=com.brescaos.hexa.dark.desktop

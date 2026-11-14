@@ -1,0 +1,16 @@
+# check=skip=InvalidDefaultArgInFrom;error=true
+
+# Tests of Hexa (scripts/test.sh, make test): bats, run in the image under
+# test, so Hexa is where its Containerfile installs it. Plasma applying it
+# can't run here: the development VM tries that.
+
+# The image to test. Required, no default: scripts/test.sh passes it.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True bats
+
+COPY *.bats /usr/lib/hexa-tests/
+
+CMD ["bats", "--print-output-on-failure", "/usr/lib/hexa-tests"]

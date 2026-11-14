@@ -72,6 +72,12 @@ extract_strings() {
                 | xargs xgettext $XGETTEXT_OPTIONS -L Shell -o "$pot" 2>&1 \
                 | { grep -v 'the syntax \$"\.\.\." is deprecated' || true; } >&2
             ;;
+        hexa)
+            # Only its Global Themes' metadata: --force-po, for theirs to join.
+            xgettext $XGETTEXT_OPTIONS --force-po -L PO -o "$pot" /dev/null
+            extract_metadata_strings look-and-feel/com.brescaos.hexa.light.desktop/metadata.json.in "$pot"
+            extract_metadata_strings look-and-feel/com.brescaos.hexa.dark.desktop/metadata.json.in "$pot"
+            ;;
         updates-applet)
             find package -name '*.qml' | sort \
                 | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript --keyword= \

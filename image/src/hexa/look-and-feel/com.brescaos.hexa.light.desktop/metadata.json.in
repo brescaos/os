@@ -1,0 +1,19 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
+            }
+        ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Copyright": "© 2026 BrescaOS",
+        "Description": "Hexa's light desktop",
+        "Id": "com.brescaos.hexa.light.desktop",
+        "License": "GPL-3.0-or-later",
+        "Name": "Hexa Light",
+        "Website": "https://www.brescaos.com"
+    },
+    "X-Plasma-APIVersion": "2"
+}

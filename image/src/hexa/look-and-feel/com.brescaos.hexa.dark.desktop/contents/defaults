@@ -1,0 +1,19 @@
+# Breeze's defaults with Hexa Dark's colors (color-schemes/HexaDark.colors):
+# everything Hexa doesn't style yet is Breeze's.
+[kdeglobals][General]
+ColorScheme=HexaDark
+
+[kdeglobals][KDE]
+widgetStyle=Breeze
+
+[kdeglobals][Icons]
+Theme=breeze-dark
+
+[plasmarc][Theme]
+name=default
+
+[kwinrc][org.kde.kdecoration2]
+library=org.kde.breeze
+
+[kcminputrc][Mouse]
+cursorTheme=breeze_cursors

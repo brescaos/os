@@ -21,6 +21,7 @@ Each translated component has a `po/` folder:
 |---|---|---|
 | `autotile` | `kcm_brescaos_autotile` | `i18n()` in `common/autotilelayout.cpp` and the KCM's QML, `i18nd()` in the applet's, and its three `*.json.in` (script, applet, KCM) |
 | `bresca-cli` | `bresca` | Its scripts' `$"..."` strings |
+| `hexa` | `hexa` | Its Global Themes' `look-and-feel/<id>/metadata.json.in` |
 | `distrobox` | `plasma_applet_com.brescaos.distrobox` | `i18n()` in its tray applet's QML and `applet/metadata.json.in` |
 | `bresca-krunner` | `krunner_brescaos` | `kli18n()` and `i18n()` in its C++, `krunner_brescaos.json.in` and its `.desktop.in` |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |
@@ -113,8 +114,8 @@ mounted. It writes, laid out as in the image:
 - the welcome's `.desktop` files, for the application menu and autostart,
   with `Name[<lang>]=`, `Comment[<lang>]=` and `Keywords[<lang>]=` lines
   (`msgfmt --desktop`);
-- the autotiling KWin script's and tray applet's `metadata.json`, as the
-  updates applet's.
+- the autotiling KWin script's and tray applet's `metadata.json`, and Hexa's
+  Global Themes', as the updates applet's.
 
 And, apart, the System Settings modules' `kcm_brescaos_updates.json` and
 `kcm_brescaos_autotile.json`, and the KRunner plugin's
