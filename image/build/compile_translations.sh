@@ -10,7 +10,8 @@
 #   - the autotiling KWin script's and tray applet's metadata.json;
 #   - the Distrobox tray applet's metadata.json;
 #   - the KRunner plugin's .desktop file (its shortcut);
-#   - Hexa's Global Themes', top bar's and its panel template's metadata.json;
+#   - Hexa's Global Themes', top bar's, panel template's and clock's
+#     metadata.json;
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
 #   autotile/kcm_brescaos_autotile.json, and the KRunner plugin's
@@ -108,5 +109,7 @@ for theme in com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop; do
 done
 translate_metadata "$src_dir/hexa/plasmoids/com.brescaos.hexa.topbar/metadata.json.in" "$src_dir/hexa/po" \
     "$out_dir/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/metadata.json"
+translate_metadata "$src_dir/hexa/plasmoids/com.brescaos.hexa.clock/metadata.json.in" "$src_dir/hexa/po" \
+    "$out_dir/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/metadata.json"
 translate_metadata "$src_dir/hexa/layout-templates/com.brescaos.hexa.topbar/metadata.json.in" "$src_dir/hexa/po" \
     "$out_dir/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/metadata.json"

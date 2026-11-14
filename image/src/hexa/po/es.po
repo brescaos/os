@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 14:04+0000\n"
+"POT-Creation-Date: 2026-11-14 15:36+0000\n"
 "PO-Revision-Date: 2026-11-14 10:07+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -21,7 +21,9 @@ msgstr ""
 msgid ""
 "A bar across the top of the screen with the launcher, the app's menu, the "
 "date and time and the system tray"
-msgstr "Una barra a lo ancho de la parte superior de la pantalla con el lanzador, el menú de la aplicación, la fecha y la hora y la bandeja del sistema"
+msgstr ""
+"Una barra a lo ancho de la parte superior de la pantalla con el lanzador, el "
+"menú de la aplicación, la fecha y la hora y la bandeja del sistema"
 
 #: layout-templates/com.brescaos.hexa.topbar/metadata.json.in
 #: plasmoids/com.brescaos.hexa.topbar/metadata.json.in
@@ -43,6 +45,54 @@ msgstr "Hexa Light"
 #: look-and-feel/com.brescaos.hexa.light.desktop/metadata.json.in
 msgid "Hexa's light desktop"
 msgstr "El escritorio claro de Hexa"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/config/config.qml
+msgctxt "@title"
+msgid "General"
+msgstr "General"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@item:inlistbox time format"
+msgid "12-hour"
+msgstr "12 horas"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@item:inlistbox time format"
+msgid "24-hour"
+msgstr "24 horas"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@item:inlistbox time format"
+msgid "As the region has it"
+msgstr "Como en la región"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@item:inlistbox date format, %1 an example"
+msgid "As the region has it (%1)"
+msgstr "Como en la región (%1)"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@label:listbox"
+msgid "Date format:"
+msgstr "Formato de fecha:"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@label"
+msgid "Preview:"
+msgstr "Vista previa:"
+
+#: plasmoids/com.brescaos.hexa.clock/contents/ui/configGeneral.qml
+msgctxt "@label:listbox"
+msgid "Time format:"
+msgstr "Formato de hora:"
+
+#: plasmoids/com.brescaos.hexa.clock/metadata.json.in
+msgid "Hexa Clock"
+msgstr "Hexa Clock"
+
+#: plasmoids/com.brescaos.hexa.clock/metadata.json.in
+msgid "The date and time"
+msgstr "La fecha y la hora"
 
 #: plasmoids/com.brescaos.hexa.topbar/metadata.json.in
 msgid "A bar across the top of the screen, with no background"

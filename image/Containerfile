@@ -187,6 +187,7 @@ COPY src/hexa/look-and-feel/com.brescaos.hexa.dark.desktop/contents/ /usr/share/
 COPY src/hexa/look-and-feel/org.kde.plasma.desktop-layout.js /usr/share/plasma/look-and-feel/com.brescaos.hexa.light.desktop/contents/layouts/
 COPY src/hexa/look-and-feel/org.kde.plasma.desktop-layout.js /usr/share/plasma/look-and-feel/com.brescaos.hexa.dark.desktop/contents/layouts/
 COPY src/hexa/plasmoids/com.brescaos.hexa.topbar/contents/ /usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/contents/
+COPY src/hexa/plasmoids/com.brescaos.hexa.clock/contents/ /usr/share/plasma/plasmoids/com.brescaos.hexa.clock/contents/
 COPY src/hexa/layout-templates/com.brescaos.hexa.topbar/contents/ /usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/
 # BrescaOS's desktop is Hexa: Hexa Light, with Hexa Dark as its dark pair.
 # Plasma applies the Global Theme's defaults at login, unless the user chose

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hexa Clock's settings (Configure Hexa Clock..., configGeneral.qml). -->
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="dateFormat" type="String">
+      <label>The date's format, in Qt's date format syntax (ddd: abbreviated weekday, d: day, MMM: abbreviated month, yy: year...); empty, the region's short date. The settings page offers common ones.</label>
+      <default>ddd d MMM</default>
+    </entry>
+    <entry name="timeFormat" type="Int">
+      <label>The time's format: 0 as the locale has it, 1 12-hour, 2 24-hour.</label>
+      <default>0</default>
+    </entry>
+  </group>
+</kcfg>

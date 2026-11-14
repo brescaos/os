@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
+            }
+        ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Category": "Date and Time",
+        "Copyright": "© 2026 BrescaOS",
+        "Description": "The date and time",
+        "Icon": "preferences-system-time",
+        "Id": "com.brescaos.hexa.clock",
+        "License": "GPL-3.0-or-later",
+        "Name": "Hexa Clock",
+        "Website": "https://www.brescaos.com"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

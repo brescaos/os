@@ -73,11 +73,13 @@ extract_strings() {
                 | { grep -v 'the syntax \$"\.\.\." is deprecated' || true; } >&2
             ;;
         hexa)
-            # Only its packages' metadata: --force-po, for theirs to join.
-            xgettext $XGETTEXT_OPTIONS --force-po -L PO -o "$pot" /dev/null
+            # The clock's QML names the domain (i18ndc).
+            find plasmoids/com.brescaos.hexa.clock -name '*.qml' | sort \
+                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript --keyword= --keyword=i18ndc:2c,3 -o "$pot"
             extract_metadata_strings look-and-feel/com.brescaos.hexa.light.desktop/metadata.json.in "$pot"
             extract_metadata_strings look-and-feel/com.brescaos.hexa.dark.desktop/metadata.json.in "$pot"
             extract_metadata_strings plasmoids/com.brescaos.hexa.topbar/metadata.json.in "$pot"
+            extract_metadata_strings plasmoids/com.brescaos.hexa.clock/metadata.json.in "$pot"
             extract_metadata_strings layout-templates/com.brescaos.hexa.topbar/metadata.json.in "$pot"
             ;;
         updates-applet)

@@ -5,7 +5,7 @@
 // spacers sharing the free width; with two spacers, what's between them is
 // centred on the bar, whatever the sides hold. Its widgets are fixed: its
 // panel template (layout-templates/com.brescaos.hexa.topbar) adds them, and
-// nothing can be dropped on it or removed or configured from it; the whole
+// nothing can be dropped on it or removed from it, only configured; the whole
 // bar can still be removed. Its content is white or black, whichever reads
 // better on the wallpaper behind it.
 import QtQuick
@@ -108,7 +108,7 @@ ContainmentItem {
     // A slot for the applet $applet where the saved order puts it (Plasma
     // restores a bar's applets one by one, in no particular order), or last
     // if it isn't in it; whether the order changed, so it needs saving. The
-    // applet is locked: Plasma then neither removes nor configures it.
+    // applet is locked: Plasma then doesn't remove it, but still configures it.
     function addSlot(applet) {
         if (slots().some(slot => slot.appletId === applet.id)) {
             return false;

@@ -19,9 +19,17 @@ spacers sharing the free width; with two spacers, what's between them (the
 clock) is centred on the screen, whatever the sides hold. Its widgets are
 fixed: its panel template, `com.brescaos.hexa.topbar` (`layout-templates/`),
 adds them, and the bar locks them, so none can be added, removed or
-configured. The whole bar can be removed (its panel settings) and added again
+moved; each can still be configured (its context menu). The whole bar can be removed (its panel settings) and added again
 (the desktop's Add Panel menu, Hexa Top Bar); the desktop layout loads the
 same template.
+
+The date and time are Hexa's clock, `com.brescaos.hexa.clock`
+(`plasmoids/`, QML): the date, then the time in semibold, on one line, in
+the user's language ("mié 14 nov  16:16" in Spanish). Plasma's own clock
+draws both in the same weight. Its settings (its context menu, Configure
+Hexa Clock...) pick the date's format from common ones, each shown as today
+in it, and the time's: as the region has it, 12-hour or 24-hour. A click,
+or Enter or Space, opens Plasma's calendar.
 
 With no background, the bar's content is drawn on the wallpaper, so the bar
 makes it white or black, whichever contrasts more (WCAG) with the wallpaper
@@ -52,13 +60,17 @@ tells it:
 | `look-and-feel/org.kde.plasma.desktop-layout.js`, for both | `/usr/share/plasma/look-and-feel/<id>/contents/layouts/` |
 | `plasmoids/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/contents/` |
 | `plasmoids/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/metadata.json` |
+| `plasmoids/com.brescaos.hexa.clock/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/contents/` |
+| `plasmoids/com.brescaos.hexa.clock/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/metadata.json` |
 | `layout-templates/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/` |
 | `layout-templates/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/metadata.json` |
 | `wallpapercontrast/`, compiled (`CMakeLists.txt`) | `/usr/lib64/qt6/qml/com/brescaos/hexa/` |
 
 `<id>` is `com.brescaos.hexa.light.desktop` or `com.brescaos.hexa.dark.desktop`.
 Each `metadata.json.in` is a template: the build fills in the version
-(`VERSION.txt`) and each language's `Description` from `po/`.
+(`VERSION.txt`) and each language's `Description` from `po/`. The clock's
+settings are translated in Hexa's domain, `hexa` (`i18ndc`), not the one
+Plasma would give the applet.
 
 The QML module is the only compiled part: cmake, extra-cmake-modules,
 gcc-c++, qt6-qtbase-devel, qt6-qtdeclarative-devel, libplasma-devel,

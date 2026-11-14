@@ -36,6 +36,15 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     jq -e '.KPlugin["Description[es]"] and .KPlugin["Description[ca]"]' "$dir/metadata.json" >/dev/null
 }
 
+@test "the clock is there, translated, and the top bar's template adds it" {
+    local dir=/usr/share/plasma/plasmoids/com.brescaos.hexa.clock
+    [[ -f $dir/contents/ui/main.qml && -f $dir/contents/ui/configGeneral.qml && -f $dir/contents/config/main.xml ]]
+    jq -e '.KPlugin.Id == "com.brescaos.hexa.clock"' "$dir/metadata.json" >/dev/null
+    jq -e '.KPlugin["Description[es]"] and .KPlugin["Description[ca]"]' "$dir/metadata.json" >/dev/null
+    grep -q 'addWidget("com.brescaos.hexa.clock")' \
+        /usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/layout.js
+}
+
 @test "the QML module the top bar imports is there" {
     local dir=/usr/lib64/qt6/qml/com/brescaos/hexa
     grep -q '^module com.brescaos.hexa$' "$dir/qmldir"
