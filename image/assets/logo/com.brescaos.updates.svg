@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img">
+  <title>BrescaOS Updates</title>
+  <path d="M 240.00 128.00 L 184.00 224.99 L 72.00 224.99 L 16.00 128.00 L 72.00 31.01 L 184.00 31.01 Z" fill="#e3a12f" stroke="#e3a12f" stroke-width="16" stroke-linejoin="round"/>
+  <g fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 66 V152"/>
+    <path d="M90 116 L128 154 L166 116"/>
+    <path d="M82 188 H174"/>
+  </g>
+</svg>

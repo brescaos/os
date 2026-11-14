@@ -206,75 +206,61 @@ KCM.SimpleKCM {
             Layout.maximumWidth: Kirigami.Units.gridUnit * 26
             spacing: Kirigami.Units.smallSpacing
 
-            // A spinning arc, as big as the icons' circle: Breeze's
-            // BusyIndicator is a turning gear. RotationAnimator turns it on
-            // the render thread, only while it shows.
-            Shape {
-                id: spinner
+            // BrescaOS's own icons (icons/): the logo with a seal for the state.
+            // While something runs, a white stretch goes around the seal's
+            // small hexagon (checking.svg).
+            Kirigami.Icon {
+                id: stateIcon
 
-                readonly property real lineWidth: Kirigami.Units.largeSpacing
-
-                Kirigami.Theme.colorGroup: Kirigami.Theme.Active
-                Kirigami.Theme.inherit: false
                 Layout.alignment: Qt.AlignHCenter
                 implicitWidth: Kirigami.Units.iconSizes.huge
                 implicitHeight: Kirigami.Units.iconSizes.huge
-                visible: page.view === "loading" || page.view === "checking" || page.view === "rollingBack"
-                preferredRendererType: Shape.CurveRenderer
+                source: page.isBusy ? Qt.resolvedUrl("icons/checking.svg")
+                      : page.view === "upToDate" ? Qt.resolvedUrl("icons/up-to-date.svg")
+                      : page.view === "available" ? Qt.resolvedUrl("icons/available.svg")
+                      : page.view === "unknown" ? Qt.resolvedUrl("icons/failed.svg")
+                      : page.isRestartPending ? Qt.resolvedUrl("icons/restart.svg")
+                      : Qt.resolvedUrl("icons/downloaded.svg")
 
-                ShapePath {
-                    fillColor: "transparent"
-                    strokeColor: Kirigami.Theme.highlightColor
-                    strokeWidth: spinner.lineWidth
-                    capStyle: ShapePath.RoundCap
-
-                    PathAngleArc {
-                        centerX: spinner.width / 2
-                        centerY: spinner.height / 2
-                        radiusX: (spinner.width - spinner.lineWidth) / 2
-                        radiusY: radiusX
-                        startAngle: -90
-                        sweepAngle: 270
+                // In the SVG's 256 units, scaled to the icon.
+                Shape {
+                    width: 256
+                    height: 256
+                    visible: page.isBusy
+                    layer.enabled: true
+                    layer.samples: 4
+                    transform: Scale {
+                        xScale: stateIcon.width / 256
+                        yScale: stateIcon.height / 256
                     }
-                }
-                RotationAnimator on rotation {
-                    from: 0
-                    to: 360
-                    duration: 1000
-                    loops: Animation.Infinite
-                    running: spinner.visible
-                }
-            }
-            // Breeze has no big colored icons for these: a symbolic one on a
-            // circle of the theme's color.
-            Rectangle {
-                // Breeze's inactive colors (an unfocused window) turn the
-                // highlight's text dark: keep the active ones.
-                Kirigami.Theme.colorGroup: Kirigami.Theme.Active
-                Kirigami.Theme.inherit: false
-                Layout.alignment: Qt.AlignHCenter
-                implicitWidth: Kirigami.Units.iconSizes.huge
-                implicitHeight: Kirigami.Units.iconSizes.huge
-                radius: width / 2
-                visible: !["loading", "checking", "rollingBack"].includes(page.view)
-                // Green when there's nothing left to fetch (up to date, or
-                // downloaded and waiting to be installed); blue while there's
-                // something to do.
-                color: page.view === "upToDate" || page.view === "downloaded" || page.view === "installing" ? Kirigami.Theme.positiveTextColor
-                     : page.view === "unknown" ? Kirigami.Theme.disabledTextColor
-                     : Kirigami.Theme.highlightColor
 
-                Kirigami.Icon {
-                    anchors.centerIn: parent
-                    width: Kirigami.Units.iconSizes.medium
-                    height: Kirigami.Units.iconSizes.medium
-                    isMask: true
-                    color: Kirigami.Theme.highlightedTextColor
-                    source: page.view === "upToDate" ? "checkmark"
-                          : page.view === "unknown" ? "question"
-                          : page.isRestartPending ? "system-reboot"
-                          : page.view === "downloaded" || page.view === "installing" ? "run-install"
-                          : "download"
+                    ShapePath {
+                        id: busyStretch
+
+                        fillColor: "transparent"
+                        strokeColor: "white"
+                        strokeWidth: 10
+                        strokeStyle: ShapePath.DashLine
+                        // In stroke widths: a 50-unit stretch of the 168-unit
+                        // hexagon.
+                        dashPattern: [5, 11.8]
+                        capStyle: ShapePath.RoundCap
+                        joinStyle: ShapePath.RoundJoin
+
+                        PathPolyline {
+                            path: [Qt.point(218, 190), Qt.point(204, 214.25), Qt.point(176, 214.25), Qt.point(162, 190),
+                                Qt.point(176, 165.75), Qt.point(204, 165.75), Qt.point(218, 190)]
+                        }
+                    }
+                    NumberAnimation {
+                        target: busyStretch
+                        property: "dashOffset"
+                        from: 0
+                        to: -16.8
+                        duration: 1400
+                        loops: Animation.Infinite
+                        running: page.isBusy
+                    }
                 }
             }
             Kirigami.Heading {

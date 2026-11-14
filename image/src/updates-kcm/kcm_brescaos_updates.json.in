@@ -9,7 +9,7 @@
         "BugReportUrl": "https://github.com/brescaos/os/issues",
         "Copyright": "© 2026 BrescaOS",
         "Description": "Install new BrescaOS versions",
-        "Icon": "system-software-update",
+        "Icon": "com.brescaos.updates",
         "License": "GPL-3.0-or-later",
         "Name": "BrescaOS Updates",
         "Website": "https://www.brescaos.com"

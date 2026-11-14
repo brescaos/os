@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img">
+  <title>BrescaOS is waiting for a restart</title>
+  <defs>
+    <mask id="seal-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+      <rect width="256" height="256" fill="#fff"/>
+      <path d="M 250.00 190.00 L 220.00 241.96 L 160.00 241.96 L 130.00 190.00 L 160.00 138.04 L 220.00 138.04 Z" fill="#000" stroke="#000" stroke-width="14" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g mask="url(#seal-cutout)">
+    <path d="M73.73 30.56 L117.41 55.78 L117.41 106.22 L73.73 131.44 L30.05 106.22 L30.05 55.78 Z" fill="#e3a12f" stroke="#e3a12f" stroke-width="8.89" stroke-linejoin="round"/>
+    <path d="M182.27 30.56 L225.95 55.78 L225.95 106.22 L182.27 131.44 L138.59 106.22 L138.59 55.78 Z" fill="#a8681f" stroke="#a8681f" stroke-width="8.89" stroke-linejoin="round"/>
+    <path d="M128.00 124.56 L171.68 149.78 L171.68 200.22 L128.00 225.44 L84.32 200.22 L84.32 149.78 Z" fill="#e9c56a" stroke="#e9c56a" stroke-width="8.89" stroke-linejoin="round"/>
+  </g>
+  <path d="M 238.00 190.00 L 214.00 231.57 L 166.00 231.57 L 142.00 190.00 L 166.00 148.43 L 214.00 148.43 Z" fill="#e3a12f" stroke="#e3a12f" stroke-width="12" stroke-linejoin="round"/>
+  <!-- Two arrows going round: restart. -->
+  <g transform="translate(133.68 133.68) scale(0.44)" fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M81 110.9 A50 50 0 0 1 171.3 103"/>
+    <path d="M177 81.7 L171.3 103 L150 97.3"/>
+    <path d="M175 145.1 A50 50 0 0 1 84.7 153"/>
+    <path d="M79 174.3 L84.7 153 L106 158.7"/>
+  </g>
+</svg>

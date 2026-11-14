@@ -84,6 +84,8 @@ left=$(rpm -qa 'fedora-release*' fedora-logos)
     printf 'PRETTY_NAME="BrescaOS"\n'
     printf 'DEFAULT_HOSTNAME="bresca"\n'
     printf 'IMAGE_ID=brescaos\n'
+    # Icon name (image/assets/logo/), Kickoff's icon in Plasma's default panel.
+    printf 'LOGO=brescaos-logo-light\n'
     [[ -z $support_end ]] || printf 'SUPPORT_END=%s\n' "$support_end"
     printf 'HOME_URL="https://www.brescaos.com"\n'
     printf 'BUG_REPORT_URL="https://github.com/brescaos/os/issues"\n'

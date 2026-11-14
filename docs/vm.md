@@ -70,7 +70,7 @@ host.
 
 ## Hot reload
 
-While the VM runs, what you change in `image/src/` reaches it within a second
+While the VM runs, what you change in `image/src/` and `image/assets/` reaches it within a second
 (what's compiled, once it compiles), without rebuilding the image: today, the
 whole `bresca` CLI (`image/src/bresca-cli/`), the updates applet and the
 System Settings module.
@@ -82,8 +82,9 @@ journalctl -fu bresca-dev-hotreload   # in the VM
 
 - After copying, a notification says which projects of `image/src/` it
   updated (e.g. `bresca-cli`) and how many files.
-- What reloads is what `image/Containerfile` copies from `src/`, to the same
-  places; a new `COPY` there reloads too.
+- What reloads is what `image/Containerfile` copies from `src/` and
+  `assets/`, to the same places; a new `COPY` there reloads too. A changed
+  icon restarts plasmashell; an app picks it up when it opens again.
 - Translations reload too: when a `po/*.po` or a `*.in` template of
   `image/src/` changes, they're compiled again with
   `image/build/compile_translations.sh`, as the image's build does, and the result is

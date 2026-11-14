@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img">
+  <title>A new BrescaOS version is available</title>
+  <defs>
+    <mask id="seal-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+      <rect width="256" height="256" fill="#fff"/>
+      <path d="M 250.00 190.00 L 220.00 241.96 L 160.00 241.96 L 130.00 190.00 L 160.00 138.04 L 220.00 138.04 Z" fill="#000" stroke="#000" stroke-width="14" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+  <g mask="url(#seal-cutout)">
+    <path d="M73.73 30.56 L117.41 55.78 L117.41 106.22 L73.73 131.44 L30.05 106.22 L30.05 55.78 Z" fill="#e3a12f" stroke="#e3a12f" stroke-width="8.89" stroke-linejoin="round"/>
+    <path d="M182.27 30.56 L225.95 55.78 L225.95 106.22 L182.27 131.44 L138.59 106.22 L138.59 55.78 Z" fill="#a8681f" stroke="#a8681f" stroke-width="8.89" stroke-linejoin="round"/>
+    <path d="M128.00 124.56 L171.68 149.78 L171.68 200.22 L128.00 225.44 L84.32 200.22 L84.32 149.78 Z" fill="#e9c56a" stroke="#e9c56a" stroke-width="8.89" stroke-linejoin="round"/>
+  </g>
+  <path d="M 238.00 190.00 L 214.00 231.57 L 166.00 231.57 L 142.00 190.00 L 166.00 148.43 L 214.00 148.43 Z" fill="#a8681f" stroke="#a8681f" stroke-width="12" stroke-linejoin="round"/>
+  <g transform="translate(132.4 132.4) scale(0.45)" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 66 V152"/>
+    <path d="M90 116 L128 154 L166 116"/>
+    <path d="M82 188 H174"/>
+  </g>
+</svg>

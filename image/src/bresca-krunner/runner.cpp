@@ -119,7 +119,7 @@ public:
             KRunner::QueryMatch match(this);
             match.setId(command.command);
             match.setText(command.text.toString());
-            match.setIconName(QStringLiteral("system-software-update"));
+            match.setIconName(QStringLiteral("com.brescaos.updates"));
             match.setData(QStringList{openSettingsKind, command.moduleAction});
             match.setCategoryRelevance(KRunner::QueryMatch::CategoryRelevance::Highest);
             match.setRelevance(isWholeCommand ? 1.0 : 0.9);

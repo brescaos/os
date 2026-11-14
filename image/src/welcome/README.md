@@ -88,8 +88,12 @@ trademarks"). Keep it on the welcome page.
 
 The welcome page's title has the BrescaOS version: `VERSION_ID` in
 `/usr/lib/os-release` (`QSysInfo::productVersion()`), which
-`image/build/identity.sh` writes. Its icon is the icon theme's `help-about`
-until the BrescaOS logo is in the image.
+`image/build/identity.sh` writes. Its icon is the BrescaOS logo,
+`brescaos-logo-light` (`image/assets/logo/`).
+
+The app's icon (the `.desktop` files, and so the window's) is
+`com.brescaos.welcome`, a waving hand on one of the logo's hexagons, in
+`image/assets/logo/com.brescaos.welcome.svg`.
 
 ## Translations
 

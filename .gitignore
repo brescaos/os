@@ -1,5 +1,6 @@
-# Copied from the LICENSE by scripts/image.sh before every build.
+# Copied from the root's by scripts/image.sh before every build.
 /image/LICENSE
+/image/TRADEMARKS.md
 # The development VM (make vm): disk, UEFI variables, boot log.
 /.vm/
 # make check-welcome's build.

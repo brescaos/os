@@ -104,13 +104,64 @@ PlasmoidItem {
     readonly property bool isDownloading: runningOperation === "download"
                                           || (runningOperation === "download-install" && !downloadResult)
 
-    // Breeze's update status icons, as Plasma's own update notifier: what's
-    // pending shows at a glance.
-    readonly property string statusIcon: restartVersion ? "system-reboot"
-                                       : availableVersion || downloadedVersion || runningOperation ? "update-medium"
-                                       : "update-none"
+    // What the icon's seal says: something to do, something running, or
+    // nothing (no seal).
+    readonly property bool hasSeal: !!(availableVersion || downloadedVersion || restartVersion || runningOperation)
 
-    Plasmoid.icon: statusIcon
+    // BrescaOS Updates' symbol (../icons/), in the panel's text color, with
+    // the seal of the KCM's state icons at its top right, in the logo's
+    // amber: still when there's something to do, fading in and out while an
+    // operation runs (a stretch running around it, as in the KCM, can't be
+    // read at the tray's 22 px).
+    component StatusSymbol: Item {
+        Kirigami.Icon {
+            anchors.fill: parent
+            isMask: true
+            color: Kirigami.Theme.textColor
+            source: root.restartVersion ? Qt.resolvedUrl("../icons/restart-sealed-symbolic.svg")
+                  : root.hasSeal ? Qt.resolvedUrl("../icons/updates-sealed-symbolic.svg")
+                  : Qt.resolvedUrl("../icons/updates-symbolic.svg")
+        }
+        Kirigami.Icon {
+            id: seal
+
+            anchors.fill: parent
+            visible: root.hasSeal
+            isMask: true
+            color: "#e3a12f"
+            source: Qt.resolvedUrl("../icons/seal.svg")
+
+            SequentialAnimation on opacity {
+                running: !!root.runningOperation
+                loops: Animation.Infinite
+                // Back to still when the operation ends.
+                onRunningChanged: if (!running) seal.opacity = 1
+
+                NumberAnimation {
+                    to: 0.3
+                    duration: 700
+                    easing.type: Easing.InOutSine
+                }
+                NumberAnimation {
+                    to: 1
+                    duration: 700
+                    easing.type: Easing.InOutSine
+                }
+            }
+        }
+    }
+
+    // The symbol without a seal, as a theme icon (image/Containerfile), for
+    // where Plasma shows only an icon's name: the tray's hidden items.
+    Plasmoid.icon: "com.brescaos.updates-symbolic"
+    compactRepresentation: MouseArea {
+        hoverEnabled: true
+        onClicked: root.expanded = !root.expanded
+
+        StatusSymbol {
+            anchors.fill: parent
+        }
+    }
     // Hidden among the tray's idle items while there's nothing to do.
     Plasmoid.status: availableVersion || downloadedVersion || restartVersion || runningOperation
                      ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
@@ -188,10 +239,9 @@ PlasmoidItem {
                 Layout.fillWidth: true
                 spacing: Kirigami.Units.largeSpacing
 
-                Kirigami.Icon {
+                StatusSymbol {
                     Layout.preferredWidth: Kirigami.Units.iconSizes.large
                     Layout.preferredHeight: Kirigami.Units.iconSizes.large
-                    source: root.statusIcon
                 }
                 ColumnLayout {
                     Layout.fillWidth: true

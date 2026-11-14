@@ -12,7 +12,6 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
-#include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 #include <QSysInfo>
@@ -30,8 +29,9 @@ int main(int argc, char *argv[])
     // The BrescaOS version (VERSION_ID in /usr/lib/os-release), for --version
     // and the welcome page's title.
     QApplication::setApplicationVersion(QSysInfo::productVersion());
+    // Also the window's icon: KWin takes it from the .desktop file. With
+    // setWindowIcon, the image Qt sends had colored fringes in the title bar.
     QApplication::setDesktopFileName(QStringLiteral("com.brescaos.welcome"));
-    QApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("help-about")));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(i18n("First steps on BrescaOS"));

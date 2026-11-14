@@ -12,6 +12,21 @@ one.
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/kcm_brescaos_updates.mo` |
 
 Its version is in `VERSION.txt`: the build writes it into the module's metadata.
+Its icon, `com.brescaos.updates` (`image/assets/logo/com.brescaos.updates.svg`),
+is a download arrow on one of the logo's hexagons; the KRunner plugin's
+results for these commands show it too.
+
+Above what's going on, the page shows the logo with a seal for the state
+(`ui/icons/`, compiled in with the page):
+
+| Icon | When |
+| --- | --- |
+| `up-to-date.svg` | Up to date |
+| `available.svg` | A new version is available |
+| `checking.svg`, with a white stretch running around the seal (`main.qml`) | Loading, checking, downloading, installing, going back |
+| `downloaded.svg` | Downloaded, waiting to be installed |
+| `restart.svg` | Installed, or going back, after restarting |
+| `failed.svg` | No result to show: the check failed, or there's none yet |
 
 It's C++ (KF6 KCMUtils) because System Settings only loads modules compiled
 as a plugin; the page is `ui/main.qml`, compiled in. `image/Containerfile`

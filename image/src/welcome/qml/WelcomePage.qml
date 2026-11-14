@@ -14,7 +14,7 @@ StepPage {
         anchors.horizontalCenter: parent.horizontalCenter
         width: Kirigami.Units.gridUnit * 4
         height: width
-        source: "help-about"
+        source: "brescaos-logo-light"
     }
 
     Kirigami.InlineMessage {

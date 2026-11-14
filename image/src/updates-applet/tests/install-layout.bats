@@ -2,10 +2,12 @@
 # The applet's files are where image/Containerfile installs them, with what it
 # runs.
 
-@test "the applet's package and its notifications are there" {
+@test "the applet's package, its icons and its notifications are there" {
     local path
     for path in /usr/share/plasma/plasmoids/com.brescaos.updates/metadata.json \
         /usr/share/plasma/plasmoids/com.brescaos.updates/contents/ui/main.qml \
+        /usr/share/plasma/plasmoids/com.brescaos.updates/contents/icons/updates-sealed-symbolic.svg \
+        /usr/share/icons/hicolor/scalable/apps/com.brescaos.updates-symbolic.svg \
         /usr/share/knotifications6/brescaos-updates.notifyrc; do
         [[ -f $path ]] || {
             echo "missing: $path"

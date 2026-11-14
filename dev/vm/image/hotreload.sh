@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Hot reload for the development VM: copies the files image/Containerfile takes
-# from image/src/ onto the running system whenever they change on the host,
+# from image/src/ and image/assets/ onto the running system whenever they
+# change on the host,
 # compiles their translations again when they change, and compiles again the
 # components image/Containerfile compiles (those with a CMakeLists.txt).
 # In the VM's image (dev/vm/image/Containerfile) as
@@ -23,8 +24,9 @@ METADATA=/run/bresca-dev/metadata
 # reboot only recompiles what changed.
 BUILDS=/var/cache/bresca-dev/build
 
-# Prints "<--chmod mode or empty>|<source>|<destination>" for each COPY whose
-# source is under src/, so what reloads is always what the image copies.
+# Prints "<--chmod mode or empty>|<source>|<destination>" for each source of a
+# COPY under src/ or assets/, so what reloads is always what the image copies.
+# A COPY with several sources copies them into its destination folder.
 print_copies() {
     awk '$1 == "COPY" {
         mode = ""
@@ -33,7 +35,9 @@ print_copies() {
             if ($i ~ /^--chmod=/) mode = substr($i, 9)
             else if ($i !~ /^--/) argument[++count] = $i
         }
-        if (count == 2 && argument[1] ~ /^src\//) print mode "|" argument[1] "|" argument[2]
+        for (i = 1; i < count; i++) {
+            if (argument[i] ~ /^(src|assets)\//) print mode "|" argument[i] "|" argument[count]
+        }
     }' "$SHARE/image/Containerfile"
 }
 
@@ -104,8 +108,9 @@ note_copied_file() {
     copied_count=$((copied_count + 1))
     case $1 in
         /usr/lib/systemd/system/* | /usr/lib/systemd/user/*) is_unit_changed=true ;;
+        # Icons too: the panel and the launcher take them when plasmashell starts.
         /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/* | \
-            /usr/lib64/qt6/qml/*)
+            /usr/lib64/qt6/qml/* | /usr/share/icons/*)
             is_plasma_changed=true
             ;;
         # The autotiling applet's translations too.
@@ -240,8 +245,8 @@ copy_changed_files() {
     local updated_projects=''
 
     while IFS='|' read -r mode source destination; do
-        # src/<project>/...
-        project=${source#src/}
+        # src/<project>/... or assets/<name>/...
+        project=${source#*/}
         project=${project%%/*}
         count_before=$copied_count
         source=$SHARE/image/$source

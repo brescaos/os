@@ -1,0 +1,5 @@
+# KDE's About This System page (kcm_about-distro): BrescaOS logo. kde-settings
+# ships this file with LogoPath=system-logo-white.png, generic-logos'
+# placeholder, which overrides os-release's LOGO.
+[General]
+LogoPath=/usr/share/icons/hicolor/scalable/apps/brescaos-logo-light.svg

@@ -3,6 +3,6 @@ Type=Application
 Name=Welcome to BrescaOS
 Comment=First steps on BrescaOS
 Exec=bresca-welcome
-Icon=help-about
+Icon=com.brescaos.welcome
 Categories=Qt;KDE;System;
 Keywords=welcome;setup;first steps;

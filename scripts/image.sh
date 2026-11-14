@@ -13,9 +13,10 @@ step "Building BrescaOS $VERSION for $ARCH (Fedora $FEDORA_VERSION) with $CONTAI
 [ "$ARCH" = "$HOST_ARCH" ] \
     || warn "building for $ARCH on a $HOST_ARCH host runs under emulation: expect it to be slow"
 
-# The repository's LICENSE is outside the build context (image/): the
-# image gets this copy, which is gitignored.
+# The repository's LICENSE and TRADEMARKS.md are outside the build context
+# (image/): the image gets these copies, which are gitignored.
 cp "$REPO_ROOT/LICENSE" "$REPO_ROOT/image/LICENSE"
+cp "$REPO_ROOT/TRADEMARKS.md" "$REPO_ROOT/image/TRADEMARKS.md"
 
 # --pull always checks quay.io for a newer base image: when there is one,
 # every BrescaOS layer is rebuilt on top of it. NO_CACHE=1 also skips the

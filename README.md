@@ -19,7 +19,9 @@ See [docs/building.md](docs/building.md).
 ## Source code
 
 BrescaOS's own code is in this repository, under the
-[GNU General Public License, version 3 or later](LICENSE). Every other package
+[GNU General Public License, version 3 or later](LICENSE). The logo is an
+exception: "BrescaOS" and its logo are trademarks, see
+[TRADEMARKS.md](TRADEMARKS.md). Every other package
 comes unmodified from Fedora. The source code of each package is in
 [Fedora's Koji](https://koji.fedoraproject.org/koji/), the system that builds
 Fedora's packages.

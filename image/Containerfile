@@ -139,6 +139,9 @@ COPY src/bresca-cli/services/bresca-updates.tmpfiles /usr/lib/tmpfiles.d/bresca-
 COPY src/bresca-cli/services/bresca-updates.rules /usr/share/polkit-1/rules.d/50-brescaos-updates.rules
 # The tray icon and notification for a new version (src/updates-applet/README.md).
 COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
+# Its symbol as a theme icon, for the tray's hidden items, which show only an
+# icon's name.
+COPY src/updates-applet/package/contents/icons/updates-symbolic.svg /usr/share/icons/hicolor/scalable/apps/com.brescaos.updates-symbolic.svg
 # BrescaOS Updates KCM (src/updates-kcm/README.md).
 COPY --from=updates-kcm-build /out/ /
 # Autotiling (src/autotile/README.md): the KWin script, its KCM and the QML
@@ -162,12 +165,22 @@ COPY src/distrobox/applet/package/contents/icons/distrobox-symbolic.svg /usr/sha
 # defaults that put its results first.
 COPY --from=bresca-krunner-build /out/ /
 COPY src/bresca-krunner/krunnerrc /etc/xdg/krunnerrc
+# The BrescaOS logo (TRADEMARKS.md): os-release's LOGO names it, and the
+# About This System page needs its path.
+COPY assets/logo/brescaos-logo-light.svg assets/logo/brescaos-logo-dark.svg assets/logo/com.brescaos.welcome.svg assets/logo/com.brescaos.updates.svg /usr/share/icons/hicolor/scalable/apps/
+COPY assets/logo/kcm-about-distrorc /etc/xdg/kcm-about-distrorc
+# start-here is the distribution's logo, the launcher's icon in Fedora's
+# Plasma themes (their dark panel); these replace generic-logos' placeholder.
+COPY assets/logo/brescaos-logo-dark.svg /usr/share/icons/hicolor/scalable/apps/start-here.svg
+COPY assets/logo/brescaos-logo-dark.svg /usr/share/icons/hicolor/scalable/places/start-here.svg
 RUN systemctl enable bresca-updates-check.timer
 
 # The translations of src/.
 COPY --from=translations /out/ /
 
 COPY LICENSE /usr/share/licenses/brescaos/LICENSE
+# The name's and the logo's terms, the logo's exception to the GPL.
+COPY TRADEMARKS.md /usr/share/licenses/brescaos/TRADEMARKS.md
 
 # BrescaOS version of this build. Required, no default: scripts/image.sh
 # passes VERSION.

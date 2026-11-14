@@ -25,10 +25,14 @@ translations of `po/`.
 - The applet only reads that file when it changes: `inotifywait`
   (inotify-tools) sleeps in the kernel until `check.json` is moved into
   place or removed, then the applet reads it and waits again.
-- Its icon is Breeze's update status icon, as Plasma's own update notifier:
-  `update-none` when it's up to date (hidden among the tray's idle items),
-  `update-medium` with a version available (`update_available`: shown), and
-  `system-reboot` with a version installed that waits for a restart
+- Its icon is BrescaOS Updates' symbol (`package/contents/icons/`), in the
+  panel's text color, with the seal of the System Settings module's state
+  icons at its top right, in the logo's amber: none when it's up to date
+  (hidden among the tray's idle items, where Plasma shows the theme icon
+  `com.brescaos.updates-symbolic`), filled with a version available
+  (`update_available`) or downloaded (shown), fading in and out while an
+  operation runs, and filled with a restart arrow in place of the
+  download one with a version installed that waits for a restart
   (`install.json`'s `installed_version`: shown, with **Restart Now** in the
   popup, until the restart empties `/run/bresca/updates/`). The popup's big
   icon is the same. A successful install removes `check.json`, so the
