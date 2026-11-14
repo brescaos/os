@@ -108,6 +108,9 @@ note_copied_file() {
     copied_count=$((copied_count + 1))
     case $1 in
         /usr/lib/systemd/system/* | /usr/lib/systemd/user/*) is_unit_changed=true ;;
+        # Before /usr/share/plasma/*: Hexa is applied again, plasmashell needn't
+        # restart.
+        /usr/share/color-schemes/Hexa* | /usr/share/plasma/look-and-feel/com.brescaos.hexa.*) is_hexa_changed=true ;;
         # Icons too: the panel and the launcher take them when plasmashell starts.
         /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/* | \
             /usr/lib64/qt6/qml/* | /usr/share/icons/*)
@@ -228,6 +231,18 @@ reload_kwin_script() {
     fi
 }
 
+# Applies the logged-in user's Global Theme again if it's one of Hexa's, so
+# its colors and defaults take effect without logging in again. Another theme
+# is left alone: the user chose it.
+reapply_hexa() {
+    local theme
+    theme=$(run_in_user_session kreadconfig6 --group KDE --key LookAndFeelPackage) || return 0
+    [[ $theme == com.brescaos.hexa.* ]] || return 0
+    if run_in_user_session plasma-apply-lookandfeel --apply "$theme" >/dev/null; then
+        echo "applied $theme again"
+    fi
+}
+
 # Closes System Settings, if it's open, and opens it again on the module $1,
 # so that it loads the module's new build and translations.
 reopen_settings() {
@@ -240,7 +255,7 @@ reopen_settings() {
 
 copy_changed_files() {
     local mode source destination project count_before cmake_lists
-    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false changed_settings_module='' changed_kwin_script=''
+    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false is_hexa_changed=false changed_settings_module='' changed_kwin_script=''
     local copied_count=0
     local updated_projects=''
 
@@ -286,6 +301,9 @@ copy_changed_files() {
     # D-Bus starts it again on the next Alt+Space.
     if $is_krunner_changed && run_in_user_session kquitapp6 krunner; then
         echo "quit KRunner"
+    fi
+    if $is_hexa_changed; then
+        reapply_hexa
     fi
     if [[ -n $changed_kwin_script ]]; then
         reload_kwin_script "$changed_kwin_script"

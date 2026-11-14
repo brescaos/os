@@ -84,7 +84,10 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   updated (e.g. `bresca-cli`) and how many files.
 - What reloads is what `image/Containerfile` copies from `src/` and
   `assets/`, to the same places; a new `COPY` there reloads too. A changed
-  icon restarts plasmashell; an app picks it up when it opens again.
+  icon restarts plasmashell; an app picks it up when it opens again. A
+  change to Hexa (`image/src/hexa/`) applies the user's Global Theme again
+  if it's one of Hexa's, which also rewrites the settings the theme sets
+  (colors, widget style, icons…).
 - Translations reload too: when a `po/*.po` or a `*.in` template of
   `image/src/` changes, they're compiled again with
   `image/build/compile_translations.sh`, as the image's build does, and the result is
