@@ -23,6 +23,27 @@ configured. The whole bar can be removed (its panel settings) and added again
 (the desktop's Add Panel menu, Hexa Top Bar); the desktop layout loads the
 same template.
 
+With no background, the bar's content is drawn on the wallpaper, so the bar
+makes it white or black, whichever contrasts more (WCAG) with the wallpaper
+behind it. `WallpaperContrast`, of Hexa's QML module `com.brescaos.hexa`
+(`wallpapercontrast/`, C++: a panel's QML can't reach its screen's desktop),
+tells it:
+
+- It finds the desktop of the bar's screen and its wallpaper item, and
+  follows them when the screens, the activity or the wallpaper plugin change.
+- It looks at the wallpaper as Plasma draws it, so with any wallpaper plugin:
+  one grab of the item, 256 px wide, of which it averages the luminance of
+  the strip the bar covers. A light sky over dark ground is light for a bar
+  at the top.
+- It looks again only when the wallpaper says it changed: Plasma's wallpapers
+  (image, slideshow, day and night, plain color) emit `accentColorChanged()`
+  with every new image or color, as Plasma's accent color from the wallpaper
+  needs. Nothing runs in between. A wallpaper plugin that doesn't emit it
+  keeps the last result.
+- The bar sets the color as its `Kirigami.Theme.textColor`, which its widgets
+  inherit; their popups are windows of their own and keep the theme's colors.
+  Until the first look, the theme's color.
+
 | Source | Installed as |
 | --- | --- |
 | `color-schemes/HexaLight.colors`, `HexaDark.colors` | `/usr/share/color-schemes/` |
@@ -33,10 +54,16 @@ same template.
 | `plasmoids/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/metadata.json` |
 | `layout-templates/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/` |
 | `layout-templates/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/metadata.json` |
+| `wallpapercontrast/`, compiled (`CMakeLists.txt`) | `/usr/lib64/qt6/qml/com/brescaos/hexa/` |
 
 `<id>` is `com.brescaos.hexa.light.desktop` or `com.brescaos.hexa.dark.desktop`.
 Each `metadata.json.in` is a template: the build fills in the version
 (`VERSION.txt`) and each language's `Description` from `po/`.
+
+The QML module is the only compiled part: cmake, extra-cmake-modules,
+gcc-c++, qt6-qtbase-devel, qt6-qtdeclarative-devel, libplasma-devel,
+kf6-kconfig-devel and kf6-kcoreaddons-devel to build it, and Plasma's own libraries to run it. `tests/luminancetest.cpp`
+checks which areas of an image count as dark.
 
 Once installed, choose it in System Settings > Colors & Themes > Global Theme,
 or with `plasma-apply-lookandfeel -a com.brescaos.hexa.light.desktop`.

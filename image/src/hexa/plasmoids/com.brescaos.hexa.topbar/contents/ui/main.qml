@@ -6,9 +6,12 @@
 // centred on the bar, whatever the sides hold. Its widgets are fixed: its
 // panel template (layout-templates/com.brescaos.hexa.topbar) adds them, and
 // nothing can be dropped on it or removed or configured from it; the whole
-// bar can still be removed.
+// bar can still be removed. Its content is white or black, whichever reads
+// better on the wallpaper behind it.
 import QtQuick
 import QtQuick.Layouts
+import com.brescaos.hexa
+import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasmoid
 
@@ -16,6 +19,18 @@ ContainmentItem {
     id: root
 
     Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
+
+    // The applets take their colors from here: a color set on a theme that
+    // inherits stays on its own item. The theme's own color until the
+    // wallpaper has been looked at.
+    Kirigami.Theme.inherit: false
+    Kirigami.Theme.textColor: wallpaperContrast.isValid ? (wallpaperContrast.isDark ? "white" : "black") : undefined
+
+    WallpaperContrast {
+        id: wallpaperContrast
+        panel: Plasmoid
+        thickness: Plasmoid.formFactor === PlasmaCore.Types.Vertical ? root.width : root.height
+    }
 
     // An applet in the row, with the width it asks for; a spacer (it asks to
     // fill) with the width centringWidths gives it, if any.

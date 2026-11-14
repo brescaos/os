@@ -1,0 +1,30 @@
+# For clangd in the editor, without a build: the include folders of the
+# headers the sources and tests use, as Fedora installs them. A new one goes
+# here too.
+# pp_file_not_found: luminancetest.moc only exists once moc runs, in a build.
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -fPIC
+    - -isystem/usr/include/qt6
+    - -isystem/usr/include/qt6/QtCore
+    - -isystem/usr/include/qt6/QtGui
+    - -isystem/usr/include/qt6/QtQml
+    - -isystem/usr/include/qt6/QtQmlIntegration
+    - -isystem/usr/include/qt6/QtQuick
+    - -isystem/usr/include/qt6/QtTest
+    - -isystem/usr/include/KF6/KConfig
+    - -isystem/usr/include/KF6/KConfigCore
+    - -isystem/usr/include/KF6/KCoreAddons
+    - -isystem/usr/include/KF6/KPackage
+    - -isystem/usr/include/Plasma
+Diagnostics:
+  Suppress: pp_file_not_found
+---
+# The tests include the headers of wallpapercontrast/ (the compile command's
+# folder is the file's).
+If:
+  PathMatch: tests/.*
+CompileFlags:
+  Add:
+    - -I../wallpapercontrast

@@ -59,6 +59,7 @@ make check-welcome   # compiles Welcome and runs its unit and QML tests, without
 make check-autotile  # compiles autotiling and runs the tests of its KWin script and its state, without the image (part of make check)
 make check-distrobox # compiles the distroboxes' terminal colors and runs their tests, without the image (part of make check)
 make check-bresca-krunner # compiles the KRunner plugin and runs its tests, without the image (part of make check)
+make check-hexa      # compiles Hexa's QML module and runs its tests, without the image (part of make check)
 ```
 
 A component of `image/src/` has tests when it has `tests/Containerfile`:

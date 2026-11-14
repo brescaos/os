@@ -36,6 +36,13 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     jq -e '.KPlugin["Description[es]"] and .KPlugin["Description[ca]"]' "$dir/metadata.json" >/dev/null
 }
 
+@test "the QML module the top bar imports is there" {
+    local dir=/usr/lib64/qt6/qml/com/brescaos/hexa
+    grep -q '^module com.brescaos.hexa$' "$dir/qmldir"
+    grep -q 'WallpaperContrast' "$dir"/*.qmltypes
+    grep -q '^import com.brescaos.hexa$' /usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/contents/ui/main.qml
+}
+
 @test "the top bar's panel template is there, translated" {
     local dir=/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar
     grep -q 'new Panel("com.brescaos.hexa.topbar")' "$dir/contents/layout.js"
