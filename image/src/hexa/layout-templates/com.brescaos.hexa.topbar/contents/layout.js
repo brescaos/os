@@ -12,6 +12,7 @@ topBar.location = "top";
 topBar.lengthMode = "fill";
 topBar.height = 26;
 topBar.floating = false;
+topBar.floatingApplets = true;
 topBar.hiding = "none";
 
 var launcher = topBar.addWidget("org.kde.plasma.kickoff");

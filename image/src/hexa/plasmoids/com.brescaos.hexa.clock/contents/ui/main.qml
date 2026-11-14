@@ -70,8 +70,10 @@ PlasmoidItem {
     }
 
     fullRepresentation: PlasmaCalendar.MonthView {
-        Layout.minimumWidth: Kirigami.Units.gridUnit * 20
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 20
+        Layout.minimumWidth: Kirigami.Units.gridUnit * 18
+        Layout.minimumHeight: Kirigami.Units.gridUnit * 18
+        Layout.preferredWidth: Layout.minimumWidth
+        Layout.preferredHeight: Layout.minimumHeight
         today: clock.dateTime
         firstDayOfWeek: Qt.locale().firstDayOfWeek
         borderOpacity: 0.25
