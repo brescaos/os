@@ -55,7 +55,8 @@ ContainmentItem {
     }
 
     // With exactly two spacers, their widths by applet id, so that what's
-    // between them is centred on the bar: the first one fills up to there,
+    // between them is centred on the row, and so on the bar (its margins are
+    // the same on both sides): the first one fills up to there,
     // the second one the rest. Empty otherwise: spacers share the free width.
     readonly property var centringWidths: {
         const all = Array.from(row.children).filter(slot => slot.isShown);
@@ -69,10 +70,10 @@ ContainmentItem {
         const left = widthOf(all.slice(0, first));
         const middle = widthOf(all.slice(first + 1, second));
         const right = widthOf(all.slice(second + 1));
-        const firstWidth = Math.max(0, (root.width - middle) / 2 - left);
+        const firstWidth = Math.max(0, (row.width - middle) / 2 - left);
         return {
             [spacers[0].appletId]: firstWidth,
-            [spacers[1].appletId]: Math.max(0, root.width - left - firstWidth - middle - right)
+            [spacers[1].appletId]: Math.max(0, row.width - left - firstWidth - middle - right)
         };
     }
 
@@ -169,9 +170,13 @@ ContainmentItem {
         }
     }
 
+    // A little room between the screen's edges and the first and last
+    // applets (the launcher, the system tray's arrow).
     RowLayout {
         id: row
         anchors.fill: parent
+        anchors.leftMargin: Kirigami.Units.smallSpacing
+        anchors.rightMargin: Kirigami.Units.smallSpacing
         spacing: 0
     }
 }
