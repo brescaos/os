@@ -87,7 +87,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   icon restarts plasmashell; an app picks it up when it opens again. A
   change to Hexa (`image/src/hexa/`) applies the user's Global Theme again
   if it's one of Hexa's, which also rewrites the settings the theme sets
-  (colors, widget style, icons…).
+  (colors, widget style, icons…); a change to its layout or its top bar's
+  panel template also replaces the panels with the layout's.
 - Translations reload too: when a `po/*.po` or a `*.in` template of
   `image/src/` changes, they're compiled again with
   `image/build/compile_translations.sh`, as the image's build does, and the result is

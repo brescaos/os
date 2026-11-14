@@ -73,10 +73,12 @@ extract_strings() {
                 | { grep -v 'the syntax \$"\.\.\." is deprecated' || true; } >&2
             ;;
         hexa)
-            # Only its Global Themes' metadata: --force-po, for theirs to join.
+            # Only its packages' metadata: --force-po, for theirs to join.
             xgettext $XGETTEXT_OPTIONS --force-po -L PO -o "$pot" /dev/null
             extract_metadata_strings look-and-feel/com.brescaos.hexa.light.desktop/metadata.json.in "$pot"
             extract_metadata_strings look-and-feel/com.brescaos.hexa.dark.desktop/metadata.json.in "$pot"
+            extract_metadata_strings plasmoids/com.brescaos.hexa.topbar/metadata.json.in "$pot"
+            extract_metadata_strings layout-templates/com.brescaos.hexa.topbar/metadata.json.in "$pot"
             ;;
         updates-applet)
             find package -name '*.qml' | sort \

@@ -1,0 +1,22 @@
+{
+    "KPackageStructure": "Plasma/LayoutTemplate",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
+            }
+        ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Copyright": "© 2026 BrescaOS",
+        "Description": "A bar across the top of the screen with the launcher, the app's menu, the date and time and the system tray",
+        "Id": "com.brescaos.hexa.topbar",
+        "License": "GPL-3.0-or-later",
+        "Name": "Hexa Top Bar",
+        "Website": "https://www.brescaos.com"
+    },
+    "X-Plasma-ContainmentCategories": [
+        "panel"
+    ],
+    "X-Plasma-Shell": "plasmashell"
+}

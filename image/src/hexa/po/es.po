@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 10:12+0000\n"
+"POT-Creation-Date: 2026-11-14 14:04+0000\n"
 "PO-Revision-Date: 2026-11-14 10:07+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -16,6 +16,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: layout-templates/com.brescaos.hexa.topbar/metadata.json.in
+msgid ""
+"A bar across the top of the screen with the launcher, the app's menu, the "
+"date and time and the system tray"
+msgstr "Una barra a lo ancho de la parte superior de la pantalla con el lanzador, el menú de la aplicación, la fecha y la hora y la bandeja del sistema"
+
+#: layout-templates/com.brescaos.hexa.topbar/metadata.json.in
+#: plasmoids/com.brescaos.hexa.topbar/metadata.json.in
+msgid "Hexa Top Bar"
+msgstr "Hexa Top Bar"
 
 #: look-and-feel/com.brescaos.hexa.dark.desktop/metadata.json.in
 msgid "Hexa Dark"
@@ -33,4 +44,6 @@ msgstr "Hexa Light"
 msgid "Hexa's light desktop"
 msgstr "El escritorio claro de Hexa"
 
-
+#: plasmoids/com.brescaos.hexa.topbar/metadata.json.in
+msgid "A bar across the top of the screen, with no background"
+msgstr "Una barra a lo ancho de la parte superior de la pantalla, sin fondo"

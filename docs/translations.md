@@ -21,7 +21,7 @@ Each translated component has a `po/` folder:
 |---|---|---|
 | `autotile` | `kcm_brescaos_autotile` | `i18n()` in `common/autotilelayout.cpp` and the KCM's QML, `i18nd()` in the applet's, and its three `*.json.in` (script, applet, KCM) |
 | `bresca-cli` | `bresca` | Its scripts' `$"..."` strings |
-| `hexa` | `hexa` | Its Global Themes' `look-and-feel/<id>/metadata.json.in` |
+| `hexa` | `hexa` | Its Global Themes' `look-and-feel/<id>/metadata.json.in` its top bar's `plasmoids/com.brescaos.hexa.topbar/metadata.json.in` and its panel template's `layout-templates/com.brescaos.hexa.topbar/metadata.json.in` |
 | `distrobox` | `plasma_applet_com.brescaos.distrobox` | `i18n()` in its tray applet's QML and `applet/metadata.json.in` |
 | `bresca-krunner` | `krunner_brescaos` | `kli18n()` and `i18n()` in its C++, `krunner_brescaos.json.in` and its `.desktop.in` |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |

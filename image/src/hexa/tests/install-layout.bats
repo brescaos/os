@@ -9,7 +9,7 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     grep -qx 'ColorScheme=HexaDark' /usr/share/color-schemes/HexaDark.colors
 }
 
-@test "each Global Theme has its metadata and defaults, with its color scheme" {
+@test "each Global Theme has its metadata, its defaults with its color scheme, and the layout" {
     local theme dir
     for theme in $THEMES; do
         dir=/usr/share/plasma/look-and-feel/$theme
@@ -21,7 +21,27 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
             echo "defaults without a Hexa color scheme: $theme"
             return 1
         }
+        [[ -f $dir/contents/layouts/org.kde.plasma.desktop-layout.js ]] || {
+            echo "missing the desktop layout: $theme"
+            return 1
+        }
     done
+}
+
+@test "the top bar's containment is there, a panel containment, translated" {
+    local dir=/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar
+    [[ -f $dir/contents/ui/main.qml && -f $dir/contents/config/main.xml ]]
+    jq -e '.KPlugin.Id == "com.brescaos.hexa.topbar" and ."X-Plasma-ContainmentType" == "Panel"' \
+        "$dir/metadata.json" >/dev/null
+    jq -e '.KPlugin["Description[es]"] and .KPlugin["Description[ca]"]' "$dir/metadata.json" >/dev/null
+}
+
+@test "the top bar's panel template is there, translated" {
+    local dir=/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar
+    grep -q 'new Panel("com.brescaos.hexa.topbar")' "$dir/contents/layout.js"
+    jq -e '.KPlugin.Id == "com.brescaos.hexa.topbar" and (."X-Plasma-ContainmentCategories" | index("panel"))' \
+        "$dir/metadata.json" >/dev/null
+    jq -e '.KPlugin["Name[es]"] and .KPlugin["Description[ca]"]' "$dir/metadata.json" >/dev/null
 }
 
 @test "the Global Themes' metadata is translated" {

@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
+            }
+        ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Category": "Containments",
+        "Copyright": "© 2026 BrescaOS",
+        "Description": "A bar across the top of the screen, with no background",
+        "Id": "com.brescaos.hexa.topbar",
+        "License": "GPL-3.0-or-later",
+        "Name": "Hexa Top Bar",
+        "Website": "https://www.brescaos.com"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-ContainmentType": "Panel"
+}
