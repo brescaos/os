@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <style type="text/css" id="current-color-scheme">
+    .ColorScheme-NegativeText {
+      color: #da4453;
+    }
+  </style>
+  <path class="ColorScheme-NegativeText" d="M7 3h8a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4ZM8.414 7A1 1 0 0 0 7 8.414L9.586 11 7 13.586A1 1 0 0 0 8.414 15L11 12.414 13.586 15A1 1 0 0 0 15 13.586L12.414 11 15 8.414A1 1 0 0 0 13.586 7L11 9.586Z" fill="currentColor" fill-rule="evenodd"/>
+</svg>

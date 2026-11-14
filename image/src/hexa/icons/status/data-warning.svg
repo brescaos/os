@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <style type="text/css" id="current-color-scheme">
+    .ColorScheme-NeutralText {
+      color: #f67400;
+    }
+  </style>
+  <g class="ColorScheme-NeutralText">
+    <path d="M10.04 4.75Q11 3 11.96 4.75L18.54 16.75Q19.5 18.5 17.5 18.5H4.5Q2.5 18.5 3.46 16.75ZM10 9.5a1 1 0 0 1 2 0v3.5a1 1 0 0 1-2 0ZM11 15a1 1 0 1 0 0 2a1 1 0 0 0 0-2Z" fill="currentColor" fill-rule="evenodd"/>
+    <path d="M10.04 4.75Q11 3 11.96 4.75L18.54 16.75Q19.5 18.5 17.5 18.5H4.5Q2.5 18.5 3.46 16.75Z" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+  </g>
+</svg>

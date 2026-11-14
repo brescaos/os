@@ -90,10 +90,11 @@ show_notification() {
 # over: a program running the old one keeps it whole.
 copy_if_different() {
     local source=$1 destination=$2 mode=${3#0}
-    [[ -n $mode ]] || mode=$(stat -c %a "$source")
+    # -L: a link's own mode is always 777; its file's is the one that counts.
+    [[ -n $mode ]] || mode=$(stat -L -c %a "$source")
     # sha256sum, from coreutils: cmp's diffutils may not be in the image.
     if [[ -f $destination && $(sha256sum <"$source") == $(sha256sum <"$destination") &&
-    $(stat -c %a "$destination") == "$mode" ]]; then
+    $(stat -L -c %a "$destination") == "$mode" ]]; then
         return 1
     fi
     mkdir -p "$(dirname "$destination")"
@@ -141,14 +142,20 @@ note_copied_file() {
 }
 
 # Copies every file in the folder $1 into the folder $2, with the mode $3 (as
-# copy_if_different). For copy_changed_files.
+# copy_if_different). A link to a file of its own folder (another name for it,
+# as an icon's) is copied as that file; any other link is left out, so
+# nothing outside the folder is read. For copy_changed_files.
 copy_folder() {
-    local source=$1 destination=${2%/} mode=$3 file
+    local source=$1 destination=${2%/} mode=$3 file link_target
     while IFS= read -r -d '' file; do
+        if [[ -L $source/$file ]]; then
+            link_target=$(realpath -e "$source/$file" 2>/dev/null) || continue
+            [[ -f $link_target && ${link_target%/*} == "$(realpath "$(dirname "$source/$file")")" ]] || continue
+        fi
         if copy_if_different "$source/$file" "$destination/$file" "$mode"; then
             note_copied_file "$destination/$file"
         fi
-    done < <(cd "$source" && find . -type f -printf '%P\0')
+    done < <(cd "$source" && find . \( -type f -o -type l \) -printf '%P\0')
 }
 
 # Adds $1 to the projects the notification names, once. For

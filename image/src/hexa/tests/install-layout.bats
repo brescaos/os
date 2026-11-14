@@ -14,6 +14,28 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     grep -qx 'frameContrast=0.08' /usr/share/color-schemes/HexaDark.colors
 }
 
+@test "each icon theme is there, on Breeze's, with Hexa's icons, and its Global Theme uses it" {
+    local variant parent icon
+    for variant in light dark; do
+        parent=breeze
+        [[ $variant == dark ]] && parent=breeze-dark
+        grep -qx "Inherits=$parent,hicolor" "/usr/share/icons/hexa-$variant/index.theme"
+        [[ -f /usr/share/icons/$parent/index.theme ]]
+        for icon in klipper-symbolic data-warning dialog-warning emblem-warning data-error dialog-error emblem-error \
+            audio-volume-{high,medium,low,muted}{,-symbolic} \
+            microphone-sensitivity-{high,medium,low,muted}{,-symbolic} audio-input-microphone{,-symbolic} \
+            video-display-brightness{,-symbolic} redshift-status-{on,day,off}{,-symbolic} lighttable{,-symbolic} \
+            network-wired-activated{,-symbolic}; do
+            [[ -f /usr/share/icons/hexa-$variant/status/$icon.svg ]] || {
+                echo "missing the icon: hexa-$variant, $icon"
+                return 1
+            }
+        done
+        grep -qx "Theme=hexa-$variant" \
+            "/usr/share/plasma/look-and-feel/com.brescaos.hexa.$variant.desktop/contents/defaults"
+    done
+}
+
 @test "each Global Theme has its metadata, its defaults with its color scheme, and the layout" {
     local theme dir
     for theme in $THEMES; do

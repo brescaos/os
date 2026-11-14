@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <style type="text/css" id="current-color-scheme">
+    .ColorScheme-Text {
+      color: #232629;
+    }
+    .ColorScheme-NegativeText {
+      color: #da4453;
+    }
+  </style>
+  <g class="ColorScheme-Text" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14.8 18.7A6.5 6.5 0 1 1 21.2 18.7V22.5H14.8ZM15.5 25.5h5"/>
+    <path class="ColorScheme-NegativeText" d="M7.5 5.5l18 21"/>
+  </g>
+</svg>

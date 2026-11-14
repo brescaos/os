@@ -59,6 +59,8 @@ tells it:
 | `look-and-feel/<id>/contents/` | `/usr/share/plasma/look-and-feel/<id>/contents/` |
 | `look-and-feel/<id>/metadata.json.in`, translated | `/usr/share/plasma/look-and-feel/<id>/metadata.json` |
 | `look-and-feel/org.kde.plasma.desktop-layout.js`, for both | `/usr/share/plasma/look-and-feel/<id>/contents/layouts/` |
+| `icons/hexa-light/`, `icons/hexa-dark/` | `/usr/share/icons/hexa-light/`, `/usr/share/icons/hexa-dark/` |
+| `icons/status/`, for both | `/usr/share/icons/<theme>/status/` |
 | `plasmoids/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/contents/` |
 | `plasmoids/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/metadata.json` |
 | `plasmoids/com.brescaos.hexa.clock/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/contents/` |

@@ -430,8 +430,8 @@ KCM.SimpleKCM {
                     text: page.status?.registry?.image ?? ""
                 }
                 Kirigami.Icon {
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                    Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                    Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                    Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
                     visible: !page.hasTls
                     source: "data-warning"
                 }
