@@ -151,6 +151,7 @@ shadeSortColumn=true
 
 [KDE]
 contrast=4
+frameContrast=0.08
 
 [WM]
 activeBackground=39,44,49

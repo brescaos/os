@@ -1,9 +1,7 @@
 # Hexa
 
 A desktop theme for KDE Plasma 6, in two variants: **Hexa Light** and
-**Hexa Dark**. Each is a Global Theme with its own color scheme: Breeze's, Hexa's
-starting point, with Hexa's yellow accent (`#f2b33d`). Everything else (widget
-style, window decoration, Plasma style, icons, cursors) is Breeze's.
+**Hexa Dark**.
 
 Both share one desktop layout: a top bar across the top edge with the
 launcher (the system's logo, `LOGO` in `/etc/os-release`) and the active

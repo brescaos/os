@@ -9,6 +9,11 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     grep -qx 'ColorScheme=HexaDark' /usr/share/color-schemes/HexaDark.colors
 }
 
+@test "both color schemes soften separators and frames" {
+    grep -qx 'frameContrast=0.08' /usr/share/color-schemes/HexaLight.colors
+    grep -qx 'frameContrast=0.08' /usr/share/color-schemes/HexaDark.colors
+}
+
 @test "each Global Theme has its metadata, its defaults with its color scheme, and the layout" {
     local theme dir
     for theme in $THEMES; do
