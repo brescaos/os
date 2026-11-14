@@ -13,8 +13,11 @@ The top bar is Hexa's own panel containment, `com.brescaos.hexa.topbar`
 a shadow behind it, whatever the Plasma style, while the dock keeps the
 style's. It lays its widgets in one row, in the order it keeps in its
 settings (`AppletOrder`), each as tall as the bar and as wide as it asks, the
-spacers sharing the free width; with two spacers, what's between them (the
-clock) is centred on the screen, whatever the sides hold. Its widgets are
+ones that ask to fill (the spacers, the global menu) sharing the free width;
+with two spacers, what's between them (the clock) stays centred on the
+screen, whatever the sides show: the global menu takes the room up to it.
+Only when a side doesn't fit does the clock move away, just enough, up to
+the other side; past that, the side is cut. Its widgets are
 fixed: its panel template, `com.brescaos.hexa.topbar` (`layout-templates/`),
 adds them, and the bar locks them, so none can be added, removed or
 moved; each can still be configured (its context menu). The whole bar can be removed (its panel settings) and added again

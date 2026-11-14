@@ -2,8 +2,9 @@
 // neither a background nor a shadow behind it, whatever the Plasma style.
 // Its applets in one row, in the order kept in its configuration
 // (AppletOrder): each one as tall as the bar and as wide as it asks, the
-// spacers sharing the free width; with two spacers, what's between them is
-// centred on the bar, whatever the sides hold. Its widgets are fixed: its
+// ones that ask to fill sharing the free width; with two spacers, what's
+// between them stays centred on the bar while both sides fit. Its widgets
+// are fixed: its
 // panel template (layout-templates/com.brescaos.hexa.topbar) adds them, and
 // nothing can be dropped on it or removed from it, only configured; the whole
 // bar can still be removed. Its content is white or black, whichever reads
@@ -32,8 +33,8 @@ ContainmentItem {
         thickness: Plasmoid.formFactor === PlasmaCore.Types.Vertical ? root.width : root.height
     }
 
-    // An applet in the row, with the width it asks for; a spacer (it asks to
-    // fill) with the width centringWidths gives it, if any.
+    // An applet in the row, with the width it asks for, or the one
+    // centringWidths gives it, if any.
     component AppletSlot: Item {
         required property Item appletItem
         required property int appletId
@@ -41,40 +42,73 @@ ContainmentItem {
         // An applet with nothing to show hides itself (the global menu, with
         // no app's menu), as a Plasma panel hides it.
         readonly property bool isShown: appletItem.plasmoid.status !== PlasmaCore.Types.HiddenStatus
-        readonly property bool isSpacer: appletItem.Layout.fillWidth
-        // A square when it asks for no width.
-        readonly property real askedWidth: Math.max(appletItem.Layout.minimumWidth,
-            appletItem.Layout.preferredWidth > 0 ? appletItem.Layout.preferredWidth : height)
+        readonly property bool isSpacer: appletItem.plasmoid.pluginName === "org.kde.plasma.panelspacer"
+        // A spacer, or an applet that takes the room there is (the global menu).
+        readonly property bool isFilling: appletItem.Layout.fillWidth
+        // The least it shows whole in: nothing for a spacer, its minimum if
+        // it fills, a square when it asks for no width.
+        readonly property real neededWidth: {
+            if (isSpacer) {
+                return 0;
+            }
+            if (isFilling) {
+                return Math.max(0, appletItem.Layout.minimumWidth);
+            }
+            return Math.max(appletItem.Layout.minimumWidth,
+                appletItem.Layout.preferredWidth > 0 ? appletItem.Layout.preferredWidth : height);
+        }
         readonly property bool isCentring: root.centringWidths[appletId] !== undefined
 
         visible: isShown
+        clip: width < neededWidth
         Layout.fillHeight: true
-        Layout.fillWidth: isSpacer && !isCentring
+        Layout.fillWidth: isFilling && !isCentring
         Layout.minimumWidth: isCentring ? 0 : appletItem.Layout.minimumWidth
-        Layout.preferredWidth: isCentring ? root.centringWidths[appletId] : askedWidth
+        Layout.preferredWidth: isCentring ? root.centringWidths[appletId] : neededWidth
     }
 
-    // With exactly two spacers, their widths by applet id, so that what's
-    // between them is centred on the row, and so on the bar (its margins are
-    // the same on both sides): the first one fills up to there,
-    // the second one the rest. Empty otherwise: spacers share the free width.
+    // With exactly two spacers, every shown applet's width by its id, so
+    // that what's between the spacers is centred on the row, and so on the
+    // bar (its margins are the same on both sides). When a side needs more
+    // than that leaves it, the middle moves away just enough, up to what
+    // the other side needs; past that, the side is cut. Empty otherwise:
+    // the applets that fill share the free width.
     readonly property var centringWidths: {
         const all = Array.from(row.children).filter(slot => slot.isShown);
         const spacers = all.filter(slot => slot.isSpacer);
         if (spacers.length !== 2) {
             return {};
         }
-        const first = all.indexOf(spacers[0]);
-        const second = all.indexOf(spacers[1]);
-        const widthOf = slots => slots.reduce((total, slot) => total + slot.askedWidth, 0);
-        const left = widthOf(all.slice(0, first));
-        const middle = widthOf(all.slice(first + 1, second));
-        const right = widthOf(all.slice(second + 1));
-        const firstWidth = Math.max(0, (row.width - middle) / 2 - left);
-        return {
-            [spacers[0].appletId]: firstWidth,
-            [spacers[1].appletId]: Math.max(0, row.width - left - firstWidth - middle - right)
+        const neededWidthOf = slots => slots.reduce((total, slot) => total + slot.neededWidth, 0);
+        const leftSide = all.slice(0, all.indexOf(spacers[0]) + 1);
+        const middle = all.slice(leftSide.length, all.indexOf(spacers[1]));
+        const rightSide = all.slice(leftSide.length + middle.length);
+        const middleWidth = neededWidthOf(middle);
+        const leftWidth = Math.max(0, Math.min(
+            Math.max((row.width - middleWidth) / 2, neededWidthOf(leftSide)),
+            row.width - middleWidth - neededWidthOf(rightSide)));
+
+        const widths = {};
+        for (const slot of middle) {
+            widths[slot.appletId] = slot.neededWidth;
+        }
+        // In a side, the applets that fill share what the others leave; its
+        // spacer takes it only when there are none.
+        const shareSide = (side, sideWidth) => {
+            const fixed = side.filter(slot => !slot.isFilling);
+            const filling = side.filter(slot => slot.isFilling && !slot.isSpacer);
+            const sharing = filling.length > 0 ? filling : side.filter(slot => slot.isSpacer);
+            const freeWidth = Math.max(0, sideWidth - neededWidthOf(fixed));
+            for (const slot of side) {
+                widths[slot.appletId] = slot.isFilling ? 0 : slot.neededWidth;
+            }
+            for (const slot of sharing) {
+                widths[slot.appletId] = freeWidth / sharing.length;
+            }
         };
+        shareSide(leftSide, leftWidth);
+        shareSide(rightSide, Math.max(0, row.width - leftWidth - middleWidth));
+        return widths;
     }
 
     Component {
