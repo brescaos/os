@@ -31,7 +31,8 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
                 return 1
             }
         done
-        for icon in media-playback-{start,stop}{,-symbolic} edit-delete{,-symbolic} window-pin{,-symbolic}; do
+        for icon in media-playback-{start,stop}{,-symbolic} edit-{delete,copy,paste,find}{,-symbolic} window-pin{,-symbolic} \
+            tab-new{,-symbolic} view-split-{left-right,top-bottom}{,-symbolic}; do
             [[ -f /usr/share/icons/hexa-$variant/actions/$icon.svg ]] || {
                 echo "missing the icon: hexa-$variant, $icon"
                 return 1
