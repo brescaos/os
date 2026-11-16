@@ -10,7 +10,7 @@ widgetStyle=Breeze
 Theme=hexa-dark
 
 [plasmarc][Theme]
-name=default
+name=hexa
 
 [kwinrc][org.kde.kdecoration2]
 library=org.kde.breeze

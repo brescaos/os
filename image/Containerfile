@@ -139,6 +139,7 @@ COPY src/hexa/look-and-feel/com.brescaos.hexa.light.desktop/contents/ /usr/share
 COPY src/hexa/look-and-feel/com.brescaos.hexa.dark.desktop/contents/ /usr/share/plasma/look-and-feel/com.brescaos.hexa.dark.desktop/contents/
 COPY src/hexa/look-and-feel/org.kde.plasma.desktop-layout.js /usr/share/plasma/look-and-feel/com.brescaos.hexa.light.desktop/contents/layouts/
 COPY src/hexa/look-and-feel/org.kde.plasma.desktop-layout.js /usr/share/plasma/look-and-feel/com.brescaos.hexa.dark.desktop/contents/layouts/
+COPY src/hexa/desktoptheme/hexa/dialogs/ /usr/share/plasma/desktoptheme/hexa/dialogs/
 COPY src/hexa/icons/hexa-light/ /usr/share/icons/hexa-light/
 COPY src/hexa/icons/hexa-dark/ /usr/share/icons/hexa-dark/
 COPY src/hexa/icons/actions/ /usr/share/icons/hexa-light/actions/

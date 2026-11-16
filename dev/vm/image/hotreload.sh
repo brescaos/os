@@ -116,7 +116,10 @@ note_copied_file() {
             is_hexa_changed=true
             is_hexa_layout_changed=true
             ;;
-        /usr/share/color-schemes/Hexa* | /usr/share/plasma/look-and-feel/com.brescaos.hexa.*) is_hexa_changed=true ;;
+        /usr/share/color-schemes/Hexa* | /usr/share/plasma/look-and-feel/com.brescaos.hexa.* | \
+            /usr/share/plasma/desktoptheme/hexa/*)
+            is_hexa_changed=true
+            ;;
         # Icons too: the panel and the launcher take them when plasmashell starts.
         /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/* | \
             /usr/lib64/qt6/qml/* | /usr/share/icons/*)

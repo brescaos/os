@@ -42,6 +42,18 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     done
 }
 
+@test "the Plasma style is there, with its opaque popups, and each Global Theme uses it" {
+    local variant
+    jq -e '.KPlugin.Id == "hexa"' /usr/share/plasma/desktoptheme/hexa/metadata.json >/dev/null
+    [[ -f /usr/share/plasma/desktoptheme/hexa/dialogs/background.svg ]]
+    # Breeze's, which gives everything else.
+    [[ -f /usr/share/plasma/desktoptheme/default/metadata.json ]]
+    for variant in light dark; do
+        grep -x -A1 '\[plasmarc\]\[Theme\]' \
+            "/usr/share/plasma/look-and-feel/com.brescaos.hexa.$variant.desktop/contents/defaults" | grep -qx 'name=hexa'
+    done
+}
+
 @test "each Global Theme has its metadata, its defaults with its color scheme, and the layout" {
     local theme dir
     for theme in $THEMES; do

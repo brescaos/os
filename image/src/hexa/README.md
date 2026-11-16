@@ -24,6 +24,9 @@ moved; each can still be configured (its context menu). The whole bar can be rem
 (the desktop's Add Panel menu, Hexa Top Bar); the desktop layout loads the
 same template.
 
+The Plasma style is Hexa's, `hexa` (`desktoptheme/`): Breeze's, with opaque
+popups.
+
 The date and time are Hexa's clock, `com.brescaos.hexa.clock`
 (`plasmoids/`, QML): the date, then the time in semibold, on one line, in
 the user's language ("mié 14 nov  16:16" in Spanish). Plasma's own clock
@@ -59,6 +62,8 @@ tells it:
 | `look-and-feel/<id>/contents/` | `/usr/share/plasma/look-and-feel/<id>/contents/` |
 | `look-and-feel/<id>/metadata.json.in`, translated | `/usr/share/plasma/look-and-feel/<id>/metadata.json` |
 | `look-and-feel/org.kde.plasma.desktop-layout.js`, for both | `/usr/share/plasma/look-and-feel/<id>/contents/layouts/` |
+| `desktoptheme/hexa/dialogs/` | `/usr/share/plasma/desktoptheme/hexa/dialogs/` |
+| `desktoptheme/hexa/metadata.json.in`, translated | `/usr/share/plasma/desktoptheme/hexa/metadata.json` |
 | `icons/hexa-light/`, `icons/hexa-dark/` | `/usr/share/icons/hexa-light/`, `/usr/share/icons/hexa-dark/` |
 | `icons/actions/`, `icons/status/`, for both | `/usr/share/icons/<theme>/actions/`, `/usr/share/icons/<theme>/status/` |
 | `plasmoids/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/contents/` |
