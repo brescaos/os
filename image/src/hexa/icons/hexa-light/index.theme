@@ -1,11 +1,18 @@
-# Hexa Light's icons: Hexa's own (../status/),
+# Hexa Light's icons: Hexa's own (../actions/, ../status/),
 # and breeze's for every other one.
 [Icon Theme]
 Name=Hexa Light
 Inherits=breeze,hicolor
 Example=klipper-symbolic
 FollowsColorScheme=true
-Directories=status
+Directories=actions,status
+
+[actions]
+Size=22
+MinSize=16
+MaxSize=256
+Context=Actions
+Type=Scalable
 
 [status]
 Size=22
