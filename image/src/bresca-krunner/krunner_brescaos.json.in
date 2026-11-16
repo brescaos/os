@@ -10,7 +10,7 @@
         "Copyright": "© 2026 BrescaOS",
         "Description": "Check for BrescaOS updates",
         "EnabledByDefault": true,
-        "Icon": "system-software-update",
+        "Icon": "com.brescaos.updates",
         "License": "GPL-3.0-or-later",
         "Name": "BrescaOS",
         "Website": "https://www.brescaos.com"
