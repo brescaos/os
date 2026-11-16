@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 07:55+0000\n"
+"POT-Creation-Date: 2026-11-16 17:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,72 +76,6 @@ msgid "BrescaOS %1 is installed"
 msgstr ""
 
 #: package/contents/ui/main.qml
-msgid "BrescaOS is up to date"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Cancel"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Check for Updates"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Checking for updates…"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Checking the new version…"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Couldn't check for updates"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Couldn't download the new version: %1"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Couldn't find out whether updates come with a secure connection (TLS)."
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Couldn't install the new version: %1"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Download"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Download & Install"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Download Anyway"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Downloading BrescaOS %1"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Downloading the new version"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Downloading…"
-msgstr ""
-
-#: package/contents/ui/main.qml
-#, no-javascript-format
-msgctxt "Download progress"
-msgid "Downloading… %1%"
-msgstr ""
-
-#: package/contents/ui/main.qml
 msgid "Install"
 msgstr ""
 
@@ -154,37 +88,9 @@ msgid "Install it from System Settings."
 msgstr ""
 
 #: package/contents/ui/main.qml
-msgid "Installing BrescaOS %1"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Installing the new version"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Installing…"
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid "Preparing…"
-msgstr ""
-
-#: package/contents/ui/main.qml
-#, no-javascript-format
-msgctxt "Download progress"
-msgid "Preparing… %1%"
-msgstr ""
-
-#: package/contents/ui/main.qml
 msgid "Restart Now"
 msgstr ""
 
 #: package/contents/ui/main.qml
 msgid "Restart to start using it."
-msgstr ""
-
-#: package/contents/ui/main.qml
-msgid ""
-"Updates come from %1 without TLS: anyone on the network path could serve a "
-"different image."
 msgstr ""

@@ -96,8 +96,7 @@ prints it) to `status.json`, for System Settings > BrescaOS Updates
 status`. Its last result stays until the next one replaces it.
 `bresca-updates.rules` lets an administrator (group `wheel`) at the computer
 start `bresca-updates@check` and `bresca-updates@status` without a password,
-for the tray applet's Check for Updates button and System Settings: both only
-read. Nothing else: downloading, installing and rolling back ask for an
+for System Settings > BrescaOS Updates: both only read. Nothing else: downloading, installing and rolling back ask for an
 administrator's password.
 
 To add an operation, add its script to `services/updates/`: the template unit

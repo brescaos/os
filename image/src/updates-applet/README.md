@@ -1,7 +1,7 @@
 # BrescaOS Updates applet
 
 A Plasma applet in the system tray that tells when a new BrescaOS version is
-available, and downloads and installs it from its popup.
+available, downloaded or installed.
 
 | Source | In the image |
 | --- | --- |
@@ -22,47 +22,27 @@ translations of `po/`.
 - `bresca-updates-check.timer` runs `bresca-updates@check` 5 minutes after
   boot and then every 6 hours (`image/src/bresca-cli/`). It only checks. Its
   result is `/run/bresca/updates/check.json`, readable without root.
-- The applet only reads that file when it changes: `inotifywait`
-  (inotify-tools) sleeps in the kernel until `check.json` is moved into
-  place or removed, then the applet reads it and waits again.
+- The applet only reads the results (`check.json`, `download.json` and
+  `install.json`) when they change: `inotifywait` (inotify-tools) sleeps in
+  the kernel until one is moved into place or removed. The applet reads them
+  half a second after each wait starts, so a change that came between two
+  waits isn't missed, and waits again. It never asks systemd and starts no
+  operation.
+- It's in the tray only with something to do, and not at all otherwise
+  (`HiddenStatus`): a version available (`check.json`'s `update_available`),
+  downloaded without installing it (`download.json` with `download_only`),
+  or installed and waiting for a restart (`install.json`'s
+  `installed_version`, until the restart empties `/run/bresca/updates/`). A
+  successful install removes `check.json`, so the available version gives
+  way to the one waiting for the restart; while it downloads or installs,
+  it's still the available one.
 - Its icon is BrescaOS Updates' symbol (`package/contents/icons/`), in the
   panel's text color, with the seal of the System Settings module's state
-  icons at its top right, in the logo's amber: none when it's up to date
-  (hidden among the tray's idle items, where Plasma shows the theme icon
-  `com.brescaos.updates-symbolic`), filled with a version available
-  (`update_available`) or downloaded (shown), fading in and out while an
-  operation runs, and filled with a restart arrow in place of the
-  download one with a version installed that waits for a restart
-  (`install.json`'s `installed_version`: shown, with **Restart Now** in the
-  popup, until the restart empties `/run/bresca/updates/`). The popup's big
-  icon is the same. A successful install removes `check.json`, so the
-  available version gives way to the one waiting for the restart.
-- Its popup, as tall as what it shows, has one row of buttons for the state:
-  - Up to date: **Check for Updates**, which starts `bresca-updates@check`
-    (`systemctl start --no-block`).
-  - A version available: **Download** and **Download & Install**
-    (`bresca-updates@download`, `@download-install`). polkit asks for an
-    administrator's password; cancelling it changes nothing. From a registry
-    allowed without TLS, or when it can't tell, it asks first in the popup,
-    with the CLI's warning, as the CLI's `--no-tls` does: the services don't
-    check it. It knows from `status.json`: it starts `bresca-updates@status`
-    as it starts, without a password dialog (`--no-ask-password`).
-  - Downloading or installing: a progress bar with the download's phase and
-    percent (`download-progress.json`), as System Settings shows it. Only
-    then it asks systemd and reads the progress every second; one started
-    elsewhere (System Settings, the CLI) shows too, once it removes its last
-    result.
-  - A version downloaded: **Install** (`bresca-updates@install`).
-  - A version installed: **Restart Now**.
-  - A failed download or install: bootc's error, above the buttons.
-
-  The system tray closes the popup when a button's password dialog takes
-  the focus (only its own **Keep Open** pin keeps it): once the dialog is
-  gone (its `systemctl start` returned), the applet opens it again
-  (`expanded`). Not for a start from a notification, with the popup closed.
-- Its configure action (the popup header's button and the context menu's
-  **Configure BrescaOS Updates…**) opens System Settings > BrescaOS Updates
-  too (`KCMLauncher`).
+  icons at its top right, in the logo's amber; with a version waiting for a
+  restart, a restart arrow in place of the download one. Its tooltip says
+  which version and what it waits for.
+- A click opens System Settings > BrescaOS Updates (`KCMLauncher`), and so
+  does its context menu's **Configure BrescaOS Updates…**.
 - The notification, event `updateAvailable` of `brescaos-updates.notifyrc.in`,
   comes when the applet sees a version for the first time in a session: when
   a check finds it, and at every login while it isn't installed, as a
@@ -70,14 +50,15 @@ translations of `po/`.
   stays until closed. Settings > Notifications > Applications > BrescaOS
   Updates configures or mutes it.
 - Two more notifications, from the results of a download and an install,
-  started from System Settings > BrescaOS Updates or the CLI. They're watched
-  as `check.json` is, and notified only when they change while the applet
-  runs, never one from before it started:
+  started from System Settings > BrescaOS Updates or the CLI. They're
+  notified only when they change while the applet runs, never one from
+  before it started:
   - `updateDownloaded`: a version downloaded without installing it
     (`download.json` with `download_only`; Download and Install's isn't).
-    Its **Install** installs it, as the popup's does. It says that
-    restarting first discards the download: bootc doesn't keep a version
-    only downloaded across a reboot.
+    Its **Install** opens System Settings > BrescaOS Updates, which installs
+    it (the module's `install` argument). It says that restarting first
+    discards the download: bootc doesn't keep a version only downloaded
+    across a reboot.
   - `updateInstalled`: a version installed (`install.json` with
     `installed_version`). Its **Restart Now** opens Plasma's restart prompt
     (`org.kde.LogoutPrompt`, with `gdbus`).

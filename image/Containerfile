@@ -108,9 +108,6 @@ COPY src/bresca-cli/services/bresca-updates.tmpfiles /usr/lib/tmpfiles.d/bresca-
 COPY src/bresca-cli/services/bresca-updates.rules /usr/share/polkit-1/rules.d/50-brescaos-updates.rules
 # The tray icon and notification for a new version (src/updates-applet/README.md).
 COPY src/updates-applet/package/ /usr/share/plasma/plasmoids/com.brescaos.updates/
-# Its symbol as a theme icon, for the tray's hidden items, which show only an
-# icon's name.
-COPY src/updates-applet/package/contents/icons/updates-symbolic.svg /usr/share/icons/hicolor/scalable/apps/com.brescaos.updates-symbolic.svg
 # BrescaOS Updates KCM (src/updates-kcm/README.md).
 COPY --from=updates-kcm-build /out/ /
 # Autotiling (src/autotile/README.md): the KWin script, its KCM and the QML
