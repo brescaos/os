@@ -26,20 +26,25 @@ struct Command {
 
 const QString commandPrefix = QStringLiteral("bresca ");
 
-// Each typed word is the start of the command's word in the same place:
-// "b u c", "bre upd" or the whole command.
-bool isTypedAs(const QStringList &typedWords, const QString &command)
+// "buc" for "bresca updates check".
+QString initialsOf(const QString &command)
 {
-    const QStringList commandWords = command.split(u' ');
-    if (typedWords.size() > commandWords.size()) {
-        return false;
+    QString initials;
+    for (const QString &word : command.split(u' ')) {
+        initials += word.front();
     }
-    for (qsizetype i = 0; i < typedWords.size(); ++i) {
-        if (!commandWords.at(i).startsWith(typedWords.at(i))) {
-            return false;
-        }
-    }
-    return true;
+    return initials;
+}
+
+// The start of the command ("bresca upd") or of its initials ("bu").
+bool isStartOf(const QString &typed, const QString &command)
+{
+    return command.startsWith(typed) || initialsOf(command).startsWith(typed);
+}
+
+bool isWhole(const QString &typed, const QString &command)
+{
+    return typed == command || typed == initialsOf(command);
 }
 
 const std::array commands{
@@ -88,7 +93,7 @@ public:
         }
     }
 
-    // Each command the query is typed as (isTypedAs()), in any case. Its
+    // Each command the query is the start of (isStartOf()), in any case. Its
     // results come first: it's KRunner's first favorite
     // (krunnerrc). With only this plugin (Ctrl+Alt+B,
     // com.brescaos.bresca-krunner.desktop), also without "bresca ", every
@@ -103,18 +108,15 @@ public:
             return;
         }
         const bool isHelp = isOnlyPlugin && query == QLatin1String("?");
-        const QStringList typedWords = query.split(u' ');
         bool isCommandFound = false;
         for (const Command &command : commands) {
             // What can be typed of it: without "bresca " too with only this plugin.
             const QString shortCommand = command.command.mid(commandPrefix.size());
-            if (!isHelp && !isTypedAs(typedWords, command.command) && !(isOnlyPlugin && isTypedAs(typedWords, shortCommand))) {
+            if (!isHelp && !isStartOf(query, command.command) && !(isOnlyPlugin && isStartOf(query, shortCommand))) {
                 continue;
             }
-            // Each of its words typed, if only their start ("b u c"): ahead of
-            // the longer commands it's the start of.
-            const qsizetype typedCommandWordCount = (isTypedAs(typedWords, command.command) ? command.command : shortCommand).count(u' ') + 1;
-            const bool isWholeCommand = typedWords.size() == typedCommandWordCount;
+            // Ahead of the longer commands it's the start of.
+            const bool isWholeCommand = isWhole(query, command.command) || (isOnlyPlugin && isWhole(query, shortCommand));
             isCommandFound = true;
             KRunner::QueryMatch match(this);
             match.setId(command.command);

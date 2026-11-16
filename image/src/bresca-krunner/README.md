@@ -28,12 +28,12 @@ gcc-c++, kf6-ki18n-devel and kf6-krunner-devel.
 
 ## How it works
 
-- Each entry shows when every word typed is the start of the command's
-  word in the same place, in any case: the whole command, while it's typed
-  (`bresca updates inst`) or abbreviated (`b u i`, `bre upd ch`); all of
-  them for their common start (`bre`). The command with every word typed,
-  even if only their start, comes first: `b u` is **Open BrescaOS
-  Updates**, ahead of the two longer ones. It never runs what's typed.
+- Each entry shows when what's typed is the start of its command or of
+  its words' initials, in any case: the whole command, while it's typed
+  (`bresca updates inst`) or its initials (`bui`); all of them for their
+  common start (`bre`, `bu`). The command typed whole, even if only its
+  initials, comes first: `bu` is **Open BrescaOS Updates**, ahead of the
+  two longer ones. It never runs what's typed.
 - Its results come first: `krunnerrc` makes it KRunner's first favorite,
   ahead of applications (`krunner_services`, KRunner's own default). It only
   has results for the `bresca` commands, so it never gets ahead of anything
@@ -42,7 +42,7 @@ gcc-c++, kf6-ki18n-devel and kf6-krunner-devel.
   `com.brescaos.bresca-krunner.desktop`, hidden from the menu, asks KRunner
   for it (`querySingleRunner`, with `gdbus`); kglobalaccel registers its
   `X-KDE-Shortcuts`, which System Settings > Keyboard > Shortcuts can
-  change. There the commands work without `bresca` too (`updates ch`, `u c`), and
+  change. There the commands work without `bresca` too (`updates ch`, `uc`), and
   anything else offers **“…” isn't a BrescaOS command: search all of
   KRunner**, which opens KRunner again with every plugin and what was
   typed, in case it was the wrong shortcut. Next to the search field,

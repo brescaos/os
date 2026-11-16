@@ -33,11 +33,11 @@ private Q_SLOTS:
         QTest::newRow("install, being typed") << QStringLiteral("bresca updates inst") << QStringList{install};
         QTest::newRow("all, their common start") << QStringLiteral("bresca upd") << QStringList{check, install, open};
         QTest::newRow("all, the start of their first word") << QStringLiteral("bre") << QStringList{check, install, open};
-        QTest::newRow("check, initials") << QStringLiteral("b u c") << QStringList{check};
-        QTest::newRow("install, initials") << QStringLiteral("b u i") << QStringList{install};
-        QTest::newRow("check, the start of each word") << QStringLiteral("bre upd ch") << QStringList{check};
+        QTest::newRow("check, initials") << QStringLiteral("buc") << QStringList{check};
+        QTest::newRow("check, initials in capitals") << QStringLiteral("BUC") << QStringList{check};
+        QTest::newRow("install, initials") << QStringLiteral("bui") << QStringList{install};
         QTest::newRow("open, whole") << QStringLiteral("bresca updates") << QStringList{check, install, open};
-        QTest::newRow("all, two initials") << QStringLiteral("b u") << QStringList{check, install, open};
+        QTest::newRow("all, two initials") << QStringLiteral("bu") << QStringList{check, install, open};
     }
 
     void testFindsTheCommands()
@@ -64,8 +64,8 @@ private Q_SLOTS:
         QTest::newRow("without bresca") << QStringLiteral("updates") << QStringList{check, install, open};
         QTest::newRow("without bresca, being typed") << QStringLiteral("updates ch") << QStringList{check};
         QTest::newRow("with bresca") << QStringLiteral("bresca updates install") << QStringList{install};
-        QTest::newRow("initials without bresca") << QStringLiteral("u c") << QStringList{check};
-        QTest::newRow("initials with bresca") << QStringLiteral("b u i") << QStringList{install};
+        QTest::newRow("initials without bresca") << QStringLiteral("uc") << QStringList{check};
+        QTest::newRow("initials with bresca") << QStringLiteral("bui") << QStringList{install};
         QTest::newRow("another command")
             << QStringLiteral("firefox") << QStringList{QStringLiteral("“firefox” isn't a BrescaOS command: search all of KRunner")};
     }
@@ -82,14 +82,14 @@ private Q_SLOTS:
         QCOMPARE(foundTexts, texts);
     }
 
-    // The command whose every word is typed, even if only their start, comes
-    // ahead of the longer ones it's the start of.
+    // The command typed whole, even if only its initials, comes ahead of the
+    // longer ones it's the start of.
     void testWholeCommandFirst_data()
     {
         QTest::addColumn<QString>("query");
         QTest::addColumn<QString>("text");
         QTest::newRow("open") << QStringLiteral("bresca updates") << QStringLiteral("Open BrescaOS Updates");
-        QTest::newRow("open, initials") << QStringLiteral("b u") << QStringLiteral("Open BrescaOS Updates");
+        QTest::newRow("open, initials") << QStringLiteral("bu") << QStringLiteral("Open BrescaOS Updates");
     }
 
     void testWholeCommandFirst()
@@ -111,8 +111,10 @@ private Q_SLOTS:
         QTest::newRow("one of its words, not first") << QStringLiteral("updates");
         QTest::newRow("its words in another order") << QStringLiteral("bresca check");
         QTest::newRow("more than a command") << QStringLiteral("bresca updates check now");
-        QTest::newRow("initials in another order") << QStringLiteral("b c u");
-        QTest::newRow("initials without bresca") << QStringLiteral("u c");
+        QTest::newRow("initials in another order") << QStringLiteral("bcu");
+        QTest::newRow("initials without bresca") << QStringLiteral("uc");
+        QTest::newRow("initials apart") << QStringLiteral("b u c");
+        QTest::newRow("the start of each word") << QStringLiteral("bre upd ch");
     }
 
     void testFindsNothing()
