@@ -157,6 +157,9 @@ COPY src/hexa/layout-templates/com.brescaos.hexa.topbar/contents/ /usr/share/pla
 # Plasma applies the Global Theme's defaults at login, unless the user chose
 # another one.
 COPY assets/desktop/kdeglobals /etc/xdg/kdeglobals
+# KWin dims the windows without the focus, for every user unless they turn
+# it off.
+COPY assets/desktop/kwinrc /etc/xdg/kwinrc
 # The BrescaOS logo (TRADEMARKS.md): os-release's LOGO names it, and the
 # About This System page needs its path.
 COPY assets/logo/brescaos-logo-light.svg assets/logo/brescaos-logo-dark.svg assets/logo/com.brescaos.welcome.svg assets/logo/com.brescaos.updates.svg /usr/share/icons/hicolor/scalable/apps/

@@ -1,0 +1,8 @@
+# Windows without the focus dimmed, so the one with it stands out (KWin's
+# Dim Inactive effect; System Settings > Desktop Effects turns it off).
+[Plugins]
+diminactiveEnabled=true
+
+[Effect-diminactive]
+# Percent; KWin's default is 25.
+Strength=35
