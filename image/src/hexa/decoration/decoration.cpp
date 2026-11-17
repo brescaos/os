@@ -2,7 +2,8 @@
 // colors, the buttons on each side as the user arranges them (Hexa's Global
 // Themes put the app's icon on the left and minimize, maximize and close on
 // the right) and the title centered on the window. KWin rounds the window's
-// corners with it.
+// corners with it and draws a line around the window with the focus in a
+// darker accent color, the same in light and dark color schemes.
 
 #include "button.h"
 
@@ -26,6 +27,9 @@ constexpr qreal BUTTON_SPACING = 2;
 // Between the title and the buttons.
 constexpr qreal TITLE_MARGIN = 16;
 constexpr qreal RESIZE_BORDER = 6;
+constexpr qreal WINDOW_BORDER_WIDTH = 2;
+// QColor::darker()'s factor: 130 makes it 30% darker.
+constexpr int WINDOW_BORDER_DARKER_FACTOR = 130;
 }
 
 class HexaDecoration : public KDecoration3::Decoration
@@ -54,12 +58,14 @@ public:
         connect(decorated, &KDecoration3::DecoratedWindow::widthChanged, this, &HexaDecoration::updateLayout);
         connect(decorated, &KDecoration3::DecoratedWindow::maximizedChanged, this, &HexaDecoration::updateLayout);
         connect(decorated, &KDecoration3::DecoratedWindow::activeChanged, this, [this] {
+            updateBorder();
             update();
         });
         connect(decorated, &KDecoration3::DecoratedWindow::captionChanged, this, [this] {
             update();
         });
         connect(decorated, &KDecoration3::DecoratedWindow::paletteChanged, this, [this] {
+            updateBorder();
             update();
         });
         // The app's icon button: an app may set its icon after its window shows.
@@ -130,7 +136,21 @@ private:
         setResizeOnlyBorders(isMaximized ? QMarginsF() : QMarginsF(RESIZE_BORDER, RESIZE_BORDER, RESIZE_BORDER, RESIZE_BORDER));
         setTitleBar(QRectF(0, 0, window()->width(), TITLE_BAR_HEIGHT));
         setBorderRadius(KDecoration3::BorderRadius(cornerRadius()));
+        updateBorder();
         positionButtons();
+    }
+
+    // Only around the window with the focus, and not when maximized.
+    void updateBorder()
+    {
+        if (!window()->isActive() || window()->isMaximized()) {
+            setBorderOutline(KDecoration3::BorderOutline());
+            return;
+        }
+        const QColor accent = window()->palette().color(QPalette::Active, QPalette::Highlight);
+        setBorderOutline(KDecoration3::BorderOutline(WINDOW_BORDER_WIDTH,
+                                                     accent.darker(WINDOW_BORDER_DARKER_FACTOR),
+                                                     KDecoration3::BorderRadius(cornerRadius())));
     }
 
     void positionButtons()
