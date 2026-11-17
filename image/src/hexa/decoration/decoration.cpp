@@ -12,7 +12,6 @@
 #include <KDecoration3/DecorationSettings>
 #include <KPluginFactory>
 #include <QPainter>
-#include <QPainterPath>
 
 #include <algorithm>
 
@@ -27,17 +26,6 @@ constexpr qreal BUTTON_SPACING = 2;
 // Between the title and the buttons.
 constexpr qreal TITLE_MARGIN = 16;
 constexpr qreal RESIZE_BORDER = 6;
-
-// The title bar with only its top corners rounded by radius: a rounded
-// rectangle reaching radius below it, cut at its bottom.
-QPainterPath titleBarShape(const QRectF &titleBar, qreal radius)
-{
-    QPainterPath roundedRectangle;
-    roundedRectangle.addRoundedRect(titleBar.adjusted(0, 0, 0, radius), radius, radius);
-    QPainterPath titleBarRectangle;
-    titleBarRectangle.addRect(titleBar);
-    return roundedRectangle.intersected(titleBarRectangle);
-}
 }
 
 class HexaDecoration : public KDecoration3::Decoration
@@ -74,6 +62,10 @@ public:
         connect(decorated, &KDecoration3::DecoratedWindow::paletteChanged, this, [this] {
             update();
         });
+        // The app's icon button: an app may set its icon after its window shows.
+        connect(decorated, &KDecoration3::DecoratedWindow::iconChanged, this, [this] {
+            update();
+        });
         connect(settings().get(), &KDecoration3::DecorationSettings::fontChanged, this, [this] {
             update();
         });
@@ -94,9 +86,16 @@ public:
         painter->setRenderHint(QPainter::Antialiasing);
         painter->setPen(Qt::NoPen);
         painter->setBrush(decorated->color(colorGroup, KDecoration3::ColorRole::TitleBar));
-        painter->drawPath(titleBarShape(titleBar, cornerRadius()));
+        // Only its top corners rounded: a rounded rectangle reaching below it,
+        // cut at its bottom.
+        const qreal radius = cornerRadius();
+        painter->setClipRect(titleBar);
+        painter->drawRoundedRect(titleBar.adjusted(0, 0, 0, radius), radius, radius);
+        painter->setClipping(false);
 
-        painter->setFont(settings()->font());
+        QFont titleFont = settings()->font();
+        titleFont.setWeight(QFont::DemiBold);
+        painter->setFont(titleFont);
         painter->setPen(decorated->color(colorGroup, KDecoration3::ColorRole::Foreground));
         const QRectF titleArea = centeredTitleArea(titleBar);
         const QString title = painter->fontMetrics().elidedText(decorated->caption(), Qt::ElideRight, titleArea.width());

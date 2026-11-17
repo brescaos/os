@@ -29,7 +29,7 @@ popups.
 
 The window decoration is Hexa's, `com.brescaos.hexa.decoration`
 (`decoration/`, C++, a KDecoration3 plugin): a title bar in the color
-scheme's title bar colors, with the window's title centered on it (shortened
+scheme's title bar colors, with the window's title centered on it in semibold (shortened
 with "…" when it doesn't fit between the buttons), and the window's corners
 rounder than Breeze's: `WINDOW_CORNER_RADIUS` in `decoration/decoration.cpp`,
 8 px (Breeze's are 5), square when maximized. Its buttons are the app's
