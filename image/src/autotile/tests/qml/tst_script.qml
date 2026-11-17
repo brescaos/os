@@ -421,87 +421,12 @@ TestCase {
 
     // A window whose minimum size doesn't fit its place.
 
-    function test_a_window_that_doesnt_fit_its_place_keeps_it_while_not_in_use() {
-        compare(geometry(bigOnLastRow().big), bigPlace);
-    }
-
-    function test_in_use_it_grows_to_its_minimum_and_those_affected_shrink_with_no_overlap() {
-        const { a, b, big, workspace } = bigOnLastRow();
-        KWin.activate(workspace, big);
-        compare(geometry(big), { x: 60, y: 140, width: 1000, height: 500 });
-        compare(geometry(a), { x: 60, y: 40, width: 500, height: 100 });
-        compare(geometry(b), { x: 560, y: 40, width: 500, height: 100 });
-    }
-
-    function test_out_of_use_everything_goes_back_to_the_layouts_places() {
+    function test_a_window_that_doesnt_fit_its_place_keeps_it_even_focused() {
         const { a, b, big, workspace } = bigOnLastRow();
         const places = [geometry(a), geometry(b)];
         KWin.activate(workspace, big);
-        KWin.activate(workspace, a);
         compare(geometry(big), bigPlace);
         compare([geometry(a), geometry(b)], places);
-        KWin.activate(workspace, big);
-        KWin.activate(workspace, null);
-        compare(geometry(big), bigPlace);
-    }
-
-    function test_sideways_too_in_the_middle_of_a_row_both_neighbours_shrinking() {
-        const a = KWin.fakeWindow("a");
-        const big = KWin.fakeWindow("big", { minSize: { width: 600, height: 0 } });
-        const c = KWin.fakeWindow("c");
-        const others = ["d", "e", "f"].map(id => KWin.fakeWindow(id));
-        const { workspace } = load([a, big, c].concat(others), { Gap: 0, Layout: "grid" });
-        KWin.activate(workspace, big);
-        compare(geometry(big).width, 600);
-        compare(geometry(a).x, area.x);
-        compare(geometry(a).x + geometry(a).width, geometry(big).x);
-        compare(geometry(big).x + geometry(big).width, geometry(c).x);
-        compare(geometry(c).x + geometry(c).width, area.x + area.width);
-    }
-
-    function test_the_gap_stays_between_windows_and_counts_towards_the_room_needed() {
-        const a = KWin.fakeWindow("a");
-        const b = KWin.fakeWindow("b");
-        const big = KWin.fakeWindow("big", { minSize: { width: 0, height: 500 } });
-        const { workspace } = load([a, b, big], { Gap: 10, Layout: "grid" });
-        KWin.activate(workspace, big);
-        compare(geometry(big).height, 500);
-        compare(geometry(big).y + geometry(big).height, area.y + area.height);
-        compare(geometry(a).y + geometry(a).height + 10, geometry(big).y);
-    }
-
-    function test_a_minimum_bigger_than_the_area_takes_all_of_it_on_that_axis() {
-        const a = KWin.fakeWindow("a");
-        const big = KWin.fakeWindow("big", { minSize: { width: 5000, height: 0 } });
-        const { workspace } = load([a, big], { Gap: 0, Layout: "master" });
-        KWin.activate(workspace, big);
-        compare(geometry(big).x, area.x);
-        compare(geometry(big).width, area.width);
-    }
-
-    function test_a_dialog_of_it_keeps_the_room() {
-        const { big, workspace } = bigOnLastRow();
-        KWin.activate(workspace, big);
-        const room = geometry(big);
-        const dialog = KWin.fakeWindow("dialog", { normalWindow: false, transient: true, transientFor: big });
-        workspace.windowAdded(dialog);
-        KWin.activate(workspace, dialog);
-        compare(geometry(big), room);
-    }
-
-    function test_a_window_that_fits_changes_nothing_when_it_gets_the_focus() {
-        const { a, b, big, workspace } = bigOnLastRow();
-        const places = [geometry(a), geometry(b), geometry(big)];
-        KWin.activate(workspace, a);
-        compare([geometry(a), geometry(b), geometry(big)], places);
-    }
-
-    function test_the_room_is_given_in_any_layout_and_follows_when_others_rearrange() {
-        const { b, big, workspace } = bigOnLastRow();
-        KWin.activate(workspace, big);
-        workspace.windowRemoved(b);
-        compare(geometry(big).width, 700);
-        compare(geometry(big).height, 600);
     }
 
     // Dragging.
@@ -514,18 +439,6 @@ TestCase {
         workspace.cursorPos = { x: placeOfA.x + 10, y: placeOfA.y + 50 };
         big.interactiveMoveResizeFinished();
         compare(geometry(a), placeOfA);
-    }
-
-    function test_dropping_on_a_window_uses_where_its_shown_shrunk_by_the_one_in_use() {
-        const { a, b, big, workspace } = bigOnLastRow();
-        KWin.activate(workspace, big);
-        const placeOfBig = geometry(big);
-        a.interactiveMoveResizeStarted();
-        a.frameGeometry = KWin.moved(geometry(a), { x: 300 });
-        workspace.cursorPos = { x: placeOfBig.x + 10, y: placeOfBig.y + 10 };
-        a.interactiveMoveResizeFinished();
-        compare(geometry(b).y, area.y);
-        compare(geometry(big).y, area.y);
     }
 
     function test_a_window_dropped_on_another_trades_places_with_it() {
@@ -765,6 +678,36 @@ TestCase {
         compare(geometry(a).width, 1000);
         shortcuts["Meta+Shift+F"]();
         compare(geometry(a).width, 500);
+    }
+
+    function test_floated_a_window_smaller_than_its_minimum_grows_to_it_and_tiled_again_takes_its_place() {
+        const { big, workspace, shortcuts } = bigOnLastRow();
+        workspace.activeWindow = big;
+        shortcuts["Meta+Shift+F"]();
+        compare(geometry(big), { x: bigPlace.x, y: area.y + area.height - 530, width: 1000, height: 530 });
+        shortcuts["Meta+Shift+F"]();
+        compare(geometry(big).height, bigPlace.height);
+    }
+
+    function test_floated_in_the_bottom_right_corner_it_grows_up_and_to_the_left() {
+        const a = KWin.fakeWindow("a");
+        const b = KWin.fakeWindow("b");
+        const c = KWin.fakeWindow("c");
+        const big = KWin.fakeWindow("big", { minSize: { width: 700, height: 400 } });
+        const { workspace, shortcuts } = load([a, b, c, big], { Gap: 0, Layout: "grid" });
+        workspace.activeWindow = big;
+        shortcuts["Meta+Shift+F"]();
+        compare(geometry(big), { x: area.x + area.width - 700, y: area.y + area.height - 430, width: 700, height: 430 });
+    }
+
+    function test_floated_a_window_bigger_than_its_minimum_keeps_its_size() {
+        const a = KWin.fakeWindow("a", { minSize: { width: 100, height: 100 } });
+        const b = KWin.fakeWindow("b");
+        const { workspace, shortcuts } = load([a, b]);
+        const place = geometry(a);
+        workspace.activeWindow = a;
+        shortcuts["Meta+Shift+F"]();
+        compare(geometry(a), place);
     }
 
     function test_the_shortcut_does_nothing_without_an_active_window() {

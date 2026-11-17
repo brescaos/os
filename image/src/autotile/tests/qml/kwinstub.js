@@ -38,8 +38,11 @@ FakeTimer.prototype.stop = function () {
     this.running = false;
 };
 
+// Its title bar, between the frame and what the app draws (clientGeometry).
+const TITLE_BAR_HEIGHT = 30;
+
 function fakeWindow(id, overrides) {
-    return Object.assign({
+    const window = Object.assign({
         internalId: id,
         normalWindow: true,
         transient: false,
@@ -66,6 +69,13 @@ function fakeWindow(id, overrides) {
         interactiveMoveResizeStarted: signal(),
         interactiveMoveResizeFinished: signal(),
     }, overrides);
+    Object.defineProperty(window, "clientGeometry", {
+        get() {
+            const { x, y, width, height } = window.frameGeometry;
+            return { x, y: y + TITLE_BAR_HEIGHT, width, height: height - TITLE_BAR_HEIGHT };
+        },
+    });
+    return window;
 }
 
 // Runs the script with these globals, then the code epilogue, whose return

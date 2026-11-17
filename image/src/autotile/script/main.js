@@ -31,9 +31,8 @@ const WELCOME = "com.brescaos.welcome";
 
 // One layout per virtual desktop and screen: key -> { layout, output, desktop }.
 const groups = new Map();
-// Windows in a layout: window id -> { window, key, rect, shown, frame }. rect is
-// its place in the layout, gap included; shown, that place after making room for
-// the window in use; frame, the window's frame in it.
+// Windows in a layout: window id -> { window, key, rect, frame }. rect is its
+// place in the layout, gap included; frame, the window's frame in it.
 const tiled = new Map();
 // Windows taken out of the layout by hand, by window id.
 const floating = new Set();
@@ -42,8 +41,6 @@ const floating = new Set();
 const dragged = new Map();
 // The window a new one splits: the last focused one that is in a layout.
 let lastFocusedId = null;
-// The tiled window that has the room it needs while in use (withRoomForInUse).
-let inUseId = null;
 // New windows hidden until they take their size: window id -> { timer, reveal }.
 const hidden = new Map();
 let gap = readConfig("Gap", DEFAULT_GAP);
@@ -85,80 +82,6 @@ function withGap(rect, area) {
     };
 }
 
-// The tiled window in use: the active one, or the one it's a dialog of.
-function inUse() {
-    for (let window = workspace.activeWindow; window; window = window.transientFor) {
-        if (tiled.has(idOf(window))) {
-            return idOf(window);
-        }
-    }
-    return null;
-}
-
-// One axis of the area, its dividing lines moved so the span start..end takes size:
-// the rest shrinks evenly on both sides of it, the area's own edges staying put. All
-// the windows go through the same lines, so they stay side by side without overlaps.
-function stretchedAxis(start, end, size, areaStart, areaEnd) {
-    const rest = areaEnd - areaStart - (end - start);
-    const scale = rest > 0 ? (areaEnd - areaStart - size) / rest : 0;
-    const newStart = areaStart + (start - areaStart) * scale;
-    const newEnd = newStart + size;
-    return (position) => {
-        if (position <= start) {
-            return Math.round(areaStart + (position - areaStart) * scale);
-        }
-        if (position >= end) {
-            return Math.round(newEnd + (position - end) * scale);
-        }
-        return Math.round(newStart + ((position - start) * size) / (end - start));
-    };
-}
-
-// The layout's places, with the window in use given room for its minimum size, which
-// may be more than its place has. Only while it's in use: the layout doesn't change.
-function withRoomForInUse(arranged, area) {
-    const id = inUse();
-    const place = arranged.find((item) => item.id === id);
-    if (!place) {
-        return arranged;
-    }
-    const { minSize } = tiled.get(id).window;
-    const frame = withGap(place.rect, area);
-    const needed = (axis, minimum, areaSize) => Math.max(place.rect[axis],
-        Math.min(areaSize, minimum + place.rect[axis] - frame[axis]));
-    const width = needed("width", minSize.width, area.width);
-    const height = needed("height", minSize.height, area.height);
-    if (width === place.rect.width && height === place.rect.height) {
-        return arranged;
-    }
-    const mapX = stretchedAxis(place.rect.x, place.rect.x + place.rect.width, width, area.x, area.x + area.width);
-    const mapY = stretchedAxis(place.rect.y, place.rect.y + place.rect.height, height, area.y, area.y + area.height);
-    return arranged.map((item) => {
-        const x = mapX(item.rect.x);
-        const y = mapY(item.rect.y);
-        return {
-            id: item.id,
-            rect: {
-                x,
-                y,
-                width: mapX(item.rect.x + item.rect.width) - x,
-                height: mapY(item.rect.y + item.rect.height) - y,
-            },
-        };
-    });
-}
-
-// The focus moved: the window it left gives the room back, the new one takes it.
-function focusChanged() {
-    const id = inUse();
-    if (id === inUseId) {
-        return;
-    }
-    const keys = [inUseId, id].map((windowId) => tiled.get(windowId)).filter(Boolean).map((entry) => entry.key);
-    inUseId = id;
-    new Set(keys).forEach(retile);
-}
-
 function retile(key) {
     const group = groups.get(key);
     if (!group) {
@@ -166,16 +89,13 @@ function retile(key) {
     }
     const area = workspace.clientArea(KWin.MaximizeArea, group.output, group.desktop);
     const whole = { x: area.x, y: area.y, width: area.width, height: area.height };
-    const arranged = group.layout.arrange(whole);
-    const shown = new Map(withRoomForInUse(arranged, whole).map(({ id, rect }) => [id, rect]));
-    for (const { id, rect } of arranged) {
+    for (const { id, rect } of group.layout.arrange(whole)) {
         const entry = tiled.get(id);
         if (!entry) {
             continue;
         }
         entry.rect = rect;
-        entry.shown = shown.get(id);
-        entry.frame = withGap(entry.shown, whole);
+        entry.frame = withGap(rect, whole);
         if (!dragged.has(id)) {
             entry.window.frameGeometry = entry.frame;
         }
@@ -236,7 +156,7 @@ function dragStarted(window) {
 // The other window of its layout whose place holds the point, if any.
 function tiledAt(point, entry, id) {
     for (const [otherId, other] of tiled) {
-        const { x, y, width, height } = other.shown;
+        const { x, y, width, height } = other.rect;
         if (otherId !== id && other.key === entry.key
             && point.x >= x && point.x < x + width && point.y >= y && point.y < y + height) {
             return otherId;
@@ -314,7 +234,6 @@ function windowFocused(window) {
     if (window && tiled.has(idOf(window))) {
         lastFocusedId = idOf(window);
     }
-    focusChanged();
 }
 
 function setLayout(name) {
@@ -377,6 +296,30 @@ function windowGone(window) {
     retile(untile(id));
 }
 
+// A window that didn't fit its place grows to its minimum size, towards the
+// screen's free area where it would leave it: from a bottom right place, up and to
+// the left. minSize is the app's, without the title bar and borders KWin adds.
+function growToMinimumSize(window) {
+    const frame = window.frameGeometry;
+    const client = window.clientGeometry;
+    const width = Math.max(frame.width, window.minSize.width + frame.width - client.width);
+    const height = Math.max(frame.height, window.minSize.height + frame.height - client.height);
+    if (width === frame.width && height === frame.height) {
+        return;
+    }
+    const area = workspace.clientArea(KWin.MaximizeArea, window.output, window.desktops[0]);
+    const inArea = (start, size, areaStart, areaSize) =>
+        Math.max(areaStart, Math.min(start, areaStart + areaSize - size));
+    window.frameGeometry = {
+        x: inArea(frame.x, width, area.x, area.width),
+        y: inArea(frame.y, height, area.y, area.height),
+        width,
+        height,
+    };
+}
+
+// Floated, a window keeps its size, grown to its minimum if its place was smaller;
+// tiled again, it takes its place.
 function toggleFloating() {
     const window = workspace.activeWindow;
     if (!window) {
@@ -385,10 +328,12 @@ function toggleFloating() {
     const id = idOf(window);
     if (floating.has(id)) {
         floating.delete(id);
+        update(window);
     } else {
         floating.add(id);
+        update(window);
+        growToMinimumSize(window);
     }
-    update(window);
 }
 
 workspace.windowAdded.connect(windowOpened);

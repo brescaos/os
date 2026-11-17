@@ -40,6 +40,9 @@ and talks to KWin over the session bus.
 - The checkbox of **Autotiling** in System Settings > KWin Scripts is the same
   switch.
 - **Meta+Shift+F** takes the active window out of the layout and puts it back.
+  Out of it, the window keeps its size, grown to its minimum if its place was
+  smaller, towards the middle of the screen so it stays on it; back in, it
+  takes its place again.
   Its name in System Settings > Shortcuts is English only: KWin shows no
   `i18n` for plain JavaScript scripts.
 
@@ -85,10 +88,9 @@ most recent use.
   the size the app chose, so the window stays hidden until it has drawn
   itself at its place (300 ms at most).
 - **Minimum sizes**: a window can't get smaller than its minimum, which may
-  be more than its place has. While it's in use (its dialogs count), its
-  place grows to fit it and the others shrink evenly, with no overlap; out
-  of use they all go back. A neighbour that reaches its own minimum sticks
-  out of its place.
+  be more than its place has: then it sticks out of its place, over its
+  neighbours, focused or not. Growing its place when it got the focus moved
+  the app under the click that gave it the focus.
 - **Dragging**: resizing a window moves the split. Dropping a moved window on
   another swaps the two; dropped anywhere else, it goes back to its place.
 - **Edge snapping**: while the script is on, dropping a window on a screen
