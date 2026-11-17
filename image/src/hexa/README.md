@@ -34,7 +34,10 @@ with "…" when it doesn't fit between the buttons), and the window's corners
 rounder than Breeze's: `WINDOW_CORNER_RADIUS` in `decoration/decoration.cpp`,
 8 px (Breeze's are 5), square when maximized. A 2 px line goes around
 the window with the focus, the accent color 30% darker (`WINDOW_BORDER_DARKER_FACTOR`),
-the same with light and dark color schemes; none when maximized. Its buttons are the app's
+the same with light and dark color schemes; none when maximized. Every
+window, with the focus or not, has the same black shadow below it
+(`SHADOW_OFFSET_Y`, `SHADOW_BLUR` and `SHADOW_OPACITY`), one image that all
+windows share. Its buttons are the app's
 icon (the window menu), minimize, maximize and close, where the user puts
 them (System Settings > Window Decorations > Titlebar Buttons); the Global
 Themes put the icon on the left and the other three on the right. Other

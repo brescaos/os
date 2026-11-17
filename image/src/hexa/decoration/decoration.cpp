@@ -3,7 +3,8 @@
 // Themes put the app's icon on the left and minimize, maximize and close on
 // the right) and the title centered on the window. KWin rounds the window's
 // corners with it and draws a line around the window with the focus in a
-// darker accent color, the same in light and dark color schemes.
+// darker accent color, the same in light and dark color schemes. Every
+// window, with the focus or not, shares one soft shadow below it.
 
 #include "button.h"
 
@@ -11,10 +12,13 @@
 #include <KDecoration3/Decoration>
 #include <KDecoration3/DecorationButtonGroup>
 #include <KDecoration3/DecorationSettings>
+#include <KDecoration3/DecorationShadow>
 #include <KPluginFactory>
 #include <QPainter>
 
 #include <algorithm>
+#include <cmath>
+#include <memory>
 
 namespace
 {
@@ -30,6 +34,70 @@ constexpr qreal RESIZE_BORDER = 6;
 constexpr qreal WINDOW_BORDER_WIDTH = 2;
 // QColor::darker()'s factor: 130 makes it 30% darker.
 constexpr int WINDOW_BORDER_DARKER_FACTOR = 130;
+// The shadow, black in light and dark color schemes: a CSS box-shadow's
+// y offset and blur (twice the gaussian's standard deviation), in px.
+constexpr qreal SHADOW_OFFSET_Y = 4;
+constexpr qreal SHADOW_BLUR = 16;
+constexpr qreal SHADOW_OPACITY = 0.5;
+
+// How much of the span from start to end, blurred by a gaussian, covers
+// position.
+qreal blurredSpanCoverage(qreal position, qreal start, qreal end, qreal sigma)
+{
+    const qreal scale = 1 / (sigma * std::sqrt(2.0));
+    return 0.5 * (std::erf((end - position) * scale) - std::erf((start - position) * scale));
+}
+
+// KWin draws the image's corners as they are and stretches its middle row and
+// column along the window's sides, so the window in the image only needs to
+// be big enough that its blurred edges don't reach its middle.
+std::shared_ptr<KDecoration3::DecorationShadow> createShadow()
+{
+    const qreal sigma = SHADOW_BLUR / 2;
+    // Past three standard deviations the shadow is invisible.
+    const int reach = int(std::ceil(3 * sigma));
+    const int windowSide = 2 * reach;
+    const int imageSide = 2 * reach + windowSide;
+    const QRectF window(reach, reach - SHADOW_OFFSET_Y, windowSide, windowSide);
+    const QRectF shadowBox = window.translated(0, SHADOW_OFFSET_Y);
+
+    QImage image(imageSide, imageSide, QImage::Format_ARGB32_Premultiplied);
+    for (int y = 0; y < imageSide; ++y) {
+        const qreal coverageY = blurredSpanCoverage(y + 0.5, shadowBox.top(), shadowBox.bottom(), sigma);
+        auto *line = reinterpret_cast<QRgb *>(image.scanLine(y));
+        for (int x = 0; x < imageSide; ++x) {
+            const qreal coverageX = blurredSpanCoverage(x + 0.5, shadowBox.left(), shadowBox.right(), sigma);
+            line[x] = qRgba(0, 0, 0, qRound(255 * SHADOW_OPACITY * coverageX * coverageY));
+        }
+    }
+
+    // Nothing under the window: it shows through its rounded corners.
+    QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setCompositionMode(QPainter::CompositionMode_Clear);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Qt::black);
+    painter.drawRoundedRect(window, WINDOW_CORNER_RADIUS, WINDOW_CORNER_RADIUS);
+    painter.end();
+
+    auto shadow = std::make_shared<KDecoration3::DecorationShadow>();
+    shadow->setShadow(image);
+    shadow->setPadding(QMarginsF(window.left(), window.top(), imageSide - window.right(), imageSide - window.bottom()));
+    shadow->setInnerShadowRect(QRectF(window.center(), QSizeF(1, 1)));
+    return shadow;
+}
+
+// Created once and shared by every window while one has the decoration.
+std::shared_ptr<KDecoration3::DecorationShadow> sharedShadow()
+{
+    static std::weak_ptr<KDecoration3::DecorationShadow> cachedShadow;
+    auto shadow = cachedShadow.lock();
+    if (!shadow) {
+        shadow = createShadow();
+        cachedShadow = shadow;
+    }
+    return shadow;
+}
 }
 
 class HexaDecoration : public KDecoration3::Decoration
@@ -78,6 +146,7 @@ public:
 
         // The rounded corners show what's behind.
         setOpaque(false);
+        setShadow(sharedShadow());
         updateLayout();
         return true;
     }
