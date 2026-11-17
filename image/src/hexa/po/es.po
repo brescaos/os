@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 18:28+0000\n"
+"POT-Creation-Date: 2026-11-17 16:41+0000\n"
 "PO-Revision-Date: 2026-11-14 10:07+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,9 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: decoration/com.brescaos.hexa.decoration.json.in
 #: desktoptheme/hexa/metadata.json.in
 msgid "Hexa"
 msgstr "Hexa"
+
+#: decoration/com.brescaos.hexa.decoration.json.in
+msgid "Hexa's window title bar"
+msgstr "La barra de título de las ventanas de Hexa"
 
 #: desktoptheme/hexa/metadata.json.in
 msgid "Hexa's Plasma style"

@@ -135,6 +135,8 @@ note_copied_file() {
             is_plasma_changed=true
             is_krunner_changed=true
             ;;
+        # KWin keeps the decoration it loaded until it restarts.
+        /usr/lib64/qt6/plugins/org.kde.kdecoration3/*) is_kwin_changed=true ;;
         /usr/share/kwin/scripts/*)
             changed_kwin_script=${1#/usr/share/kwin/scripts/}
             changed_kwin_script=${changed_kwin_script%%/*}
@@ -246,6 +248,15 @@ reload_kwin_script() {
     fi
 }
 
+# Has KWin exit for kwin_wayland_wrapper to start it again, so that it loads
+# the window decoration's new build; the apps and plasmashell reconnect to the
+# new one, without logging out.
+restart_kwin() {
+    if run_in_user_session kwin_wayland --replace; then
+        echo "restarted KWin"
+    fi
+}
+
 # Applies the logged-in user's Global Theme again if it's one of Hexa's, so
 # its colors and defaults take effect without logging in again; with $1 set
 # to --resetLayout, its layout too, which replaces the user's panels. Another
@@ -274,7 +285,7 @@ reopen_settings() {
 
 copy_changed_files() {
     local mode source destination project count_before cmake_lists
-    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false is_hexa_changed=false is_hexa_layout_changed=false changed_settings_module='' changed_kwin_script=''
+    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false is_kwin_changed=false is_hexa_changed=false is_hexa_layout_changed=false changed_settings_module='' changed_kwin_script=''
     local copied_count=0
     local updated_projects=''
 
@@ -320,6 +331,9 @@ copy_changed_files() {
     # D-Bus starts it again on the next Alt+Space.
     if $is_krunner_changed && run_in_user_session kquitapp6 krunner; then
         echo "quit KRunner"
+    fi
+    if $is_kwin_changed; then
+        restart_kwin
     fi
     if $is_hexa_layout_changed; then
         reapply_hexa --resetLayout

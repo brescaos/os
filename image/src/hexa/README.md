@@ -27,6 +27,17 @@ same template.
 The Plasma style is Hexa's, `hexa` (`desktoptheme/`): Breeze's, with opaque
 popups.
 
+The window decoration is Hexa's, `com.brescaos.hexa.decoration`
+(`decoration/`, C++, a KDecoration3 plugin): a title bar in the color
+scheme's title bar colors, with the window's title centered on it (shortened
+with "…" when it doesn't fit between the buttons), and the window's corners
+rounder than Breeze's: `WINDOW_CORNER_RADIUS` in `decoration/decoration.cpp`,
+8 px (Breeze's are 5), square when maximized. Its buttons are the app's
+icon (the window menu), minimize, maximize and close, where the user puts
+them (System Settings > Window Decorations > Titlebar Buttons); the Global
+Themes put the icon on the left and the other three on the right. Other
+buttons are left out.
+
 The date and time are Hexa's clock, `com.brescaos.hexa.clock`
 (`plasmoids/`, QML): the date, then the time in semibold, on one line, in
 the user's language ("mié 14 nov  16:16" in Spanish). Plasma's own clock
@@ -73,16 +84,21 @@ tells it:
 | `layout-templates/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/` |
 | `layout-templates/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/metadata.json` |
 | `wallpapercontrast/`, compiled (`CMakeLists.txt`) | `/usr/lib64/qt6/qml/com/brescaos/hexa/` |
+| `decoration/`, compiled with `decoration/com.brescaos.hexa.decoration.json.in` translated | `/usr/lib64/qt6/plugins/org.kde.kdecoration3/com.brescaos.hexa.decoration.so` |
 
 `<id>` is `com.brescaos.hexa.light.desktop` or `com.brescaos.hexa.dark.desktop`.
-Each `metadata.json.in` is a template: the build fills in the version
+Each `metadata.json.in`, and the decoration's JSON, is a template: the build fills in the version
 (`VERSION.txt`) and each language's `Description` from `po/`. The clock's
 settings are translated in Hexa's domain, `hexa` (`i18ndc`), not the one
 Plasma would give the applet.
 
-The QML module is the only compiled part: cmake, extra-cmake-modules,
-gcc-c++, qt6-qtbase-devel, qt6-qtdeclarative-devel, libplasma-devel,
-kf6-kconfig-devel and kf6-kcoreaddons-devel to build it, and Plasma's own libraries to run it. `tests/luminancetest.cpp`
+The QML module and the window decoration are the only compiled parts:
+cmake, extra-cmake-modules, gcc-c++, qt6-qtbase-devel,
+qt6-qtdeclarative-devel, libplasma-devel, kf6-kconfig-devel,
+kf6-kcoreaddons-devel and kdecoration-devel to build them, and Plasma's own
+libraries to run them. The decoration's metadata is compiled in translated:
+CMake needs `TRANSLATED_METADATA_DIR`, the folder where
+`image/build/compile_translations.sh` writes it. `tests/luminancetest.cpp`
 checks which areas of an image count as dark.
 
 Once installed, choose it in System Settings > Colors & Themes > Global Theme,

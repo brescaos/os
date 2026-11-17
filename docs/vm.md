@@ -88,7 +88,10 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   change to Hexa (`image/src/hexa/`) applies the user's Global Theme again
   if it's one of Hexa's, which also rewrites the settings the theme sets
   (colors, widget style, icons…); a change to its layout or its top bar's
-  panel template also replaces the panels with the layout's.
+  panel template also replaces the panels with the layout's. A changed
+  window decoration restarts KWin (`kwin_wayland --replace`): KWin keeps the
+  one it loaded until it restarts, and its wrapper starts it again, with the
+  open windows and the session.
 - Translations reload too: when a `po/*.po` or a `*.in` template of
   `image/src/` changes, they're compiled again with
   `image/build/compile_translations.sh`, as the image's build does, and the result is
@@ -98,7 +101,8 @@ journalctl -fu bresca-dev-hotreload   # in the VM
 - What `image/Containerfile` compiles (today, System Settings > BrescaOS
   Updates, `image/src/updates-kcm/`, autotiling, `image/src/autotile/`,
   Welcome, `image/src/welcome/`, the distroboxes' terminal colors,
-  `image/src/distrobox/`, and the KRunner plugin, `image/src/bresca-krunner/`:
+  `image/src/distrobox/`, the KRunner plugin, `image/src/bresca-krunner/`, and
+  Hexa's QML module and window decoration, `image/src/hexa/`:
   every `image/src/` component with a `CMakeLists.txt`) is compiled again in the VM when its sources or its
   translations change, as the image's stage does, into
   `/var/cache/bresca-dev/build/<component>/`; it persists, so only what

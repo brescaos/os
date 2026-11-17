@@ -21,7 +21,7 @@ Each translated component has a `po/` folder:
 |---|---|---|
 | `autotile` | `kcm_brescaos_autotile` | `i18n()` in `common/autotilelayout.cpp` and the KCM's QML, `i18nd()` in the applet's, and its three `*.json.in` (script, applet, KCM) |
 | `bresca-cli` | `bresca` | Its scripts' `$"..."` strings |
-| `hexa` | `hexa` | `i18ndc()` in its clock's QML, and its Global Themes' `look-and-feel/<id>/metadata.json.in`, its top bar's `plasmoids/com.brescaos.hexa.topbar/metadata.json.in`, its clock's `plasmoids/com.brescaos.hexa.clock/metadata.json.in` and its panel template's `layout-templates/com.brescaos.hexa.topbar/metadata.json.in` |
+| `hexa` | `hexa` | `i18ndc()` in its clock's QML, and its Global Themes' `look-and-feel/<id>/metadata.json.in`, its top bar's `plasmoids/com.brescaos.hexa.topbar/metadata.json.in`, its clock's `plasmoids/com.brescaos.hexa.clock/metadata.json.in`, its panel template's `layout-templates/com.brescaos.hexa.topbar/metadata.json.in` and its window decoration's `decoration/com.brescaos.hexa.decoration.json.in` |
 | `distrobox` | `plasma_applet_com.brescaos.distrobox` | `i18n()` in its tray applet's QML and `applet/metadata.json.in` |
 | `bresca-krunner` | `krunner_brescaos` | `kli18n()` and `i18n()` in its C++, `krunner_brescaos.json.in` and its `.desktop.in` |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |
@@ -118,11 +118,13 @@ mounted. It writes, laid out as in the image:
   Global Themes', as the updates applet's.
 
 And, apart, the System Settings modules' `kcm_brescaos_updates.json` and
-`kcm_brescaos_autotile.json`, and the KRunner plugin's
-`krunner_brescaos.json`, with `"Name[<lang>]"`, `"Description[<lang>]"`
-and `"X-KDE-Keywords[<lang>]"`: System Settings and KRunner read them from
-the plugin's own metadata, so the `updates-kcm-build`, `autotile-build` and
-`bresca-krunner-build` stages compile them into the plugins.
+`kcm_brescaos_autotile.json`, the KRunner plugin's
+`krunner_brescaos.json` and Hexa's window decoration's
+`com.brescaos.hexa.decoration.json`, with `"Name[<lang>]"`,
+`"Description[<lang>]"` and `"X-KDE-Keywords[<lang>]"`: System Settings,
+KRunner and KWin read them from the plugin's own metadata, so the
+`updates-kcm-build`, `autotile-build`, `bresca-krunner-build` and
+`hexa-build` stages compile them into the plugins.
 
 Every one of those metadata files also gets the version in its
 component's `VERSION.txt`.

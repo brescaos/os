@@ -80,16 +80,19 @@ RUN --mount=type=bind,source=src/bresca-krunner,target=/tmp/src \
     && cmake --build /tmp/build \
     && DESTDIR=/out cmake --install /tmp/build
 
-# Hexa's QML module: what its top bar knows about the wallpaper behind it.
+# Hexa's QML module, what its top bar knows about the wallpaper behind it,
+# and its window decoration.
 # kf6-kconfig-devel, kf6-kcoreaddons-devel: Plasma's headers and CMake files
 # use them, and libplasma-devel doesn't bring them.
 FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS hexa-build
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
-        libplasma-devel kf6-kconfig-devel kf6-kcoreaddons-devel
+        libplasma-devel kf6-kconfig-devel kf6-kcoreaddons-devel kdecoration-devel
 RUN --mount=type=bind,source=src/hexa,target=/tmp/src \
+    --mount=type=bind,from=translations,source=/metadata/hexa,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTRANSLATED_METADATA_DIR=/tmp/metadata \
     && cmake --build /tmp/build \
     && DESTDIR=/out cmake --install /tmp/build
 
@@ -132,7 +135,8 @@ COPY src/distrobox/applet/package/contents/icons/distrobox-symbolic.svg /usr/sha
 COPY --from=bresca-krunner-build /out/ /
 COPY src/bresca-krunner/krunnerrc /etc/xdg/krunnerrc
 # Hexa, the desktop theme (src/hexa/README.md); its metadata.json come
-# translated from the translations stage, its QML module from hexa-build.
+# translated from the translations stage, its QML module and window
+# decoration from hexa-build.
 COPY --from=hexa-build /out/ /
 COPY src/hexa/color-schemes/ /usr/share/color-schemes/
 COPY src/hexa/look-and-feel/com.brescaos.hexa.light.desktop/contents/ /usr/share/plasma/look-and-feel/com.brescaos.hexa.light.desktop/contents/

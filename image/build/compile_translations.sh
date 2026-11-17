@@ -15,7 +15,8 @@
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
 #   autotile/kcm_brescaos_autotile.json, and the KRunner plugin's
-#   bresca-krunner/krunner_brescaos.json, with "Name[<lang>]" and the like.
+#   bresca-krunner/krunner_brescaos.json, and Hexa's window decoration's
+#   hexa/com.brescaos.hexa.decoration.json, with "Name[<lang>]" and the like.
 # Every metadata.json and KCM JSON also gets the version in its component's
 # VERSION.txt.
 # Runs in image/Containerfile's translations stage and in the development VM's
@@ -115,3 +116,5 @@ translate_metadata "$src_dir/hexa/plasmoids/com.brescaos.hexa.clock/metadata.jso
     "$out_dir/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/metadata.json"
 translate_metadata "$src_dir/hexa/layout-templates/com.brescaos.hexa.topbar/metadata.json.in" "$src_dir/hexa/po" \
     "$out_dir/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/metadata.json"
+translate_metadata "$src_dir/hexa/decoration/com.brescaos.hexa.decoration.json.in" "$src_dir/hexa/po" \
+    "$metadata_dir/hexa/com.brescaos.hexa.decoration.json"

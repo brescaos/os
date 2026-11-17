@@ -82,6 +82,7 @@ extract_strings() {
             extract_metadata_strings plasmoids/com.brescaos.hexa.topbar/metadata.json.in "$pot"
             extract_metadata_strings plasmoids/com.brescaos.hexa.clock/metadata.json.in "$pot"
             extract_metadata_strings layout-templates/com.brescaos.hexa.topbar/metadata.json.in "$pot"
+            extract_metadata_strings decoration/com.brescaos.hexa.decoration.json.in "$pot"
             ;;
         updates-applet)
             find package -name '*.qml' | sort \

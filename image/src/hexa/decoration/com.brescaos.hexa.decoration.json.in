@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "BrescaOS",
+                "Website": "https://www.brescaos.com"
+            }
+        ],
+        "BugReportUrl": "https://github.com/brescaos/os/issues",
+        "Copyright": "© 2026 BrescaOS",
+        "Description": "Hexa's window title bar",
+        "Id": "com.brescaos.hexa.decoration",
+        "License": "GPL-3.0-or-later",
+        "Name": "Hexa",
+        "Website": "https://www.brescaos.com"
+    },
+    "org.kde.kdecoration3": {
+        "blur": false,
+        "kcmodule": false
+    }
+}

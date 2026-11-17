@@ -118,3 +118,15 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
         done
     done
 }
+
+@test "the window decoration is there, translated, and each Global Theme uses it" {
+    local plugin=/usr/lib64/qt6/plugins/org.kde.kdecoration3/com.brescaos.hexa.decoration.so variant defaults
+    [[ -f $plugin ]]
+    grep -qa 'Description\[es\]' "$plugin"
+    for variant in light dark; do
+        defaults=/usr/share/plasma/look-and-feel/com.brescaos.hexa.$variant.desktop/contents/defaults
+        grep -x -A1 '\[kwinrc\]\[org.kde.kdecoration2\]' "$defaults" | grep -qx 'library=com.brescaos.hexa.decoration'
+        grep -qx 'ButtonsOnLeft=M' "$defaults"
+        grep -qx 'ButtonsOnRight=IAX' "$defaults"
+    done
+}

@@ -12,8 +12,12 @@ Theme=hexa-light
 [plasmarc][Theme]
 name=hexa
 
+# Hexa's window decoration: the app's icon on the left, and minimize,
+# maximize and close on the right.
 [kwinrc][org.kde.kdecoration2]
-library=org.kde.breeze
+library=com.brescaos.hexa.decoration
+ButtonsOnLeft=M
+ButtonsOnRight=IAX
 
 [kcminputrc][Mouse]
 cursorTheme=breeze_cursors
