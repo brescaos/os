@@ -21,6 +21,18 @@ ContainmentItem {
 
     Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
 
+    // Plasma doesn't widen the area of a bar with no background that takes
+    // the mouse (PanelView::updateMask) when the bar grows, as when the
+    // display's scale goes down: its right end, the system tray, lets clicks
+    // through. A change of backgroundHints has Plasma work it out again;
+    // these two, back to none before anything is drawn, show nothing.
+    function refreshMouseArea() {
+        Plasmoid.backgroundHints = PlasmaCore.Types.DefaultBackground;
+        Plasmoid.backgroundHints = PlasmaCore.Types.NoBackground;
+    }
+    onWidthChanged: Qt.callLater(refreshMouseArea)
+    onHeightChanged: Qt.callLater(refreshMouseArea)
+
     // The applets take their colors from here: a color set on a theme that
     // inherits stays on its own item. The theme's own color until the
     // wallpaper has been looked at.
