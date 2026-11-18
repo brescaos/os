@@ -66,11 +66,14 @@ PlasmoidItem {
         }
 
         // Small enough to leave the symbol readable, with a ring of the
-        // panel's color that sets it apart from the symbol's lines.
+        // panel's color that sets it apart from the symbol's lines. Raised
+        // off the cell's bottom, which is the panel's: there it would touch
+        // the edge of a window right below the panel.
         Rectangle {
             visible: distroboxes.runningCount > 0
             anchors.right: compactSymbol.right
             anchors.bottom: compactSymbol.bottom
+            anchors.bottomMargin: 4
             height: Math.round(compactSymbol.height * 0.4)
             width: Math.max(height, badgeLabel.implicitWidth + Kirigami.Units.smallSpacing)
             radius: height / 2
