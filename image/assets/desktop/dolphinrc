@@ -1,0 +1,39 @@
+# Dolphin's defaults for every user. 
+# The details view itself is in dolphin-view-properties.
+
+[General]
+OpenExternallyCalledFolderInNewTab=true
+EditableUrl=true
+ShowFullPath=true
+ShowFullPathInTitlebar=true
+BrowseThroughArchives=true
+# Expands a folder a file is dragged over.
+AutoExpandFolders=true
+# Each folder keeps its own view; one without uses the global one.
+GlobalViewProps=false
+ShowToolTips=true
+ShowStatusBar=FullWidth
+ShowZoomSlider=true
+
+[DetailsMode]
+PreviewSize=22
+
+[ContentDisplay]
+UseShortRelativeDates=false
+
+[IconsMode]
+IconSize=48
+PreviewSize=80
+
+[CompactMode]
+PreviewSize=22
+MaximumTextWidthIndex=1
+
+[ContextMenu]
+ShowCopyMoveMenu=true
+ShowOpenInNewWindow=false
+
+[MainWindow]
+# The menu in the hamburger button and the top bar's global menu.
+MenuBar=Disabled
+ToolBarsMovable=Disabled

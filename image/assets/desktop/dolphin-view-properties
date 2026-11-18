@@ -1,0 +1,6 @@
+# Dolphin's global view properties for a new user (/etc/skel): the
+# details view, for every folder without a view of its own. Dolphin reads
+# them only from the user's home, never from /etc/xdg, so they're copied
+# once, when the user is created; after that they're the user's.
+[Dolphin]
+ViewMode=1

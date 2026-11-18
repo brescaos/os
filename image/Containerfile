@@ -165,6 +165,11 @@ COPY assets/desktop/kwinrc /etc/xdg/kwinrc
 # Qt Quick apps use Hexa's style, for every user (it only takes the place
 # of KDE's desktop style where Hexa draws a control its own way).
 COPY assets/desktop/hexa-qtquick-style.conf /usr/lib/environment.d/60-hexa-qtquick-style.conf
+# Dolphin's defaults: system-wide in /etc/xdg (a user's own settings win),
+# and the details view in a new user's home, copied once (Dolphin reads it
+# only from there).
+COPY assets/desktop/dolphinrc /etc/xdg/dolphinrc
+COPY assets/desktop/dolphin-view-properties /etc/skel/.local/share/dolphin/view_properties/global/.directory
 # The BrescaOS logo (TRADEMARKS.md): os-release's LOGO names it, and the
 # About This System page needs its path.
 COPY assets/logo/brescaos-logo-light.svg assets/logo/brescaos-logo-dark.svg assets/logo/com.brescaos.welcome.svg assets/logo/com.brescaos.updates.svg /usr/share/icons/hicolor/scalable/apps/
