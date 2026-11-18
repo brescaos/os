@@ -29,6 +29,15 @@ popups and its own switches (`widgets/switch.svg`): Breeze's, with the
 outlines of the handle and the track in the button text color at 30%, as the
 Qt Quick Controls style's below.
 
+The QtWidgets style is Hexa's, `Hexa` (`widgetstyle/`, C++, a Qt style
+plugin): Breeze's, which it wraps (a `QProxyStyle`), without the line Breeze
+draws along every scroll bar, next to the content
+(`widgetstyle/widgets/scrollbar.cpp` leaves its strip out). Each control it
+changes has its own file in `widgetstyle/widgets/`;
+`widgetstyle/hexastyle.cpp` hands it each one. Qt Quick apps get it too: KDE's
+desktop style draws their scroll bars with the QtWidgets style. Without
+Breeze installed, it wraps Qt's default style.
+
 Qt Quick apps (System Settings, Kirigami apps) have Hexa's Qt Quick Controls
 style, `com.brescaos.hexa.style` (`style/`, QML): KDE's desktop style
 (`org.kde.desktop`), which it falls back to for every control, except the
@@ -104,6 +113,7 @@ tells it:
 | `style/` | `/usr/lib64/qt6/qml/com/brescaos/hexa/style/` |
 | `wallpapercontrast/`, compiled (`CMakeLists.txt`) | `/usr/lib64/qt6/qml/com/brescaos/hexa/` |
 | `decoration/`, compiled with `decoration/com.brescaos.hexa.decoration.json.in` translated | `/usr/lib64/qt6/plugins/org.kde.kdecoration3/com.brescaos.hexa.decoration.so` |
+| `widgetstyle/`, compiled | `/usr/lib64/qt6/plugins/styles/hexastyle.so` |
 
 `<id>` is `com.brescaos.hexa.light.desktop` or `com.brescaos.hexa.dark.desktop`.
 Each `metadata.json.in`, and the decoration's JSON, is a template: the build fills in the version
@@ -111,14 +121,16 @@ Each `metadata.json.in`, and the decoration's JSON, is a template: the build fil
 settings are translated in Hexa's domain, `hexa` (`i18ndc`), not the one
 Plasma would give the applet.
 
-The QML module and the window decoration are the only compiled parts:
+The QML module, the window decoration and the QtWidgets style are the only
+compiled parts:
 cmake, extra-cmake-modules, gcc-c++, qt6-qtbase-devel,
 qt6-qtdeclarative-devel, libplasma-devel, kf6-kconfig-devel,
 kf6-kcoreaddons-devel and kdecoration-devel to build them, and Plasma's own
 libraries to run them. The decoration's metadata is compiled in translated:
 CMake needs `TRANSLATED_METADATA_DIR`, the folder where
 `image/build/compile_translations.sh` writes it. `tests/luminancetest.cpp`
-checks which areas of an image count as dark.
+checks which areas of an image count as dark, and `tests/scrollbarlinetest.cpp`
+that the QtWidgets style leaves Breeze's line out (skipped without Breeze).
 
 Once installed, choose it in System Settings > Colors & Themes > Global Theme,
 or with `plasma-apply-lookandfeel -a com.brescaos.hexa.light.desktop`.

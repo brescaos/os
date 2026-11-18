@@ -1,5 +1,6 @@
 # Hexa's compiled parts (README.md): its QML module, what its top bar needs
-# to know about the wallpaper behind it, and its window decoration. Built by
+# to know about the wallpaper behind it, its window decoration and its
+# QtWidgets style. Built by
 # the image's Containerfile (its hexa-build stage), by the development VM's
 # hot reload and, with its tests, by make check-hexa. Everything else in Hexa
 # is copied as it is.
@@ -23,7 +24,7 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(ECMQmlModule)
 
-find_package(Qt6 6.6 REQUIRED COMPONENTS Gui Qml Quick)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Gui Qml Quick Widgets)
 find_package(Plasma 6.0 REQUIRED)
 find_package(KF6 6.0 REQUIRED COMPONENTS CoreAddons)
 find_package(KDecoration3 6.3 REQUIRED)
@@ -52,6 +53,17 @@ kcoreaddons_add_plugin(com.brescaos.hexa.decoration SOURCES decoration/decoratio
 # moc finds decoration.cpp's com.brescaos.hexa.decoration.json in the include folders.
 target_include_directories(com.brescaos.hexa.decoration PRIVATE "${TRANSLATED_METADATA_DIR}")
 target_link_libraries(com.brescaos.hexa.decoration PRIVATE KDecoration3::KDecoration KF6::CoreAddons Qt6::Gui)
+
+# Out of the plugin, so the tests can link it.
+add_library(widget-style STATIC widgetstyle/hexastyle.cpp widgetstyle/hexastyle.h
+    widgetstyle/widgets/scrollbar.cpp widgetstyle/widgets/scrollbar.h)
+target_include_directories(widget-style PUBLIC widgetstyle)
+target_link_libraries(widget-style PUBLIC Qt6::Widgets)
+
+# <Qt plugins>/styles/hexastyle.so, the style Hexa.
+add_library(hexastyle MODULE widgetstyle/hexastyleplugin.cpp)
+target_link_libraries(hexastyle PRIVATE widget-style)
+install(TARGETS hexastyle DESTINATION ${KDE_INSTALL_QTPLUGINDIR}/styles)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

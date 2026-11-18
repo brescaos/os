@@ -140,3 +140,15 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     # The style it falls back to.
     grep -qx 'module org.kde.desktop' /usr/lib64/qt6/qml/org/kde/desktop/qmldir
 }
+
+@test "the QtWidgets style is there, on Breeze's, and each Global Theme uses it" {
+    local variant
+    [[ -f /usr/lib64/qt6/plugins/styles/hexastyle.so ]]
+    grep -qa '"Hexa"' /usr/lib64/qt6/plugins/styles/hexastyle.so
+    # The style it draws with.
+    [[ -f /usr/lib64/qt6/plugins/styles/breeze6.so ]]
+    for variant in light dark; do
+        grep -x -A1 '\[kdeglobals\]\[KDE\]' \
+            "/usr/share/plasma/look-and-feel/com.brescaos.hexa.$variant.desktop/contents/defaults" | grep -qx 'widgetStyle=Hexa'
+    done
+}

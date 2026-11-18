@@ -3,8 +3,9 @@
 [kdeglobals][General]
 ColorScheme=HexaDark
 
+# Hexa's QtWidgets style: Breeze's, without the line along scroll bars.
 [kdeglobals][KDE]
-widgetStyle=Breeze
+widgetStyle=Hexa
 
 [kdeglobals][Icons]
 Theme=hexa-dark
