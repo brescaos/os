@@ -25,7 +25,19 @@ moved; each can still be configured (its context menu). The whole bar can be rem
 same template.
 
 The Plasma style is Hexa's, `hexa` (`desktoptheme/`): Breeze's, with opaque
-popups.
+popups and its own switches (`widgets/switch.svg`): Breeze's, with the
+outlines of the handle and the track in the button text color at 30%, as the
+Qt Quick Controls style's below.
+
+Qt Quick apps (System Settings, Kirigami apps) have Hexa's Qt Quick Controls
+style, `com.brescaos.hexa.style` (`style/`, QML): KDE's desktop style
+(`org.kde.desktop`), which it falls back to for every control, except the
+switches (`Switch`, `SwitchDelegate`). Their outlines mix 30% of the text
+color into the background (`outlineContrast` in `style/SwitchIndicator.qml`)
+instead of the color schemes' `frameContrast`, 8%, which keeps separators and
+frames soft but leaves a switch's handle the color of a header behind it.
+Qt uses it only where `QT_QUICK_CONTROLS_STYLE=com.brescaos.hexa.style` is
+set; Plasma's widgets draw theirs with the Plasma style.
 
 The window decoration is Hexa's, `com.brescaos.hexa.decoration`
 (`decoration/`, C++, a KDecoration3 plugin): a title bar in the color
@@ -79,6 +91,7 @@ tells it:
 | `look-and-feel/<id>/metadata.json.in`, translated | `/usr/share/plasma/look-and-feel/<id>/metadata.json` |
 | `look-and-feel/org.kde.plasma.desktop-layout.js`, for both | `/usr/share/plasma/look-and-feel/<id>/contents/layouts/` |
 | `desktoptheme/hexa/dialogs/` | `/usr/share/plasma/desktoptheme/hexa/dialogs/` |
+| `desktoptheme/hexa/widgets/` | `/usr/share/plasma/desktoptheme/hexa/widgets/` |
 | `desktoptheme/hexa/metadata.json.in`, translated | `/usr/share/plasma/desktoptheme/hexa/metadata.json` |
 | `icons/hexa-light/`, `icons/hexa-dark/` | `/usr/share/icons/hexa-light/`, `/usr/share/icons/hexa-dark/` |
 | `icons/actions/`, `icons/status/`, for both | `/usr/share/icons/<theme>/actions/`, `/usr/share/icons/<theme>/status/` |
@@ -88,6 +101,7 @@ tells it:
 | `plasmoids/com.brescaos.hexa.clock/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/metadata.json` |
 | `layout-templates/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/` |
 | `layout-templates/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/metadata.json` |
+| `style/` | `/usr/lib64/qt6/qml/com/brescaos/hexa/style/` |
 | `wallpapercontrast/`, compiled (`CMakeLists.txt`) | `/usr/lib64/qt6/qml/com/brescaos/hexa/` |
 | `decoration/`, compiled with `decoration/com.brescaos.hexa.decoration.json.in` translated | `/usr/lib64/qt6/plugins/org.kde.kdecoration3/com.brescaos.hexa.decoration.so` |
 
@@ -108,3 +122,6 @@ checks which areas of an image count as dark.
 
 Once installed, choose it in System Settings > Colors & Themes > Global Theme,
 or with `plasma-apply-lookandfeel -a com.brescaos.hexa.light.desktop`.
+The Qt Quick Controls style takes `QT_QUICK_CONTROLS_STYLE=com.brescaos.hexa.style`
+in the session's environment (for example in `~/.config/environment.d/`), from
+the next login.

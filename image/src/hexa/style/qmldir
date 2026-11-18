@@ -1,0 +1,5 @@
+module com.brescaos.hexa.style
+Switch 1.0 Switch.qml
+SwitchDelegate 1.0 SwitchDelegate.qml
+internal SwitchIndicator SwitchIndicator.qml
+import org.kde.desktop auto

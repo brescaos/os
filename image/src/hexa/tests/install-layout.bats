@@ -43,10 +43,11 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
     done
 }
 
-@test "the Plasma style is there, with its opaque popups, and each Global Theme uses it" {
+@test "the Plasma style is there, with its opaque popups and its switches, and each Global Theme uses it" {
     local variant
     jq -e '.KPlugin.Id == "hexa"' /usr/share/plasma/desktoptheme/hexa/metadata.json >/dev/null
     [[ -f /usr/share/plasma/desktoptheme/hexa/dialogs/background.svg ]]
+    [[ -f /usr/share/plasma/desktoptheme/hexa/widgets/switch.svg ]]
     # Breeze's, which gives everything else.
     [[ -f /usr/share/plasma/desktoptheme/default/metadata.json ]]
     for variant in light dark; do
@@ -129,4 +130,13 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
         grep -qx 'ButtonsOnLeft=M' "$defaults"
         grep -qx 'ButtonsOnRight=IAX' "$defaults"
     done
+}
+
+@test "the Qt Quick Controls style is there, on KDE's desktop style, with its switches" {
+    local dir=/usr/lib64/qt6/qml/com/brescaos/hexa/style
+    grep -qx 'module com.brescaos.hexa.style' "$dir/qmldir"
+    grep -qx 'import org.kde.desktop auto' "$dir/qmldir"
+    [[ -f $dir/Switch.qml && -f $dir/SwitchDelegate.qml && -f $dir/SwitchIndicator.qml ]]
+    # The style it falls back to.
+    grep -qx 'module org.kde.desktop' /usr/lib64/qt6/qml/org/kde/desktop/qmldir
 }
