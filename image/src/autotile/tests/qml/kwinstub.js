@@ -4,6 +4,8 @@
 //
 // No object spread: KWin's JavaScript engine, this one, doesn't parse it.
 
+// Where the script places windows: KWin's free area (clientArea) less the
+// script's EDGE_MARGIN.
 const AREA = { x: 60, y: 40, width: 1000, height: 600 };
 const DESKTOP = { id: "desktop-1" };
 const OUTPUT = { name: "Virtual-1" };
@@ -91,6 +93,7 @@ function run(source, globals, epilogue) {
 function load(source, existing, config) {
     existing = existing || [];
     config = config || { Gap: 0 };
+    const margin = internals(source).EDGE_MARGIN;
     const shortcuts = {};
     const options = { configChanged: signal(), electricBorderMaximize: true, electricBorderTiling: true };
     const workspace = {
@@ -103,7 +106,12 @@ function load(source, existing, config) {
         windowActivated: signal(),
         screensChanged: signal(),
         virtualScreenGeometryChanged: signal(),
-        clientArea: () => AREA,
+        clientArea: () => ({
+            x: AREA.x - margin,
+            y: AREA.y - margin,
+            width: AREA.width + 2 * margin,
+            height: AREA.height + 2 * margin,
+        }),
     };
     run(source, {
         workspace,
@@ -134,7 +142,7 @@ function internals(source) {
         options: { configChanged: signal() },
         readConfig: (key, fallback) => fallback,
         registerShortcut: () => {},
-    }, "return { LAYOUTS, DEFAULT_LAYOUT, DEFAULT_GAP, createBinaryTree, createMaster, createGrid };");
+    }, "return { LAYOUTS, DEFAULT_LAYOUT, DEFAULT_GAP, EDGE_MARGIN, createBinaryTree, createMaster, createGrid };");
 }
 
 // A reconfigure: the user's own settings come back, then the script is told.

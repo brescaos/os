@@ -628,6 +628,20 @@ TestCase {
         compare(geometry(b).x - (geometry(a).x + geometry(a).width), 5);
     }
 
+    function test_windows_keep_the_edge_margin_off_the_screens_free_area() {
+        const a = KWin.fakeWindow("a");
+        const { workspace } = load([a], { Gap: 0 });
+        const free = workspace.clientArea();
+        const margin = KWin.internals(scriptSource).EDGE_MARGIN;
+        verify(margin > 0);
+        compare(geometry(a), {
+            x: free.x + margin,
+            y: free.y + margin,
+            width: free.width - 2 * margin,
+            height: free.height - 2 * margin,
+        });
+    }
+
     function test_one_window_alone_has_no_gap() {
         const a = KWin.fakeWindow("a");
         load([a], { Gap: 10 });

@@ -24,6 +24,12 @@
 const LAYOUTS = { binaryTree: createBinaryTree, master: createMaster, grid: createGrid };
 const DEFAULT_LAYOUT = "binaryTree";
 const DEFAULT_GAP = 8;
+// Kept free along the screen's free area: KWin draws the line around the
+// window with the focus (Hexa's window decoration) 2 px outside it, which
+// would fall off the screen or under a panel. Its width is
+// WINDOW_BORDER_WIDTH in image/src/hexa/decoration/decoration.cpp: change
+// both together.
+const EDGE_MARGIN = 2;
 // How long a new window stays hidden at most, if it never takes its new size.
 const REVEAL_TIMEOUT_MS = 300;
 // Bresca Welcome always floats: a first-login assistant, not a window to work in.
@@ -68,7 +74,7 @@ function keyOf(window) {
 }
 
 // The window's frame in its place: half the gap off each side that has another
-// window next to it, none off the screen's edges.
+// window next to it, none off the tiling area's edges.
 function withGap(rect, area) {
     const left = rect.x > area.x ? Math.ceil(gap / 2) : 0;
     const top = rect.y > area.y ? Math.ceil(gap / 2) : 0;
@@ -82,13 +88,23 @@ function withGap(rect, area) {
     };
 }
 
+// Where windows go on output's desktop: the screen's free area, EDGE_MARGIN in.
+function tilingArea(output, desktop) {
+    const area = workspace.clientArea(KWin.MaximizeArea, output, desktop);
+    return {
+        x: area.x + EDGE_MARGIN,
+        y: area.y + EDGE_MARGIN,
+        width: area.width - 2 * EDGE_MARGIN,
+        height: area.height - 2 * EDGE_MARGIN,
+    };
+}
+
 function retile(key) {
     const group = groups.get(key);
     if (!group) {
         return;
     }
-    const area = workspace.clientArea(KWin.MaximizeArea, group.output, group.desktop);
-    const whole = { x: area.x, y: area.y, width: area.width, height: area.height };
+    const whole = tilingArea(group.output, group.desktop);
     for (const { id, rect } of group.layout.arrange(whole)) {
         const entry = tiled.get(id);
         if (!entry) {
@@ -297,7 +313,7 @@ function windowGone(window) {
 }
 
 // A window that didn't fit its place grows to its minimum size, towards the
-// screen's free area where it would leave it: from a bottom right place, up and to
+// tiling area where it would leave it: from a bottom right place, up and to
 // the left. minSize is the app's, without the title bar and borders KWin adds.
 function growToMinimumSize(window) {
     const frame = window.frameGeometry;
@@ -307,7 +323,7 @@ function growToMinimumSize(window) {
     if (width === frame.width && height === frame.height) {
         return;
     }
-    const area = workspace.clientArea(KWin.MaximizeArea, window.output, window.desktops[0]);
+    const area = tilingArea(window.output, window.desktops[0]);
     const inArea = (start, size, areaStart, areaSize) =>
         Math.max(areaStart, Math.min(start, areaStart + areaSize - size));
     window.frameGeometry = {

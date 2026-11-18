@@ -31,7 +31,7 @@ and talks to KWin over the session bus.
   (`kcm_brescaos_autotile`): a switch for autotiling and, while it's on, the
   layouts (a card each: a radio button, its symbol, name and description)
   and the gap between windows (8 px by default, up to 64, none at the
-  screen's edges). A checkbox shows the tray icon. The changes wait for
+  screen's edges, which keep 2 px). A checkbox shows the tray icon. The changes wait for
   Apply; Defaults is off, Binary tree, 8 px, no icon.
 - **The tray applet**: hidden unless that checkbox is on (`ShowInTray`). Its
   icon is the current layout's monochrome symbol, or two free windows while
@@ -80,6 +80,11 @@ most recent use.
 - **Layout and gap**: saved, then KWin reconfigures, which is when the script
   reads its settings again (`readConfig`). A layout no longer known is the
   default, in the script and in `AutotileLayout`.
+- **Screen edges**: windows keep 2 px off the screen's free area
+  (`EDGE_MARGIN`), the width of the line KWin draws outside the window with
+  the focus (Hexa's window decoration): flush with the edge, it would fall
+  off the screen or under the dock. A window that grows to its minimum size
+  keeps them too.
 - **Windows that stay out**: dialogs, fixed-size, minimized, maximized and
   full screen windows, those on all desktops, those hidden from both the task
   bar and Alt+Tab (such as `xwaylandvideobridge`, which is invisible), and
