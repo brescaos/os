@@ -3,44 +3,12 @@
 #include "terminalcolors.h"
 
 #include <QGuiApplication>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QPalette>
 #include <QProcess>
 
 #include <algorithm>
-#include <functional>
 
 using namespace std::chrono_literals;
-
-namespace
-{
-
-// Runs program with arguments, then calls done with whether it exited with 0,
-// its output and its errors (or why it didn't start).
-void runProgram(QObject *context,
-                const QString &program,
-                const QStringList &arguments,
-                const std::function<void(bool hasSucceeded, const QString &output, const QString &errors)> &done)
-{
-    auto *process = new QProcess(context);
-    QObject::connect(process, &QProcess::finished, context, [process, done](int exitCode, QProcess::ExitStatus exitStatus) {
-        done(exitStatus == QProcess::NormalExit && exitCode == 0,
-             QString::fromUtf8(process->readAllStandardOutput()),
-             QString::fromUtf8(process->readAllStandardError()).trimmed());
-        process->deleteLater();
-    });
-    QObject::connect(process, &QProcess::errorOccurred, context, [process, done](QProcess::ProcessError error) {
-        if (error == QProcess::FailedToStart) {
-            done(false, QString(), process->errorString());
-            process->deleteLater();
-        }
-    });
-    process->start(program, arguments);
-}
-
-}
 
 DistroboxModel::DistroboxModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -116,19 +84,18 @@ int DistroboxModel::runningCount() const
 
 void DistroboxModel::start(const QString &name)
 {
-    // enter returns once the first start's setup is done, which can take a
-    // few minutes: the spinner lasts as long.
-    beginOperation(name, Operation::Starting, {QStringLiteral("enter"), name, QStringLiteral("--"), QStringLiteral("true")});
+    // The spinner lasts as long as the first start's setup.
+    beginOperation(name, Operation::Starting, &DistroboxCommands::start);
 }
 
 void DistroboxModel::stop(const QString &name)
 {
-    beginOperation(name, Operation::Stopping, {QStringLiteral("stop"), QStringLiteral("--yes"), name});
+    beginOperation(name, Operation::Stopping, &DistroboxCommands::stop);
 }
 
 void DistroboxModel::remove(const QString &name)
 {
-    beginOperation(name, Operation::Removing, {QStringLiteral("rm"), QStringLiteral("--force"), name});
+    beginOperation(name, Operation::Removing, &DistroboxCommands::remove);
 }
 
 void DistroboxModel::watchEvents()
@@ -169,30 +136,24 @@ void DistroboxModel::list()
         return;
     }
     m_isListing = true;
-    runProgram(this,
-               QStringLiteral("podman"),
-               {QStringLiteral("ps"), QStringLiteral("--all"), QStringLiteral("--filter"), QStringLiteral("label=manager=distrobox"),
-                QStringLiteral("--format"), QStringLiteral("json")},
-               [this](bool hasSucceeded, const QString &output, const QString &errors) {
-                   m_isListing = false;
-                   if (hasSucceeded) {
-                       QList<Distrobox> listed;
-                       for (const QJsonValue &container : QJsonDocument::fromJson(output.toUtf8()).array()) {
-                           const QJsonObject object = container.toObject();
-                           listed.append({.name = object[QLatin1String("Names")].toArray().first().toString(),
-                                          .isRunning = object[QLatin1String("State")].toString() == QLatin1String("running")});
-                       }
-                       std::ranges::sort(listed, {}, &Distrobox::name);
-                       updateRows(listed);
-                   } else {
-                       // The last listing stays.
-                       qWarning("podman ps failed: %s", qPrintable(errors));
-                   }
-                   if (m_shouldListAgain) {
-                       m_shouldListAgain = false;
-                       list();
-                   }
-               });
+    runProgram(this, QStringLiteral("podman"), DistroboxCommands::listArguments(), [this](bool hasSucceeded, const QString &output, const QString &errors) {
+        m_isListing = false;
+        if (hasSucceeded) {
+            QList<Distrobox> listed;
+            for (const DistroboxCommands::ListedDistrobox &distrobox : DistroboxCommands::parseListing(output)) {
+                listed.append({.name = distrobox.name, .isRunning = distrobox.isRunning});
+            }
+            std::ranges::sort(listed, {}, &Distrobox::name);
+            updateRows(listed);
+        } else {
+            // The last listing stays.
+            qWarning("podman ps failed: %s", qPrintable(errors));
+        }
+        if (m_shouldListAgain) {
+            m_shouldListAgain = false;
+            list();
+        }
+    });
 }
 
 void DistroboxModel::updateRows(const QList<Distrobox> &listed)
@@ -230,7 +191,7 @@ int DistroboxModel::rowOf(const QString &name) const
     return found == m_distroboxes.end() ? -1 : static_cast<int>(found - m_distroboxes.begin());
 }
 
-void DistroboxModel::beginOperation(const QString &name, Operation operation, const QStringList &distroboxArguments)
+void DistroboxModel::beginOperation(const QString &name, Operation operation, DistroboxCommands::Command command)
 {
     const int row = rowOf(name);
     if (row < 0 || m_distroboxes[row].operation != Operation::None) {
@@ -241,19 +202,8 @@ void DistroboxModel::beginOperation(const QString &name, Operation operation, co
     distrobox.failedOperation = Operation::None;
     distrobox.errorDetails.clear();
     emitRowChanged(row);
-    runProgram(this, QStringLiteral("distrobox"), distroboxArguments, [this, name, operation](bool hasSucceeded, const QString &, const QString &errors) {
-        if (hasSucceeded || operation != Operation::Stopping) {
-            finishOperation(name, operation, hasSucceeded, errors);
-            return;
-        }
-        // With a terminal open in it, podman stops it but then fails, "has
-        // active exec sessions, refusing to clean up": stopped is stopped.
-        runProgram(this,
-                   QStringLiteral("podman"),
-                   {QStringLiteral("inspect"), QStringLiteral("--format"), QStringLiteral("{{.State.Running}}"), name},
-                   [this, name, errors](bool hasInspected, const QString &output, const QString &) {
-                       finishOperation(name, Operation::Stopping, hasInspected && output.trimmed() == QLatin1String("false"), errors);
-                   });
+    command(this, name, [this, name, operation](bool hasSucceeded, const QString &errors) {
+        finishOperation(name, operation, hasSucceeded, errors);
     });
 }
 

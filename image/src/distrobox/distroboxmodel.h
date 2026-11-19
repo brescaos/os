@@ -6,6 +6,8 @@
 // distroboxmodelqml.h).
 #pragma once
 
+#include "distroboxcommands.h"
+
 #include <QAbstractListModel>
 #include <QTimer>
 
@@ -72,7 +74,7 @@ private:
     void updateRows(const QList<Distrobox> &listed);
     // -1 when there's none.
     int rowOf(const QString &name) const;
-    void beginOperation(const QString &name, Operation operation, const QStringList &distroboxArguments);
+    void beginOperation(const QString &name, Operation operation, DistroboxCommands::Command command);
     void finishOperation(const QString &name, Operation operation, bool hasSucceeded, const QString &errorDetails);
     void emitRowChanged(int row);
     void updateRunningCount();

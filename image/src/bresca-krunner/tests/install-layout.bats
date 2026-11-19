@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# The plugin, its shortcut and KRunner's defaults are where
+# The plugin and its shortcut are where
 # image/Containerfile installs them, translated.
 
 PLUGIN=/usr/lib64/qt6/plugins/kf6/krunner/krunner_brescaos.so
@@ -9,10 +9,6 @@ PLUGIN=/usr/lib64/qt6/plugins/kf6/krunner/krunner_brescaos.so
         echo "missing: $PLUGIN"
         return 1
     }
-}
-
-@test "KRunner's first favorite is the plugin" {
-    grep -q "^plugins=krunner_brescaos," /etc/xdg/krunnerrc
 }
 
 @test "Ctrl+Alt+B opens KRunner with only the plugin" {

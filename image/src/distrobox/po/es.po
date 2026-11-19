@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 14:38+0000\n"
+"POT-Creation-Date: 2026-11-19 18:23+0000\n"
 "PO-Revision-Date: 2026-11-11 14:38+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,7 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: applet/metadata.json.in
+#: applet/metadata.json.in krunner/com.brescaos.distrobox.desktop.in
+#: krunner/krunner_distrobox.json.in
 msgid "Distrobox"
 msgstr "Distrobox"
 
@@ -60,11 +61,11 @@ msgstr "Crea uno con «distrobox create <nombre>» en un terminal."
 msgid "No distroboxes"
 msgstr "No hay distroboxes"
 
-#: applet/package/contents/ui/main.qml
+#: applet/package/contents/ui/main.qml krunner/runner.cpp
 msgid "Remove"
 msgstr "Eliminar"
 
-#: applet/package/contents/ui/main.qml
+#: applet/package/contents/ui/main.qml krunner/runner.cpp
 msgid ""
 "Remove the distrobox “%1”? Everything installed in it will be lost. Your "
 "home folder is not affected."
@@ -79,3 +80,61 @@ msgstr "Iniciar"
 #: applet/package/contents/ui/main.qml
 msgid "Stop"
 msgstr "Detener"
+
+#: krunner/com.brescaos.distrobox.desktop.in
+msgid "Shows the progress of creating, stopping and removing distroboxes"
+msgstr "Muestra el progreso al crear, detener y eliminar distroboxes"
+
+#: krunner/krunner_distrobox.json.in
+msgid "Create, stop and remove your distroboxes"
+msgstr "Crea, detén y elimina tus distroboxes"
+
+#: krunner/runner.cpp
+msgid "Create distrobox “%1”"
+msgstr "Crear el distrobox «%1»"
+
+#: krunner/runner.cpp
+msgid "Creates the distrobox :q:"
+msgstr "Crea el distrobox :q:"
+
+#: krunner/runner.cpp
+msgid "Creating distrobox “%1”"
+msgstr "Creando el distrobox «%1»"
+
+#: krunner/runner.cpp
+msgid "Distrobox “%1” already exists"
+msgstr "El distrobox «%1» ya existe"
+
+#: krunner/runner.cpp
+msgid "Remove distrobox “%1”"
+msgstr "Eliminar el distrobox «%1»"
+
+#: krunner/runner.cpp
+msgid "Removes the distrobox :q:"
+msgstr "Elimina el distrobox :q:"
+
+#: krunner/runner.cpp
+msgid "Removing distrobox “%1”"
+msgstr "Eliminando el distrobox «%1»"
+
+#: krunner/runner.cpp
+msgid "Stop distrobox “%1”"
+msgstr "Detener el distrobox «%1»"
+
+#: krunner/runner.cpp
+msgid "Stopping distrobox “%1”"
+msgstr "Deteniendo el distrobox «%1»"
+
+#: krunner/runner.cpp
+msgid "Stops the running distrobox :q:"
+msgstr "Detiene el distrobox en marcha :q:"
+
+#: krunner/runner.cpp
+msgid ""
+"Use only letters, digits, “_”, “.” and “-”, starting with a letter or a digit"
+msgstr ""
+"Usa solo letras, números, «_», «.» y «-», empezando por una letra o un número"
+
+#: krunner/runner.cpp
+msgid "“%1” can't be a distrobox's name"
+msgstr "«%1» no puede ser el nombre de un distrobox"

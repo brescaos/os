@@ -14,7 +14,6 @@ System Settings > BrescaOS Updates (`image/src/updates-kcm/`):
 | --- | --- |
 | `runner.cpp` and `krunner_brescaos.json.in`, translated | `/usr/lib64/qt6/plugins/kf6/krunner/krunner_brescaos.so` |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/krunner_brescaos.mo` |
-| `krunnerrc` | `/etc/xdg/krunnerrc` |
 | `com.brescaos.bresca-krunner.desktop.in`, translated | `/usr/share/applications/com.brescaos.bresca-krunner.desktop` |
 
 Its version is in `VERSION.txt`: the build writes it into the plugin's
@@ -34,8 +33,10 @@ gcc-c++, kf6-ki18n-devel and kf6-krunner-devel.
   common start (`bre`, `bu`). The command typed whole, even if only its
   initials, comes first: `bu` is **Open BrescaOS Updates**, ahead of the
   two longer ones. It never runs what's typed.
-- Its results come first: `krunnerrc` makes it KRunner's first favorite,
-  ahead of applications (`krunner_services`, KRunner's own default). It only
+- Its results come first: BrescaOS's `krunnerrc`
+  (`image/assets/desktop/`) makes it KRunner's first favorite, ahead of
+  other applications
+  (`krunner_services`, KRunner's own default). It only
   has results for the `bresca` commands, so it never gets ahead of anything
   else. A user's own `krunnerrc` (KRunner's settings) wins.
 - **Ctrl+Alt+B** opens KRunner with only this plugin:
@@ -72,7 +73,7 @@ its translations and compiles it into the plugin.
   tests: `tests/runnertest.cpp` loads the plugin as KRunner does and checks
   what each query finds.
 - `make test` (on the host) checks in the image that the plugin, its
-  translations, its shortcut and `krunnerrc` are installed
+  translations and its shortcut are installed
   (`tests/install-layout.bats`).
 
 Choosing it only runs in the development VM.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 14:38+0000\n"
+"POT-Creation-Date: 2026-11-19 18:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: applet/metadata.json.in
+#: applet/metadata.json.in krunner/com.brescaos.distrobox.desktop.in
+#: krunner/krunner_distrobox.json.in
 msgid "Distrobox"
 msgstr ""
 
@@ -61,11 +62,11 @@ msgstr ""
 msgid "No distroboxes"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
+#: applet/package/contents/ui/main.qml krunner/runner.cpp
 msgid "Remove"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
+#: applet/package/contents/ui/main.qml krunner/runner.cpp
 msgid ""
 "Remove the distrobox “%1”? Everything installed in it will be lost. Your "
 "home folder is not affected."
@@ -77,4 +78,61 @@ msgstr ""
 
 #: applet/package/contents/ui/main.qml
 msgid "Stop"
+msgstr ""
+
+#: krunner/com.brescaos.distrobox.desktop.in
+msgid "Shows the progress of creating, stopping and removing distroboxes"
+msgstr ""
+
+#: krunner/krunner_distrobox.json.in
+msgid "Create, stop and remove your distroboxes"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Create distrobox “%1”"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Creates the distrobox :q:"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Creating distrobox “%1”"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Distrobox “%1” already exists"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Remove distrobox “%1”"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Removes the distrobox :q:"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Removing distrobox “%1”"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Stop distrobox “%1”"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Stopping distrobox “%1”"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "Stops the running distrobox :q:"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid ""
+"Use only letters, digits, “_”, “.” and “-”, starting with a letter or a digit"
+msgstr ""
+
+#: krunner/runner.cpp
+msgid "“%1” can't be a distrobox's name"
 msgstr ""

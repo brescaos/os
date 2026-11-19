@@ -1,7 +1,7 @@
 # For clangd in the editor, without a build: the include folders of the
 # headers the sources and tests use, as Fedora installs them. A new one goes
 # here too.
-# pp_file_not_found: terminalcolorstest.moc only exists once moc runs, in a
+# pp_file_not_found: the .moc files and krunner_distrobox.json only exist in a
 # build.
 CompileFlags:
   Add:
@@ -13,9 +13,16 @@ CompileFlags:
     - -isystem/usr/include/qt6/QtQml
     - -isystem/usr/include/qt6/QtQmlIntegration
     - -isystem/usr/include/qt6/QtTest
+    - -isystem/usr/include/qt6/QtWidgets
     - -isystem/usr/include/KF6/KColorScheme
     - -isystem/usr/include/KF6/KConfig
     - -isystem/usr/include/KF6/KConfigCore
+    - -isystem/usr/include/KF6/KCoreAddons
+    - -isystem/usr/include/KF6/KI18n
+    - -isystem/usr/include/KF6/KJobWidgets
+    - -isystem/usr/include/KF6/KRunner
+    - -isystem/usr/include/KF6/KWidgetsAddons
+    - -DTRANSLATION_DOMAIN="plasma_applet_com.brescaos.distrobox"
 Diagnostics:
   Suppress: pp_file_not_found
 ---
@@ -26,4 +33,16 @@ If:
 CompileFlags:
   Add:
     - -I..
+    - -I../krunner
     - -DFAKES_DIR="fakes"
+    # What krunner_configure_test defines for AbstractRunnerTest: where the
+    # built plugin is.
+    - -DKRUNNER_TEST_RUNNER_PLUGIN_NAME="krunner_distrobox.so"
+    - -DKRUNNER_TEST_RUNNER_PLUGIN_DIR="bin/kf6/krunner"
+---
+# The KRunner plugin includes the headers from the folder above.
+If:
+  PathMatch: krunner/.*
+CompileFlags:
+  Add:
+    - -I..

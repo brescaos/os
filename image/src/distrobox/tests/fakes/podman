@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fake podman for DistroboxModel's tests, on $FAKE_STATE (a folder): logs each
+# Fake podman for the tests, on $FAKE_STATE (a folder): logs each
 # call in calls; ps prints ps.json, events a line for each line appended to
 # events, inspect prints inspect.
 set -euo pipefail

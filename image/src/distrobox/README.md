@@ -1,7 +1,8 @@
 # Distrobox
 
 BrescaOS's integration of Distrobox: each distrobox's colors in the terminal,
-and a system tray applet to start, stop and remove them.
+a system tray applet to start, stop and remove them, and a KRunner plugin to
+create, stop and remove them.
 
 ## Files
 
@@ -11,9 +12,12 @@ and a system tray applet to start, stop and remove them.
 | `terminalcolors.cpp`, `main.cpp` | `/usr/libexec/bresca/distrobox/bresca-distrobox-colors` | Prints the colors of the distrobox `distrobox enter` enters |
 | `profile.sh` | `/usr/libexec/bresca/distrobox/profile.sh`, in every distrobox as `/etc/profile.d/zz-brescaos-distrobox.sh` (read-only) | Background, prompt and Konsole's container indicator |
 | `distroboxmodel.cpp`, `distroboxmodelqml.h` | `/usr/lib64/qt6/qml/com/brescaos/distrobox/` | The tray applet's list and actions, the QML module `com.brescaos.distrobox` |
+| `distroboxcommands.cpp` | in both of them | The podman and distrobox commands the applet and the KRunner plugin run |
+| `krunner/runner.cpp`, `krunner/distroboxjob.cpp`, `krunner/krunner_distrobox.json.in` (translated) | `/usr/lib64/qt6/plugins/kf6/krunner/krunner_distrobox.so` | The KRunner plugin |
+| `krunner/com.brescaos.distrobox.desktop.in`, translated | `/usr/share/applications/com.brescaos.distrobox.desktop`, hidden from the menu | The application its progress notifications show: Distrobox's name and symbol |
 | `applet/` | `/usr/share/plasma/plasmoids/com.brescaos.distrobox/` | The tray applet (`metadata.json` from `metadata.json.in`, with the translations) |
 | `applet/package/contents/icons/distrobox-symbolic.svg` | also `/usr/share/icons/hicolor/scalable/apps/com.brescaos.distrobox.svg` | The applet's icon in its metadata (About, the tray's settings), which takes only a theme icon's name |
-| `po/` | `/usr/share/locale/<lang>/LC_MESSAGES/plasma_applet_com.brescaos.distrobox.mo` | The applet's translations ([docs/translations.md](../../../docs/translations.md)) |
+| `po/` | `/usr/share/locale/<lang>/LC_MESSAGES/plasma_applet_com.brescaos.distrobox.mo` | The applet's and the KRunner plugin's translations ([docs/translations.md](../../../docs/translations.md)) |
 
 ## Terminal colors
 
@@ -148,24 +152,75 @@ It's a Plasma applet, `com.brescaos.distrobox`, in the system tray because its
 metadata says it's a notification area applet (`X-Plasma-NotificationArea`),
 enabled by default, so the tray loads it for every user. Its texts are in its
 QML, with `i18n()`: Plasma gives it the domain
-`plasma_applet_com.brescaos.distrobox`. The C++ has none: from a failure it
-passes on what the command said.
+`plasma_applet_com.brescaos.distrobox`. Its C++ (the list) has none: from a
+failure it passes on what the command said.
+
+## KRunner plugin
+
+In KRunner (Alt+Space) and Plasma's search (the launcher):
+
+| Typed | Result | Choosing it |
+|---|---|---|
+| `distrobox create <name>` or `dc <name>` | **Create distrobox “name”** | Runs `distrobox create --yes --name <name>`, with Distrobox's default image (downloaded the first time without asking) |
+| the same, with a name podman doesn't take (letters, digits, `_`, `.` and `-`, starting with a letter or a digit) or one that exists | Why it can't be created | Can't be chosen |
+| `distrobox stop <start of a name>` or `ds <…>` | **Stop distrobox “name”**, one per running distrobox whose name starts so | Runs `distrobox stop --yes <name>`, without asking: it ends whatever runs in it, terminals included; nothing installed in it is lost |
+| `distrobox rm <start of a name>` or `dr <…>` | **Remove distrobox “name”**, one per distrobox whose name starts so, running or not | Asks first, in a dialog (everything installed in it will be lost; the home folder isn't affected), then runs `distrobox rm --force <name>` |
+
+The commands are in any case, the names as typed; a command needs a name,
+and the distrobox with exactly the name typed comes first. Its results come
+before other plugins' but BrescaOS's: BrescaOS's `krunnerrc`
+(`image/assets/desktop/`) makes it KRunner's second favorite, ahead of
+applications, which also match "distrobox". It only has results for its
+commands, so it never gets ahead of anything else.
+
+While a command runs, a notification says so ("Creating distrobox “name”"),
+with a progress bar without a percentage, which can't be cancelled (a
+distrobox created halfway would be left behind) and doesn't close by itself.
+When the command ends, the same notification says so: Plasma adds
+"(Finished)" to its title, or "(Failed)" with what distrobox said.
+
+**How it works.** It's C++ (KF6 Runner) because KRunner loads its plugins
+into its own process: krunner, or plasmashell for the launcher's search.
+
+- It lists the distroboxes with `podman ps` (as the applet) once per search,
+  when KRunner starts one (`prepare`), not for every key.
+- KRunner runs each plugin in a thread of its own; choosing a result moves to
+  the process's GUI thread, which the dialog and the notification need.
+- The dialog is KDE's (`KMessageDialog`), shown without blocking the process.
+- The progress notification is Plasma's job notification, as a file copy's in
+  Dolphin: the command is a `KJob` (`DistroboxJob`) that
+  `KUiServerV2JobTracker` (KJobWidgets) reports; `immediateProgressReporting`
+  shows it at once. Its application is Distrobox:
+  `com.brescaos.distrobox.desktop`, hidden from the menu. KJobWidgets can't
+  take it away when it ends (Plasma's `transient` hint), so it's also the
+  result.
+- Stopping runs what the applet runs, including the check after a failure
+  (`distroboxcommands.cpp`, above).
+
+Its strings are in the applet's domain (`TRANSLATION_DOMAIN`): a component has
+one.
 
 ## Build and tests
 
 Built in `image/Containerfile`'s `distrobox-build` stage (cmake,
 extra-cmake-modules, gcc-c++, qt6-qtbase-devel, qt6-qtdeclarative-devel,
-kf6-kcolorscheme-devel, kf6-kconfig-devel); the image already has the
-libraries they use, for Plasma and Konsole. The applet's QML is copied as it
-is.
+kf6-kcolorscheme-devel, kf6-kconfig-devel, kf6-kcoreaddons-devel,
+kf6-ki18n-devel, kf6-kjobwidgets-devel, kf6-knotifications-devel,
+kf6-krunner-devel, kf6-kwidgetsaddons-devel), with the KRunner plugin's
+metadata translated by the `translations` stage; the image already has the
+libraries they use, for Plasma, Konsole and Dolphin. The applet's QML is
+copied as it is.
 
 - `make check-distrobox` (part of `make check`): compiles it with its tests
   into `build/distrobox/` and runs them: `tests/terminalcolorstest.cpp` (the
   name, Konsole's color, the hues and the contrast) and
   `tests/distroboxmodeltest.cpp` (the list, the events, the three operations,
   one at a time, and their failures, with the fake `podman` and `distrobox`
-  of `tests/fakes/`).
+  of `tests/fakes/`), `tests/runnertest.cpp` (what each KRunner query finds,
+  with the plugin loaded as KRunner loads it) and `tests/distroboxjobtest.cpp`
+  (the plugin's job and its failure).
 - `tests/` (`make test`, on the host): bats in the BrescaOS image, for
-  `distrobox.conf`, `profile.sh` and the applet's files.
-- The applet's QML needs Plasma, which `make check` doesn't have: the
-  development VM tries it.
+  `distrobox.conf`, `profile.sh`, the applet's files and the KRunner
+  plugin's.
+- The applet's QML, the plugin's dialog and its notifications need Plasma,
+  which `make check` doesn't have: the development VM tries them.

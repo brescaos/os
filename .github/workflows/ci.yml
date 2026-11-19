@@ -19,7 +19,8 @@ jobs:
       # cmake ... kf6-kconfig-devel: compile Bresca Welcome and its tests (make check-welcome).
       # kf6-kirigami, kf6-qqc2-desktop-style: its tests load its QML offscreen.
       # kf6-kcmutils-devel, kf6-kcoreaddons-devel: autotiling and its tests (make check-autotile).
-      # kf6-kcolorscheme-devel: the distroboxes' terminal colors (make check-distrobox).
+      # kf6-kcolorscheme-devel, kf6-kjobwidgets-devel, kf6-kwidgetsaddons-devel:
+      # the distroboxes' terminal colors and KRunner plugin (make check-distrobox).
       # kf6-krunner-devel: the KRunner plugin (make check-bresca-krunner).
       # libplasma-devel (with kf6-kconfig-devel and kf6-kcoreaddons-devel, above) and kdecoration-devel: Hexa's QML module and window decoration (make check-hexa).
       - name: Install dependencies
@@ -30,6 +31,7 @@ jobs:
               qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel \
               kf6-kcmutils-devel kf6-kcoreaddons-devel kf6-kcolorscheme-devel \
               kf6-krunner-devel libplasma-devel kdecoration-devel \
+              kf6-kjobwidgets-devel kf6-kwidgetsaddons-devel \
               kf6-kirigami kf6-qqc2-desktop-style
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

@@ -32,7 +32,7 @@ check-welcome: ## Compile Bresca Welcome and run its tests (offscreen)
 check-autotile: ## Compile autotiling (KWin script, KCM, applet's QML module) and run its tests (offscreen)
 	@scripts/check_autotile.sh
 
-check-distrobox: ## Compile the distroboxes' terminal colors and run their tests
+check-distrobox: ## Compile the distroboxes' terminal colors, applet and KRunner plugin and run their tests (offscreen)
 	@scripts/check_distrobox.sh
 
 check-bresca-krunner: ## Compile the KRunner plugin and run its tests (offscreen)

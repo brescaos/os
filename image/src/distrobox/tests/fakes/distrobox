@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fake distrobox for DistroboxModel's tests, on $FAKE_STATE (a folder): logs
+# Fake distrobox for the tests, on $FAKE_STATE (a folder): logs
 # each call in calls, and fails, with its content as the error, when there's a
 # <command>.fails (e.g. stop.fails).
 set -euo pipefail

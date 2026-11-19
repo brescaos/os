@@ -8,14 +8,16 @@
 #     and "Name[<lang>]" from its .po files;
 #   - the welcome's .desktop files (menu and autostart), with Name[<lang>]=...;
 #   - the autotiling KWin script's and tray applet's metadata.json;
-#   - the Distrobox tray applet's metadata.json;
+#   - the Distrobox tray applet's metadata.json, and its KRunner plugin's
+#     .desktop file (its progress notifications' application);
 #   - the KRunner plugin's .desktop file (its shortcut);
 #   - Hexa's Global Themes', Plasma style's, top bar's, panel template's and
 #     clock's metadata.json;
 # - into <metadata dir>, what a build compiles in: the KCMs'
 #   updates-kcm/kcm_brescaos_updates.json and
-#   autotile/kcm_brescaos_autotile.json, and the KRunner plugin's
-#   bresca-krunner/krunner_brescaos.json, and Hexa's window decoration's
+#   autotile/kcm_brescaos_autotile.json, the KRunner plugins'
+#   bresca-krunner/krunner_brescaos.json and distrobox/krunner_distrobox.json,
+#   and Hexa's window decoration's
 #   hexa/com.brescaos.hexa.decoration.json, with "Name[<lang>]" and the like.
 # Every metadata.json and KCM JSON also gets the version in its component's
 # VERSION.txt.
@@ -98,6 +100,10 @@ translate_desktop_file "$welcome_dir/com.brescaos.welcome-autostart.desktop.in" 
 distrobox_dir=$src_dir/distrobox
 translate_metadata "$distrobox_dir/applet/metadata.json.in" "$distrobox_dir/po" \
     "$out_dir/usr/share/plasma/plasmoids/com.brescaos.distrobox/metadata.json"
+translate_metadata "$distrobox_dir/krunner/krunner_distrobox.json.in" "$distrobox_dir/po" \
+    "$metadata_dir/distrobox/krunner_distrobox.json"
+translate_desktop_file "$distrobox_dir/krunner/com.brescaos.distrobox.desktop.in" "$distrobox_dir/po" \
+    "$out_dir/usr/share/applications/com.brescaos.distrobox.desktop"
 
 translate_metadata "$src_dir/bresca-krunner/krunner_brescaos.json.in" "$src_dir/bresca-krunner/po" \
     "$metadata_dir/bresca-krunner/krunner_brescaos.json"

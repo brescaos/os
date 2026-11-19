@@ -94,9 +94,9 @@ public:
     }
 
     // Each command the query is the start of (isStartOf()), in any case. Its
-    // results come first: it's KRunner's first favorite
-    // (krunnerrc). With only this plugin (Ctrl+Alt+B,
-    // com.brescaos.bresca-krunner.desktop), also without "bresca ", every
+    // results come first: it's KRunner's first favorite. With only 
+    // this plugin (Ctrl+Alt+B, com.brescaos.bresca-krunner.desktop), 
+    // also without "bresca ", every
     // command for "?" (KRunner's help button types it, and its help plugin
     // isn't there), and for anything else a way out to the whole KRunner.
     // KRunner never asks for an empty query.
