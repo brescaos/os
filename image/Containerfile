@@ -11,92 +11,76 @@
 # scripts/settings/settings.sh. Without it the FROM line fails (empty tag).
 ARG FEDORA_VERSION
 
-# The translations of src/ (docs/translations.md), compiled with gettext:
-# /out for the image, /metadata for the builds below.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS translations
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True gettext jq
-COPY build/compile_translations.sh /tmp/brescaos-build-compile_translations.sh
-RUN --mount=type=bind,source=src,target=/tmp/src \
-    bash /tmp/brescaos-build-compile_translations.sh /tmp/src /out /metadata
-
-# BrescaOS Updates KCM.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS updates-kcm-build
+FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS build-base
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake extra-cmake-modules gcc-c++ kf6-kcmutils-devel
+        gettext jq cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
+        kf6-kcmutils-devel kf6-kcolorscheme-devel kf6-kconfig-devel kf6-kcoreaddons-devel \
+        kf6-ki18n-devel kf6-kjobwidgets-devel kf6-krunner-devel kf6-kwidgetsaddons-devel \
+        libplasma-devel kdecoration-devel
+
+# The translations of src/ (docs/translations.md), compiled with gettext:
+# /out for the image, /metadata for the builds below.
+FROM build-base AS translations
+RUN --mount=type=bind,source=build/compile_translations.sh,target=/tmp/brescaos-build-compile_translations.sh \
+    --mount=type=bind,source=src,target=/tmp/src \
+    bash /tmp/brescaos-build-compile_translations.sh /tmp/src /out /metadata
+
+# The builds below: one make job per CPU.
+
+# BrescaOS Updates KCM.
+FROM build-base AS updates-kcm-build
 RUN --mount=type=bind,source=src/updates-kcm,target=/tmp/src \
     --mount=type=bind,from=translations,source=/metadata/updates-kcm,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
         -DTRANSLATED_METADATA_DIR=/tmp/metadata \
-    && cmake --build /tmp/build \
+    && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
 # Autotiling: its KWin script, its KCM and the QML module the KCM and the tray
 # applet share.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS autotile-build
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake extra-cmake-modules gcc-c++ kf6-kcmutils-devel kf6-kconfig-devel kf6-kcoreaddons-devel \
-        kf6-ki18n-devel qt6-qtdeclarative-devel
+FROM build-base AS autotile-build
 RUN --mount=type=bind,source=src/autotile,target=/tmp/src \
     --mount=type=bind,from=translations,source=/metadata/autotile,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
         -DTRANSLATED_METADATA_DIR=/tmp/metadata \
-    && cmake --build /tmp/build \
+    && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
 # Bresca Welcome.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS welcome-build
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake extra-cmake-modules gcc-c++ qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel
+FROM build-base AS welcome-build
 RUN --mount=type=bind,source=src/welcome,target=/tmp/src \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
-    && cmake --build /tmp/build \
+    && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
 # The distroboxes' terminal colors (bresca-distrobox-colors), the tray
 # applet's QML module and the KRunner plugin.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS distrobox-build
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
-        kf6-kcolorscheme-devel kf6-kconfig-devel kf6-kcoreaddons-devel kf6-ki18n-devel \
-        kf6-kjobwidgets-devel kf6-krunner-devel kf6-kwidgetsaddons-devel
+FROM build-base AS distrobox-build
 RUN --mount=type=bind,source=src/distrobox,target=/tmp/src \
     --mount=type=bind,from=translations,source=/metadata/distrobox,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
         -DTRANSLATED_METADATA_DIR=/tmp/metadata \
-    && cmake --build /tmp/build \
+    && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
 # KRunner plugin for BrescaOS.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS bresca-krunner-build
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake extra-cmake-modules gcc-c++ kf6-ki18n-devel kf6-krunner-devel
+FROM build-base AS bresca-krunner-build
 RUN --mount=type=bind,source=src/bresca-krunner,target=/tmp/src \
     --mount=type=bind,from=translations,source=/metadata/bresca-krunner,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
         -DTRANSLATED_METADATA_DIR=/tmp/metadata \
-    && cmake --build /tmp/build \
+    && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
 # Hexa's QML module, what its top bar knows about the wallpaper behind it,
 # and its window decoration.
-# kf6-kconfig-devel, kf6-kcoreaddons-devel: Plasma's headers and CMake files
-# use them, and libplasma-devel doesn't bring them.
-FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS hexa-build
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
-        cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
-        libplasma-devel kf6-kconfig-devel kf6-kcoreaddons-devel kdecoration-devel
+FROM build-base AS hexa-build
 RUN --mount=type=bind,source=src/hexa,target=/tmp/src \
     --mount=type=bind,from=translations,source=/metadata/hexa,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
         -DTRANSLATED_METADATA_DIR=/tmp/metadata \
-    && cmake --build /tmp/build \
+    && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
 # Everything the image copies as it is
@@ -204,7 +188,10 @@ ARG FEDORA_VERSION
 # fails with EINVAL and drops the staged update (bootc-dev/bootc#2402). The
 # mask in /etc wins over the generated unit. Remove once Fedora ships ostree
 # with ostreedev/ostree#3664.
+# build/release.sh swaps Fedora's release packages for generic-* in this same
+# step: every step that runs dnf writes rpm's whole database into its layer.
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    --mount=type=bind,source=build/release.sh,target=/tmp/brescaos-build-release.sh \
     dnf -y upgrade --refresh --setopt=install_weak_deps=False --setopt=keepcache=True \
     && dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         bash-completion \
@@ -228,19 +215,19 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     && set -- /usr/lib/modules/* \
     && { { [ "$#" -eq 1 ] && [ -f "$1/initramfs.img" ]; } \
         || { echo "error: expected one kernel with its initramfs.img, got: $*" >&2; exit 1; }; } \
+    && bash /tmp/brescaos-build-release.sh \
     && systemctl mask boot.automount \
     && systemctl enable plasmalogin.service \
     && systemctl set-default graphical.target
 
-# Version-independent system setup
-COPY build/system.sh /tmp/brescaos-build-system.sh
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    bash /tmp/brescaos-build-system.sh \
-    && rm -f /tmp/brescaos-build-system.sh
+# Version-independent system setup (build/system.sh). The build scripts are
+# mounted, not copied: a COPY would be a layer of its own, and the script
+# would stay in it.
+RUN --mount=type=bind,source=build/system.sh,target=/tmp/brescaos-build-system.sh \
+    bash /tmp/brescaos-build-system.sh "${FEDORA_VERSION}"
 
 # BrescaOS's own files (the files stage).
 COPY --from=files / /
-RUN systemctl enable bresca-updates-check.timer
 
 # BrescaOS version of this build. Required, no default: scripts/image.sh
 # passes VERSION.
@@ -252,10 +239,11 @@ LABEL org.opencontainers.image.title="BrescaOS" \
       containers.bootc="1"
 
 # Version stamp (build/identity.sh). No dnf: a new VERSION builds without the
-# network beyond the base image check.
-COPY build/identity.sh /tmp/brescaos-build-identity.sh
-RUN { [ -n "${BRESCAOS_VERSION}" ] || { echo "error: build argument BRESCAOS_VERSION is required" >&2; exit 1; }; } \
+# network beyond the base image check. The files stage's timer is enabled in
+# this step too, instead of in a layer of its own.
+RUN --mount=type=bind,source=build/identity.sh,target=/tmp/brescaos-build-identity.sh \
+    { [ -n "${BRESCAOS_VERSION}" ] || { echo "error: build argument BRESCAOS_VERSION is required" >&2; exit 1; }; } \
     && bash /tmp/brescaos-build-identity.sh "${BRESCAOS_VERSION}" "${FEDORA_VERSION}" \
-    && rm -f /tmp/brescaos-build-identity.sh
+    && systemctl enable bresca-updates-check.timer
 
 RUN bootc container lint

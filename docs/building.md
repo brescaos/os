@@ -79,7 +79,7 @@ test images (`brescaos-tests-<component>:0.0.0-<ARCH>`) stay, like the
 | `image brescaos:… not found` | Run `make image` with the same `VERSION` (and `ARCH`) first |
 | `push to … failed` | Check that the repository exists and you can push to it |
 | `the local registry doesn't answer` | Port 5050 may be in use: set `REGISTRY_PORT` |
-| `build/system.sh: ... missing, check fedora-release-common's file list` | Fedora changed its release package: update `image/build/system.sh` |
+| `build/release.sh: ... missing, check fedora-release-common's file list` | Fedora changed its release package: update `image/build/release.sh` |
 | `make check` reports a shfmt diff | Run `make format` |
 | `make check`: `… is stale` or `… is out of sync with the code` | Run `make pot`, then translate what's new ([Translations](translations.md)) |
 | `make check`: `… untranslated` or `… fuzzy` | Translate or review those strings in Poedit ([Translations](translations.md)) |

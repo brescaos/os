@@ -100,7 +100,7 @@ runs both checks even when the scripts fail, as the CI does.
 
 ## How it's built
 
-The first stage of `image/Containerfile` (`translations`, on
+The `translations` stage of `image/Containerfile` (on its `build-base`,
 `quay.io/fedora/fedora` with gettext and jq) runs
 [`image/build/compile_translations.sh`](../image/build/compile_translations.sh) with `src/`
 mounted. It writes, laid out as in the image:

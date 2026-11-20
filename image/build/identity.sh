@@ -6,7 +6,7 @@ set -euo pipefail
 version=$1
 fedora_version=$2
 
-# The version lines of os-release (build/system.sh writes the rest).
+# The version lines of os-release (build/release.sh writes the rest).
 {
     printf 'VERSION="%s"\n' "$version"
     printf 'VERSION_ID=%s\n' "$version"
