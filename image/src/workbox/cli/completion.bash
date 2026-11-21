@@ -9,14 +9,16 @@ _comp_cmd_workbox() {
     _comp_initialize -- "$@" || return
 
     if ((cword == 1)); then
-        _comp_compgen -- -W 'create list rm --help'
+        _comp_compgen -- -W 'create list start stop rm --help'
     elif [[ ${words[1]} == create && $cur == -* ]]; then
         _comp_compgen -- -W '--name --color --help'
     elif [[ ${words[1]} == list && $cur == -* ]]; then
         _comp_compgen -- -W '--quiet --help'
     elif [[ ${words[1]} == rm && $cur == -* ]]; then
         _comp_compgen -- -W '--yes --help'
-    elif [[ ${words[1]} == rm ]]; then
+    elif [[ ${words[1]} == @(start|stop) && $cur == -* ]]; then
+        _comp_compgen -- -W '--help'
+    elif [[ ${words[1]} == @(start|stop|rm) ]]; then
         # The ids of the workboxes there are; nothing when workbox fails.
         _comp_compgen_split -- "$(workbox list --quiet 2>/dev/null)"
     fi

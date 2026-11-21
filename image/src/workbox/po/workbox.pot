@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:23+0000\n"
+"POT-Creation-Date: 2026-11-21 08:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,6 +95,38 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
+"Starts a workbox.\n"
+"\n"
+"Example:\n"
+"  workbox start c1"
+msgstr ""
+
+#: cli/main.cpp
+msgid "The workbox %1 is already running."
+msgstr ""
+
+#: cli/main.cpp
+msgid "Started the workbox %1."
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
+"Stops a workbox, and everything running in it.\n"
+"\n"
+"Example:\n"
+"  workbox stop c1"
+msgstr ""
+
+#: cli/main.cpp
+msgid "The workbox %1 is already stopped."
+msgstr ""
+
+#: cli/main.cpp
+msgid "Stopped the workbox %1."
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
 "Lists the workboxes.\n"
 "\n"
 "Example:\n"
@@ -120,6 +152,11 @@ msgstr ""
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
+msgid "NAME"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "column of workbox list"
 msgid "STATUS"
 msgstr ""
 
@@ -134,11 +171,6 @@ msgid "stopped"
 msgstr ""
 
 #: cli/main.cpp
-msgctxt "column of workbox list"
-msgid "NAME"
-msgstr ""
-
-#: cli/main.cpp
 msgid ""
 "Usage: workbox <command> [options]\n"
 "\n"
@@ -148,6 +180,8 @@ msgid ""
 "Commands:\n"
 "  create  Create a workbox\n"
 "  list    List the workboxes\n"
+"  start   Start a workbox\n"
+"  stop    Stop a workbox\n"
 "  rm      Remove a workbox and its home\n"
 "\n"
 "\"workbox <command> --help\" shows a command's options."

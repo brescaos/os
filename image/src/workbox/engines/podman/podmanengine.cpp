@@ -76,10 +76,20 @@ void PodmanEngine::create(const Workbox &workbox, const QString &image)
     runPodman(arguments);
 }
 
+void PodmanEngine::start(const QString &id)
+{
+    runPodman({QStringLiteral("start"), id});
+}
+
+// --time 0 here and in remove(): sleep, its first process, ignores SIGTERM,
+// so Podman would wait 10 seconds before killing it anyway.
+void PodmanEngine::stop(const QString &id)
+{
+    runPodman({QStringLiteral("stop"), QStringLiteral("--time"), QStringLiteral("0"), id});
+}
+
 void PodmanEngine::remove(const QString &id)
 {
-    // --time 0: sleep, its first process, ignores SIGTERM, so Podman would
-    // wait 10 seconds before killing it anyway.
     runPodman({QStringLiteral("rm"), QStringLiteral("--force"), QStringLiteral("--time"), QStringLiteral("0"), id});
     runPodman({QStringLiteral("volume"), QStringLiteral("rm"), homeVolumeName(id)});
 }

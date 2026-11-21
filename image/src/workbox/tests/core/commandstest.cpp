@@ -26,6 +26,14 @@ public:
         images.append(image);
     }
 
+    void start(const QString &) override
+    {
+    }
+
+    void stop(const QString &) override
+    {
+    }
+
     void remove(const QString &id) override
     {
         workboxes.removeIf([&id](const Workbox &workbox) {

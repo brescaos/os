@@ -17,6 +17,10 @@ public:
     // Creates the workbox from image, with its home volume.
     virtual void create(const Workbox &workbox, const QString &image) = 0;
 
+    virtual void start(const QString &id) = 0;
+
+    virtual void stop(const QString &id) = 0;
+
     // Stops the workbox if it runs, and removes it and its home volume.
     virtual void remove(const QString &id) = 0;
 };

@@ -113,6 +113,46 @@ int remove(const QStringList &arguments)
     return 0;
 }
 
+int start(const QStringList &arguments)
+{
+    QCommandLineParser parser;
+    parser.setApplicationDescription(
+        i18n("Starts a workbox.\n"
+             "\n"
+             "Example:\n"
+             "  workbox start c1"));
+    const QString id = parseId(parser, QStringLiteral("start"), arguments);
+
+    const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
+    if (Commands::find(*engine, id).isRunning) {
+        printLine(stdout, i18n("The workbox %1 is already running.", id));
+        return 0;
+    }
+    engine->start(id);
+    printLine(stdout, i18n("Started the workbox %1.", id));
+    return 0;
+}
+
+int stop(const QStringList &arguments)
+{
+    QCommandLineParser parser;
+    parser.setApplicationDescription(
+        i18n("Stops a workbox, and everything running in it.\n"
+             "\n"
+             "Example:\n"
+             "  workbox stop c1"));
+    const QString id = parseId(parser, QStringLiteral("stop"), arguments);
+
+    const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
+    if (!Commands::find(*engine, id).isRunning) {
+        printLine(stdout, i18n("The workbox %1 is already stopped.", id));
+        return 0;
+    }
+    engine->stop(id);
+    printLine(stdout, i18n("Stopped the workbox %1.", id));
+    return 0;
+}
+
 int list(const QStringList &arguments)
 {
     QCommandLineParser parser;
@@ -200,6 +240,12 @@ int main(int argc, char **argv)
         if (command == QLatin1String("list")) {
             return list(arguments);
         }
+        if (command == QLatin1String("start")) {
+            return start(arguments);
+        }
+        if (command == QLatin1String("stop")) {
+            return stop(arguments);
+        }
         if (command.isEmpty() || command == QLatin1String("--help") || command == QLatin1String("-h")) {
             printLine(stdout,
                       i18n("Usage: workbox <command> [options]\n"
@@ -209,6 +255,8 @@ int main(int argc, char **argv)
                            "Commands:\n"
                            "  create  Create a workbox\n"
                            "  list    List the workboxes\n"
+                           "  start   Start a workbox\n"
+                           "  stop    Stop a workbox\n"
                            "  rm      Remove a workbox and its home\n"
                            "\n"
                            "\"workbox <command> --help\" shows a command's options."));

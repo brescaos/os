@@ -3,18 +3,20 @@
 `workbox` runs rootless Podman containers, each a separate place to work (for
 example one per client), that share nothing with the host: no home folder, no
 SSH agent, no display, no host network. Distrobox does the opposite. Today it
-creates, lists and removes them; entering them and the options that share something
+creates, lists, starts, stops and removes them; entering them and the options that share something
 with the host come next.
 
 ```bash
 workbox create c1 --name "Cliente 01" --color '#3584e4'
 workbox list
+workbox start c1
+workbox stop c1
 workbox rm c1
 ```
 
 `workbox --help` lists the commands, and `workbox <command> --help` shows
 that command's options, with an example. Bash completes the commands,
-their options and `rm`'s ids.
+their options and the ids `start`, `stop` and `rm` take.
 
 | Source | In the image |
 | --- | --- |
@@ -35,6 +37,8 @@ qt6-qtbase-devel, kf6-kconfig-devel and kf6-ki18n-devel.
   path as the user's home. The image is downloaded the first time.
 - `workbox list [--quiet]` shows every workbox by id, with its name
   and its status.
+- `workbox start <id>` and `workbox stop <id>` start and stop it, and say
+  so when it already is (not an error). Stopping it stops everything in it.
 - `workbox rm <id> [--yes]` stops it if it runs and removes it and its
   home volume, after asking (`[y/N]`) unless `--yes`.
 
@@ -74,9 +78,9 @@ tests (and later a KDE app) use the same code as the command line:
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `engine.h`: what workbox needs from an engine (list, create, remove). `commands.h`: what `create`, `list` and `rm` do, on any engine |
+| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `engine.h`: what workbox needs from an engine (list, create, start, stop, remove). `commands.h`: what `create`, `list` and `rm` do, on any engine |
 | `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands. Another engine would go in `engines/<name>/` |
-| `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages. `completion.bash`, its bash completion: keep it in sync with the commands and options; `rm`'s ids come from `workbox list --quiet` |
+| `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name` and
   `com.brescaos.workbox.color`, the only copy of its settings; the name's
@@ -84,8 +88,9 @@ tests (and later a KDE app) use the same code as the command line:
 - `podman create --userns=keep-id --network=pasta` with its labels and
   `--volume workbox-<id>-home:$HOME`, running `sleep infinity`: the same uid
   inside, its own network (outgoing only), nothing of the host shared.
-- `rm` is `podman rm --force --time 0` (sleep ignores SIGTERM, so Podman
-  would wait 10 seconds to kill it anyway), then `podman volume rm`.
+- `start` is `podman start`; `stop` is `podman stop --time 0`, and `rm` is
+  `podman rm --force --time 0` then `podman volume rm` (sleep ignores
+  SIGTERM, so Podman would wait 10 seconds to kill it anyway).
 - Podman's own errors go to stderr as they are; workbox adds which command
   failed.
 

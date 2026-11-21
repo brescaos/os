@@ -14,7 +14,7 @@ fi
 case $1 in
     ps) cat "$FAKE_STATE/ps.json" 2>/dev/null || echo '[]' ;;
     create) echo 0123456789abcdef ;;
-    rm | volume) ;;
+    start | stop | rm | volume) ;;
     *)
         echo "fake podman: unexpected command: $*" >&2
         exit 2

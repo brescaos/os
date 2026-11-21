@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:23+0000\n"
+"POT-Creation-Date: 2026-11-21 08:29+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -109,11 +109,47 @@ msgstr "S'ha eliminat el workbox %1."
 
 #: cli/main.cpp
 msgid ""
+"Starts a workbox.\n"
+"\n"
+"Example:\n"
+"  workbox start c1"
+msgstr "Engega un workbox.\n\nExemple:\n  workbox start c1"
+
+#: cli/main.cpp
+msgid "The workbox %1 is already running."
+msgstr "El workbox %1 ja està en marxa."
+
+#: cli/main.cpp
+msgid "Started the workbox %1."
+msgstr "S'ha engegat el workbox %1."
+
+#: cli/main.cpp
+msgid ""
+"Stops a workbox, and everything running in it.\n"
+"\n"
+"Example:\n"
+"  workbox stop c1"
+msgstr "Atura un workbox i tot el que s'hi executa.\n\nExemple:\n  workbox stop c1"
+
+#: cli/main.cpp
+msgid "The workbox %1 is already stopped."
+msgstr "El workbox %1 ja està aturat."
+
+#: cli/main.cpp
+msgid "Stopped the workbox %1."
+msgstr "S'ha aturat el workbox %1."
+
+#: cli/main.cpp
+msgid ""
 "Lists the workboxes.\n"
 "\n"
 "Example:\n"
 "  workbox list"
-msgstr "Llista els workboxes.\n\nExemple:\n  workbox list"
+msgstr ""
+"Llista els workboxes.\n"
+"\n"
+"Exemple:\n"
+"  workbox list"
 
 #: cli/main.cpp
 msgid "Only their ids, one per line."
@@ -134,6 +170,11 @@ msgstr "ID"
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
+msgid "NAME"
+msgstr "NOM"
+
+#: cli/main.cpp
+msgctxt "column of workbox list"
 msgid "STATUS"
 msgstr "ESTAT"
 
@@ -148,11 +189,6 @@ msgid "stopped"
 msgstr "aturat"
 
 #: cli/main.cpp
-msgctxt "column of workbox list"
-msgid "NAME"
-msgstr "NOM"
-
-#: cli/main.cpp
 msgid ""
 "Usage: workbox <command> [options]\n"
 "\n"
@@ -162,21 +198,12 @@ msgid ""
 "Commands:\n"
 "  create  Create a workbox\n"
 "  list    List the workboxes\n"
+"  start   Start a workbox\n"
+"  stop    Stop a workbox\n"
 "  rm      Remove a workbox and its home\n"
 "\n"
 "\"workbox <command> --help\" shows a command's options."
-msgstr ""
-"Ús: workbox <ordre> [opcions]\n"
-"\n"
-"Executa contenidors, cadascun un lloc de treball a part, que no comparteixen "
-"res amb el sistema.\n"
-"\n"
-"Ordres:\n"
-"  create  Crea un workbox\n"
-"  list    Llista els workboxes\n"
-"  rm      Elimina un workbox i la seva carpeta personal\n"
-"\n"
-"«workbox <ordre> --help» mostra les opcions d'una ordre."
+msgstr "Ús: workbox <ordre> [opcions]\n\nExecuta contenidors, cadascun un lloc de treball a part, que no comparteixen res amb el sistema.\n\nOrdres:\n  create  Crea un workbox\n  list    Llista els workboxes\n  start   Engega un workbox\n  stop    Atura un workbox\n  rm      Elimina un workbox i la seva carpeta personal\n\n«workbox <ordre> --help» mostra les opcions d'una ordre."
 
 #: cli/main.cpp
 msgid "unknown command \"%1\" (workbox --help)"

@@ -84,6 +84,14 @@ private Q_SLOTS:
                                       "infinity"}}));
     }
 
+    void startAndStop()
+    {
+        PodmanEngine engine;
+        engine.start("c1");
+        engine.stop("c1");
+        QCOMPARE(calls(), (QList<QStringList>{{"start", "c1"}, {"stop", "--time", "0", "c1"}}));
+    }
+
     void removeRemovesTheContainerAndItsHome()
     {
         PodmanEngine().remove("c1");
