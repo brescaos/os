@@ -59,7 +59,8 @@ extract_strings() {
             ;;
         workbox)
             find lib cli applet -name '*.cpp' | sort \
-                | xargs xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=i18nc:1c,2 -o "$pot"
+                | xargs xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 \
+                    -o "$pot"
             # The applet's QML names the domain (i18nd).
             find applet -name '*.qml' | sort \
                 | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript -j --keyword= \

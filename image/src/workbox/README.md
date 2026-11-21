@@ -66,12 +66,15 @@ cmake --install build
   and the status in green or red, as `list`.
 - `workbox start <id>` and `workbox stop <id>` start and stop it, and say
   so when it already is (not an error). Stopping it stops everything in it.
+  `workbox stop --all` stops every running one.
 - `workbox enter <id> [--root]` opens a login bash in it, in the user's
   home, starting it first if it's stopped (see [Terminal](#terminal)). Its
   exit status is the shell's. `--root`, as the workbox's root in `/root`,
   with or without `--sudo`.
-- `workbox rm <id> [--yes]` stops it if it runs and removes it and its
+- `workbox rm <id>|--all [--yes]` stops it if it runs and removes it and its
   volumes (its home too), after asking to type its id, unless `--yes`.
+  `--all` removes every workbox, after asking `[y/N]` with their ids,
+  unless `--yes`.
 
 The workbox's root is root only inside it: rootless Podman maps it to the
 user outside, so it can change anything of the workbox (its packages, its

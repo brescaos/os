@@ -54,6 +54,17 @@ setup() {
     [[ $output == *"it's the whole home folder"* ]]
 }
 
+@test "stop --all stops the running ones, rm --all --yes removes every one" {
+    printf '%s' '[{"Names": ["c1"], "State": "running", "Labels": {"com.brescaos.workbox.name": "c1", "com.brescaos.workbox.color": "#3584e4"}}, {"Names": ["c2"], "State": "exited", "Labels": {"com.brescaos.workbox.name": "c2", "com.brescaos.workbox.color": "#e5a50a"}}]' \
+        >"$FAKE_STATE/ps.json"
+    run workbox stop --all
+    [[ $status -eq 0 ]]
+    [[ $output == "Stopped the workbox c1." ]]
+    run workbox rm --all --yes
+    [[ $status -eq 0 ]]
+    [[ $output == *"Removed the workbox c1."* && $output == *"Removed the workbox c2."* ]]
+}
+
 @test "info shows a workbox's settings" {
     printf '%s' '[{"Names": ["c1"], "State": "running", "Image": "example.org/image:1", "Labels": {"com.brescaos.workbox.name": "Cliente 01", "com.brescaos.workbox.color": "#3584e4", "com.brescaos.workbox.sudo": "true"}}]' \
         >"$FAKE_STATE/ps.json"

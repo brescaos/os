@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 13:20+0000\n"
+"POT-Creation-Date: 2026-11-21 14:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -135,6 +135,14 @@ msgid "Don't ask before removing it."
 msgstr ""
 
 #: cli/main.cpp
+msgid "Every running workbox."
+msgstr ""
+
+#: cli/main.cpp
+msgid "Every workbox."
+msgstr ""
+
+#: cli/main.cpp
 msgctxt "field of workbox info"
 msgid "Home"
 msgstr ""
@@ -185,6 +193,10 @@ msgid "Name"
 msgstr ""
 
 #: cli/main.cpp
+msgid "No workbox is running."
+msgstr ""
+
+#: cli/main.cpp
 msgid "No workboxes yet: workbox create <id> creates one."
 msgstr ""
 
@@ -207,13 +219,24 @@ msgid ""
 msgstr ""
 
 #: cli/main.cpp
+msgid ""
+"Remove the workbox %2? Everything in it and in its volumes will be lost. [y/"
+"N] "
+msgid_plural ""
+"Remove the %1 workboxes (%2)? Everything in them and in their volumes will "
+"be lost. [y/N] "
+msgstr[0] ""
+msgstr[1] ""
+
+#: cli/main.cpp
 msgid "Removed the workbox %1."
 msgstr ""
 
 #: cli/main.cpp
 msgid ""
 "Removes a workbox and its home, stopping it first if it runs: everything in "
-"them is lost. Asks for its id first, unless --yes.\n"
+"them is lost. Asks for its id first, or with --all, for a yes, unless --"
+"yes.\n"
 "\n"
 "Example:\n"
 "  workbox rm c1"
@@ -261,7 +284,8 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
-"Stops a workbox, and everything running in it.\n"
+"Stops a workbox, or with --all every running one, and everything running in "
+"them.\n"
 "\n"
 "Example:\n"
 "  workbox stop c1"
@@ -286,6 +310,10 @@ msgstr ""
 
 #: cli/main.cpp
 msgid "The workbox's id."
+msgstr ""
+
+#: cli/main.cpp
+msgid "There are no workboxes to remove."
 msgstr ""
 
 #: cli/main.cpp
@@ -348,11 +376,24 @@ msgid "unknown command \"%1\" (workbox --help)"
 msgstr ""
 
 #: cli/main.cpp
+msgid "workbox %1 takes an id or --all, not both"
+msgstr ""
+
+#: cli/main.cpp
 msgid "workbox %1 takes one id (workbox %1 --help)"
 msgstr ""
 
 #: cli/main.cpp
+msgid "workbox %1 takes one id or --all (workbox %1 --help)"
+msgstr ""
+
+#: cli/main.cpp
 msgid "workbox list takes no arguments (workbox list --help)"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "the answer to [y/N] that removes them"
+msgid "y"
 msgstr ""
 
 #: cli/main.cpp

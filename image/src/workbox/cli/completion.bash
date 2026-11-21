@@ -17,10 +17,12 @@ _comp_cmd_workbox() {
     elif [[ ${words[1]} == list && $cur == -* ]]; then
         _comp_compgen -- -W '--quiet --help'
     elif [[ ${words[1]} == rm && $cur == -* ]]; then
-        _comp_compgen -- -W '--yes --help'
+        _comp_compgen -- -W '--yes --all --help'
     elif [[ ${words[1]} == enter && $cur == -* ]]; then
         _comp_compgen -- -W '--root --help'
-    elif [[ ${words[1]} == @(info|start|stop) && $cur == -* ]]; then
+    elif [[ ${words[1]} == stop && $cur == -* ]]; then
+        _comp_compgen -- -W '--all --help'
+    elif [[ ${words[1]} == @(info|start) && $cur == -* ]]; then
         _comp_compgen -- -W '--help'
     elif [[ ${words[1]} == @(info|start|stop|enter|rm) ]]; then
         # The ids of the workboxes there are; nothing when workbox fails.

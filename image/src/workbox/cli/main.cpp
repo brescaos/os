@@ -101,6 +101,28 @@ QString parseId(QCommandLineParser &parser, const QString &command, const QStrin
     return parser.positionalArguments().first();
 }
 
+// The id that command takes or, with allOption (added here), none; the rest
+// as parseId().
+std::optional<QString>
+parseIdOrAll(QCommandLineParser &parser, const QCommandLineOption &allOption, const QString &command, const QStringList &arguments)
+{
+    parser.addOption(allOption);
+    parser.addHelpOption();
+    parser.addPositionalArgument(QStringLiteral("id"), i18n("The workbox's id."), command + QStringLiteral(" <id>|--all"));
+    parser.process(QStringList{arguments.first()} + arguments.mid(2));
+    const QStringList ids = parser.positionalArguments();
+    if (parser.isSet(allOption)) {
+        if (!ids.isEmpty()) {
+            throw WorkboxError{i18n("workbox %1 takes an id or --all, not both", command)};
+        }
+        return std::nullopt;
+    }
+    if (ids.size() != 1) {
+        throw WorkboxError{i18n("workbox %1 takes one id or --all (workbox %1 --help)", command)};
+    }
+    return ids.first();
+}
+
 int create(const QStringList &arguments)
 {
     QCommandLineParser parser;
@@ -146,6 +168,21 @@ int create(const QStringList &arguments)
 }
 
 // The user types the workbox's id, so a removal can't be a reflex "y".
+bool confirmRemovingAll(const QList<Workbox> &workboxes)
+{
+    QStringList ids;
+    for (const Workbox &workbox : workboxes) {
+        ids.append(workbox.id);
+    }
+    QTextStream(stdout) << i18np("Remove the workbox %2? Everything in it and in its volumes will be lost. [y/N] ",
+                                 "Remove the %1 workboxes (%2)? Everything in them and in their volumes will be lost. [y/N] ",
+                                 workboxes.size(),
+                                 ids.join(QStringLiteral(", ")))
+                        << Qt::flush;
+    const QString answer = QTextStream(stdin).readLine().trimmed();
+    return answer.compare(i18nc("the answer to [y/N] that removes them", "y"), Qt::CaseInsensitive) == 0;
+}
+
 bool confirmRemoval(const Workbox &workbox)
 {
     QTextStream(stdout) << i18n("Removing the workbox %1 (\"%2\") loses everything in it and in its home.\nType its id to remove it: ",
@@ -160,22 +197,39 @@ int remove(const QStringList &arguments)
     QCommandLineParser parser;
     parser.setApplicationDescription(
         i18n("Removes a workbox and its home, stopping it first if it runs: everything in them is lost. "
-             "Asks for its id first, unless --yes.\n"
+             "Asks for its id first, or with --all, for a yes, unless --yes.\n"
              "\n"
              "Example:\n"
              "  workbox rm c1"));
     const QCommandLineOption yesOption({QStringLiteral("y"), QStringLiteral("yes")}, i18n("Don't ask before removing it."));
     parser.addOption(yesOption);
-    const QString id = parseId(parser, QStringLiteral("rm"), arguments);
+    const QCommandLineOption allOption({QStringLiteral("a"), QStringLiteral("all")}, i18n("Every workbox."));
+    const std::optional<QString> id = parseIdOrAll(parser, allOption, QStringLiteral("rm"), arguments);
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
-    const Workbox workbox = Commands::find(listWorkboxes(*engine), id);
+    if (!id) {
+        const QList<Workbox> workboxes = Commands::sortedById(listWorkboxes(*engine));
+        if (workboxes.isEmpty()) {
+            printLine(stdout, i18n("There are no workboxes to remove."));
+            return 0;
+        }
+        if (!parser.isSet(yesOption) && !confirmRemovingAll(workboxes)) {
+            printLine(stdout, i18n("Nothing removed."));
+            return 1;
+        }
+        for (const Workbox &workbox : workboxes) {
+            runToEnd(engine->remove(workbox));
+            printLine(stdout, i18n("Removed the workbox %1.", workbox.id));
+        }
+        return 0;
+    }
+    const Workbox workbox = Commands::find(listWorkboxes(*engine), *id);
     if (!parser.isSet(yesOption) && !confirmRemoval(workbox)) {
         printLine(stdout, i18n("Nothing removed."));
         return 1;
     }
     runToEnd(engine->remove(workbox));
-    printLine(stdout, i18n("Removed the workbox %1.", id));
+    printLine(stdout, i18n("Removed the workbox %1.", workbox.id));
     return 0;
 }
 
@@ -203,13 +257,30 @@ int stop(const QStringList &arguments)
 {
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        i18n("Stops a workbox, and everything running in it.\n"
+        i18n("Stops a workbox, or with --all every running one, and everything running in them.\n"
              "\n"
              "Example:\n"
              "  workbox stop c1"));
-    const QString id = parseId(parser, QStringLiteral("stop"), arguments);
+    const QCommandLineOption allOption({QStringLiteral("a"), QStringLiteral("all")}, i18n("Every running workbox."));
+    const std::optional<QString> optionalId = parseIdOrAll(parser, allOption, QStringLiteral("stop"), arguments);
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
+    if (!optionalId) {
+        QList<Workbox> running = Commands::sortedById(listWorkboxes(*engine));
+        running.removeIf([](const Workbox &workbox) {
+            return !workbox.isRunning;
+        });
+        if (running.isEmpty()) {
+            printLine(stdout, i18n("No workbox is running."));
+            return 0;
+        }
+        for (const Workbox &workbox : running) {
+            runToEnd(engine->stop(workbox.id));
+            printLine(stdout, i18n("Stopped the workbox %1.", workbox.id));
+        }
+        return 0;
+    }
+    const QString &id = *optionalId;
     if (!Commands::find(listWorkboxes(*engine), id).isRunning) {
         printLine(stdout, i18n("The workbox %1 is already stopped.", id));
         return 0;
