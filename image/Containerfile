@@ -83,7 +83,7 @@ RUN --mount=type=bind,source=src/hexa,target=/tmp/src \
     && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
-# workbox's command line.
+# workbox: its command line, its bash completion and its own settings.
 FROM build-base AS workbox-build
 RUN --mount=type=bind,source=src/workbox,target=/tmp/src \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
@@ -149,9 +149,8 @@ COPY src/hexa/plasmoids/com.brescaos.hexa.clock/contents/ /usr/share/plasma/plas
 COPY src/hexa/layout-templates/com.brescaos.hexa.topbar/contents/ /usr/share/plasma/layout-templates/com.brescaos.hexa.topbar/contents/
 COPY src/hexa/style/ /usr/lib64/qt6/qml/com/brescaos/hexa/style/
 # workbox, containers that share nothing with the host (src/workbox/README.md);
-# its settings come from build/system.sh.
+# BrescaOS's settings for it come from build/system.sh.
 COPY --from=workbox-build /out/ /
-COPY src/workbox/cli/completion.bash /usr/share/bash-completion/completions/workbox
 # BrescaOS's desktop is Hexa: Hexa Light, with Hexa Dark as its dark pair.
 # Plasma applies the Global Theme's defaults at login, unless the user chose
 # another one.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:08+0000\n"
+"POT-Creation-Date: 2026-11-21 09:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -201,43 +201,44 @@ msgid ""
 "  enter   Open a shell in a workbox\n"
 "  rm      Remove a workbox and its home\n"
 "\n"
-"\"workbox <command> --help\" shows a command's options."
+"\"workbox <command> --help\" shows a command's options; \"workbox --"
+"version\", its version."
 msgstr ""
 
 #: cli/main.cpp
 msgid "unknown command \"%1\" (workbox --help)"
 msgstr ""
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid ""
 "invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not "
 "starting with a hyphen"
 msgstr ""
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "the name can't be empty"
 msgstr ""
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
 msgstr ""
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "a workbox with the id \"%1\" already exists"
 msgstr ""
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "there's no workbox with the id \"%1\""
 msgstr ""
 
-#: core/settings.cpp
-msgid "no %1 in %2 or %3"
+#: lib/core/settings.cpp
+msgid "no %1 in %2"
 msgstr ""
 
-#: engines/podman/podmanjob.cpp
+#: lib/engines/podman/podmanjob.cpp
 msgid "podman %1 failed"
 msgstr ""
 
-#: engines/podman/podmanjob.cpp
+#: lib/engines/podman/podmanjob.cpp
 msgid "couldn't run podman: %1"
 msgstr ""

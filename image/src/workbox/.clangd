@@ -21,7 +21,7 @@ Diagnostics:
 # Each layer includes the headers of the ones below it, as CMakeLists.txt's
 # include folders (the compile command's folder is the file's).
 If:
-  PathMatch: engines/podman/.*
+  PathMatch: lib/engines/podman/.*
 CompileFlags:
   Add:
     - -I../../core
@@ -30,21 +30,29 @@ If:
   PathMatch: cli/.*
 CompileFlags:
   Add:
-    - -I../core
-    - -I../engines/podman
+    - -I../lib/core
+    - -I../lib/engines/podman
+    - -DWORKBOX_VERSION="0"
+---
+If:
+  PathMatch: lib/core/.*
+CompileFlags:
+  Add:
+    - -DSETTINGS_FILE="workbox.conf"
+    - -DDISTRIBUTION_SETTINGS_FILE="workbox.conf"
 ---
 # The tests mirror the sources' folders under tests/; FAKES_DIR comes from
 # tests/CMakeLists.txt.
 If:
-  PathMatch: tests/core/.*
+  PathMatch: tests/lib/core/.*
 CompileFlags:
   Add:
-    - -I../../core
+    - -I../../../lib/core
 ---
 If:
-  PathMatch: tests/engines/podman/.*
+  PathMatch: tests/lib/engines/podman/.*
 CompileFlags:
   Add:
-    - -I../../../core
-    - -I../../../engines/podman
-    - -DFAKES_DIR="../../fakes"
+    - -I../../../../lib/core
+    - -I../../../../lib/engines/podman
+    - -DFAKES_DIR="../../../fakes"

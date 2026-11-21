@@ -85,9 +85,7 @@ printf 'container_image_default="registry.fedoraproject.org/fedora-toolbox:%s"\n
     >/usr/share/distrobox/distrobox.conf
 
 # --- workbox ---------------------------------------------------------------------------
-# workbox's settings (image/src/workbox/README.md): Podman and Fedora's toolbox
-# image for this system's release, as Distrobox's. In /usr, so they follow the
-# image; the user's ~/.config/workbox/workbox.conf wins key by key.
-mkdir -p /usr/share/workbox
-printf '[General]\nengine=podman\nimage=registry.fedoraproject.org/fedora-toolbox:%s\n' "$fedora_version" \
-    >/usr/share/workbox/workbox.conf
+# Set default image of workbox.
+mkdir -p /usr/share/defaults/workbox
+printf '[General]\nimage=registry.fedoraproject.org/fedora-toolbox:%s\n' "$fedora_version" \
+    >/usr/share/defaults/workbox/workbox.conf

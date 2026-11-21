@@ -19,18 +19,26 @@ workbox rm c1
 that command's options, with an example. Bash completes the commands,
 their options and the ids `start`, `stop`, `enter` and `rm` take.
 
-| Source | In the image |
+| Source | Installed as |
 | --- | --- |
-| `core/`, `engines/podman/`, `cli/` | `/usr/bin/workbox` |
+| `lib/`, `cli/` | `/usr/bin/workbox` |
 | `cli/completion.bash` | `/usr/share/bash-completion/completions/workbox` |
+| `config/workbox.conf` | `/usr/share/workbox/workbox.conf` |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/workbox.mo` |
-| `image/build/system.sh` | `/usr/share/workbox/workbox.conf` |
 
-It's C++ (Qt, KF6 Config, CoreAddons and I18n), so a KDE app to manage workboxes can use
-the same code later. `image/Containerfile` compiles it in its own stage,
-`workbox-build`. Building it needs cmake, extra-cmake-modules, gcc-c++,
-qt6-qtbase-devel, kf6-kconfig-devel, kf6-kcoreaddons-devel and
-kf6-ki18n-devel.
+Its version is in `VERSION.txt`; `workbox --version` shows it.
+
+It's C++ (Qt, KF6 Config, CoreAddons and I18n): a library, the command
+line on it, and later an applet and an app on the same library. It runs
+`podman` (rootless) and, for workboxes, Fedora's toolbox image. Building it
+needs cmake, extra-cmake-modules, gcc-c++, qt6-qtbase-devel,
+kf6-kconfig-devel, kf6-kcoreaddons-devel and kf6-ki18n-devel:
+
+```bash
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+cmake --install build
+```
 
 ## Commands
 
@@ -48,12 +56,12 @@ kf6-ki18n-devel.
   home, starting it first if it's stopped (see [Terminal](#terminal)). Its
   exit status is the shell's. `--root`, as the workbox's root in `/root`,
   with or without `--sudo`.
+- `workbox rm <id> [--yes]` stops it if it runs and removes it and its
+  home volume, after asking to type its id, unless `--yes`.
 
 The workbox's root is root only inside it: rootless Podman maps it to the
 user outside, so it can change anything of the workbox (its packages, its
 home, what's shared with it), nothing else of the host.
-- `workbox rm <id> [--yes]` stops it if it runs and removes it and its
-  home volume, after asking to type its id, unless `--yes`.
 
 The **id** (`c1`) is what every command takes: `[a-z0-9][a-z0-9-]*`, up to
 32 characters, unique, and never changes. The **name** is only shown
@@ -81,7 +89,7 @@ workbox's name, bold in a light shade of that hue:
 🧰 Cliente 01 [user@c1 ~]$
 ```
 
-- The colors (`core/terminalcolors.h`) take only the hue (OKLCH) of the
+- The colors (`lib/core/terminalcolors.h`) take only the hue (OKLCH) of the
   workbox's color: the background at lightness 0.28 and chroma 0.048 (what
   sRGB has for every hue), the text `#fcfcfc`, the label at 0.84 with up to
   0.11 chroma. Text and label read at 7:1 or more (WCAG AAA) on every
@@ -97,24 +105,31 @@ workbox's name, bold in a light shade of that hue:
 
 ## Settings
 
-`/usr/share/workbox/workbox.conf`, written by `image/build/system.sh`,
-follows the image; the user's `~/.config/workbox/workbox.conf` wins key by
-key (KConfig, group `[General]`):
+`workbox.conf` (KConfig, group `[General]`), on three levels, each key from
+the most specific that has it:
 
-| Key | Image's value |
+| File | Whose |
+| --- | --- |
+| `/usr/share/workbox/workbox.conf` | workbox's own (`config/workbox.conf`) |
+| `/usr/share/defaults/workbox/workbox.conf` | a distribution's, if it has one (as Distrobox's, in `/usr/share/defaults/distrobox/`) |
+| `~/.config/workbox/workbox.conf` | the user's |
+
+| Key | workbox's value |
 | --- | --- |
 | `engine` | `podman`, the only one today |
-| `image` | `registry.fedoraproject.org/fedora-toolbox:<Fedora release>`, Distrobox's too |
+| `image` | `registry.fedoraproject.org/fedora-toolbox:latest`; a distribution can name its own release's |
 
-A new image applies to the workboxes created after it.
+A new image applies to the workboxes created after it. The paths follow the
+install prefix (`<datadir>/workbox/`, `<datadir>/defaults/workbox/`).
 
 ## How it works
 
-One folder per layer; each is a static library the next one links, so the
-tests (and later a KDE app) use the same code as the command line.
+Three parts: the library (`lib/`), the command line (`cli/`) and, later, an
+applet and an app. The library is static, one folder per layer, each a
+library the next one links, so the tests and every part use the same code.
 
 **Nothing blocks.** Every engine operation is a job, an
-`EngineJob` (`core/enginejob.h`): a `KJob` that runs without waiting and
+`EngineJob` (`lib/core/enginejob.h`): a `KJob` that runs without waiting and
 says when it's done with its `result()` signal, so an applet or an app can
 use the engine without freezing. On failure, its `errorText()` says why,
 translated. Its `output(line)` signal gives what the engine prints as it
@@ -134,9 +149,9 @@ before the first `list()`, so no change between them is missed.
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
-| `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `engines/<name>/` |
-| `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
+| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
+| `lib/engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `lib/engines/<name>/` |
+| `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages, `--version`. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name`,
   `com.brescaos.workbox.color` and, with `--sudo`,
@@ -169,25 +184,27 @@ before the first `list()`, so no change between them is missed.
 
 ## Translations
 
-`i18n()` and `i18nc()` in the C++, domain `workbox`
+`i18n()` and `i18nc()` in the C++, domain `workbox`: `po/<lang>.po`, for
+now with the rest of the repository's
 ([`docs/translations.md`](../../../docs/translations.md)). The commands and
 options aren't translated; Qt's own words in the help (`Usage:`,
 `Options:`) come from Qt's translations.
 
 ## Tests
 
-- `make check-workbox` (part of `make check`) compiles it with its tests,
-  each in `tests/` at its source's path (`tests/core/colortest.cpp` tests
-  `core/color.cpp`): the model, the colors and the pick, the terminal's
+- With `-DBUILD_TESTING=ON`, `ctest` runs its tests (`make check-workbox`
+  in this repository), each in `tests/` at its source's path
+  (`tests/lib/core/colortest.cpp` tests `lib/core/color.cpp`): the model, the colors and the pick, the terminal's
   colors and their contrast, the settings, the commands on a fake engine,
   and `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`.
   They also check that nothing blocks: results come after `start()`
   returns, and the event loop keeps running while podman does; a job's
   output, and killing it; that several events are one change, and that
   `podman events` is started again when it ends.
-- `make test` (on the host) checks in the image that `workbox` is
-  installed and translated, that its settings name Distrobox's image
-  and `create` uses it, and that bash completes its commands and `rm`'s
-  ids (`tests/workbox.bats`, with the fake `podman`).
+- `tests/cli/workbox.bats` checks an installed workbox, for now in this
+  repository's image (`tests/Containerfile`, `make test`): its own settings,
+  that `create` takes the image the user's settings name over the others,
+  `--version`, its translations and its bash completion, with the fake
+  `podman`.
 
-With the real Podman it only runs in the development VM.
+Neither runs the real Podman.

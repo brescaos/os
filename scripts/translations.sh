@@ -69,7 +69,7 @@ extract_strings() {
             extract_metadata_strings krunner_brescaos.json.in "$pot"
             ;;
         workbox)
-            find core engines cli -name '*.cpp' | sort \
+            find lib cli -name '*.cpp' | sort \
                 | xargs xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=i18nc:1c,2 -o "$pot"
             ;;
         bresca-cli)

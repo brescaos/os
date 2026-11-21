@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:08+0000\n"
+"POT-Creation-Date: 2026-11-21 09:38+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -237,28 +237,15 @@ msgid ""
 "  enter   Open a shell in a workbox\n"
 "  rm      Remove a workbox and its home\n"
 "\n"
-"\"workbox <command> --help\" shows a command's options."
-msgstr ""
-"Uso: workbox <comando> [opciones]\n"
-"\n"
-"Ejecuta contenedores, cada uno un lugar de trabajo aparte, que no comparten "
-"nada con el sistema.\n"
-"\n"
-"Comandos:\n"
-"  create  Crea un workbox\n"
-"  list    Lista los workboxes\n"
-"  start   Arranca un workbox\n"
-"  stop    Detiene un workbox\n"
-"  enter   Abre un shell en un workbox\n"
-"  rm      Elimina un workbox y su carpeta personal\n"
-"\n"
-"«workbox <comando> --help» muestra las opciones de un comando."
+"\"workbox <command> --help\" shows a command's options; \"workbox --"
+"version\", its version."
+msgstr "Uso: workbox <comando> [opciones]\n\nEjecuta contenedores, cada uno un lugar de trabajo aparte, que no comparten nada con el sistema.\n\nComandos:\n  create  Crea un workbox\n  list    Lista los workboxes\n  start   Arranca un workbox\n  stop    Detiene un workbox\n  enter   Abre un shell en un workbox\n  rm      Elimina un workbox y su carpeta personal\n\n«workbox <comando> --help» muestra las opciones de un comando; «workbox --version», su versión."
 
 #: cli/main.cpp
 msgid "unknown command \"%1\" (workbox --help)"
 msgstr "comando «%1» desconocido (workbox --help)"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid ""
 "invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not "
 "starting with a hyphen"
@@ -266,30 +253,30 @@ msgstr ""
 "id «%1» no válido: hasta 32 letras minúsculas (a-z), dígitos y guiones, sin "
 "empezar por un guion"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "the name can't be empty"
 msgstr "el nombre no puede estar vacío"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
 msgstr "color «%1» no válido: usa #rgb, #rrggbb o r,g,b (cada uno de 0 a 255)"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "a workbox with the id \"%1\" already exists"
 msgstr "ya hay un workbox con el id «%1»"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "there's no workbox with the id \"%1\""
 msgstr "no hay ningún workbox con el id «%1»"
 
-#: core/settings.cpp
-msgid "no %1 in %2 or %3"
-msgstr "no hay %1 en %2 ni en %3"
+#: lib/core/settings.cpp
+msgid "no %1 in %2"
+msgstr "no hay %1 en %2"
 
-#: engines/podman/podmanjob.cpp
+#: lib/engines/podman/podmanjob.cpp
 msgid "podman %1 failed"
 msgstr "ha fallado podman %1"
 
-#: engines/podman/podmanjob.cpp
+#: lib/engines/podman/podmanjob.cpp
 msgid "couldn't run podman: %1"
 msgstr "no se ha podido ejecutar podman: %1"

@@ -11,7 +11,6 @@
 #include <QCoreApplication>
 #include <QLibraryInfo>
 #include <QScopeGuard>
-#include <QStandardPaths>
 #include <QTextStream>
 #include <QTranslator>
 
@@ -23,9 +22,6 @@
 namespace
 {
 
-// The image's settings; the user's are in ~/.config/workbox/workbox.conf.
-const QString systemSettingsFile = QStringLiteral("/usr/share/workbox/workbox.conf");
-
 void printLine(FILE *stream, const QString &line)
 {
     QTextStream(stream) << line << Qt::endl;
@@ -33,8 +29,7 @@ void printLine(FILE *stream, const QString &line)
 
 Settings readConfiguredSettings()
 {
-    return readSettings(systemSettingsFile,
-                        QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + QStringLiteral("/workbox/workbox.conf"));
+    return readSettings(settingsFiles());
 }
 
 // Runs job to its end, its output on stderr as it comes, and gives it back;
@@ -297,6 +292,7 @@ int main(int argc, char **argv)
 {
     QCoreApplication application(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("workbox"));
+    QCoreApplication::setApplicationVersion(QStringLiteral(WORKBOX_VERSION));
     // QCommandLineParser's own words in its help and errors.
     QTranslator qtTranslator;
     if (qtTranslator.load(QLocale(), QStringLiteral("qtbase"), QStringLiteral("_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
@@ -324,6 +320,10 @@ int main(int argc, char **argv)
         if (command == QLatin1String("enter")) {
             return enter(arguments);
         }
+        if (command == QLatin1String("--version")) {
+            printLine(stdout, QStringLiteral("workbox " WORKBOX_VERSION));
+            return 0;
+        }
         if (command.isEmpty() || command == QLatin1String("--help") || command == QLatin1String("-h")) {
             printLine(stdout,
                       i18n("Usage: workbox <command> [options]\n"
@@ -338,7 +338,7 @@ int main(int argc, char **argv)
                            "  enter   Open a shell in a workbox\n"
                            "  rm      Remove a workbox and its home\n"
                            "\n"
-                           "\"workbox <command> --help\" shows a command's options."));
+                           "\"workbox <command> --help\" shows a command's options; \"workbox --version\", its version."));
             return command.isEmpty() ? 1 : 0;
         }
         throw WorkboxError{i18n("unknown command \"%1\" (workbox --help)", command)};

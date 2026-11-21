@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:08+0000\n"
+"POT-Creation-Date: 2026-11-21 09:38+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -236,28 +236,15 @@ msgid ""
 "  enter   Open a shell in a workbox\n"
 "  rm      Remove a workbox and its home\n"
 "\n"
-"\"workbox <command> --help\" shows a command's options."
-msgstr ""
-"Ús: workbox <ordre> [opcions]\n"
-"\n"
-"Executa contenidors, cadascun un lloc de treball a part, que no comparteixen "
-"res amb el sistema.\n"
-"\n"
-"Ordres:\n"
-"  create  Crea un workbox\n"
-"  list    Llista els workboxes\n"
-"  start   Engega un workbox\n"
-"  stop    Atura un workbox\n"
-"  enter   Obre un shell en un workbox\n"
-"  rm      Elimina un workbox i la seva carpeta personal\n"
-"\n"
-"«workbox <ordre> --help» mostra les opcions d'una ordre."
+"\"workbox <command> --help\" shows a command's options; \"workbox --"
+"version\", its version."
+msgstr "Ús: workbox <ordre> [opcions]\n\nExecuta contenidors, cadascun un lloc de treball a part, que no comparteixen res amb el sistema.\n\nOrdres:\n  create  Crea un workbox\n  list    Llista els workboxes\n  start   Engega un workbox\n  stop    Atura un workbox\n  enter   Obre un shell en un workbox\n  rm      Elimina un workbox i la seva carpeta personal\n\n«workbox <ordre> --help» mostra les opcions d'una ordre; «workbox --version», la seva versió."
 
 #: cli/main.cpp
 msgid "unknown command \"%1\" (workbox --help)"
 msgstr "ordre «%1» desconeguda (workbox --help)"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid ""
 "invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not "
 "starting with a hyphen"
@@ -265,31 +252,31 @@ msgstr ""
 "id «%1» no vàlid: fins a 32 lletres minúscules (a-z), dígits i guions, sense "
 "començar per un guió"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "the name can't be empty"
 msgstr "el nom no pot estar buit"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
 msgstr ""
 "color «%1» no vàlid: fes servir #rgb, #rrggbb o r,g,b (cadascun de 0 a 255)"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "a workbox with the id \"%1\" already exists"
 msgstr "ja hi ha un workbox amb l'id «%1»"
 
-#: core/commands.cpp
+#: lib/core/commands.cpp
 msgid "there's no workbox with the id \"%1\""
 msgstr "no hi ha cap workbox amb l'id «%1»"
 
-#: core/settings.cpp
-msgid "no %1 in %2 or %3"
-msgstr "no hi ha %1 a %2 ni a %3"
+#: lib/core/settings.cpp
+msgid "no %1 in %2"
+msgstr "no hi ha %1 a %2"
 
-#: engines/podman/podmanjob.cpp
+#: lib/engines/podman/podmanjob.cpp
 msgid "podman %1 failed"
 msgstr "ha fallat podman %1"
 
-#: engines/podman/podmanjob.cpp
+#: lib/engines/podman/podmanjob.cpp
 msgid "couldn't run podman: %1"
 msgstr "no s'ha pogut executar podman: %1"

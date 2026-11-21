@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
-# workbox, its settings and its translations are where image/Containerfile
-# and build/system.sh put them, and it creates a workbox from the image they
-# name (with the fake podman of fakes/).
+# workbox, its own settings, its bash completion and its translations are
+# installed, and it creates a workbox from the image its settings name (with
+# the fake podman of fakes/).
 
 setup() {
     export FAKE_STATE=$BATS_TEST_TMPDIR HOME=$BATS_TEST_TMPDIR LANG=C.UTF-8
@@ -15,19 +15,23 @@ setup() {
     [[ $output == *"rm      Remove a workbox"* ]]
 }
 
-@test "its image is Distrobox's: Fedora's toolbox for this release" {
-    local distrobox_image
-    distrobox_image=$(sed -n 's/^container_image_default="\(.*\)"$/\1/p' /usr/share/distrobox/distrobox.conf)
-    [[ $distrobox_image == registry.fedoraproject.org/fedora-toolbox:* ]]
-    grep -qx "image=$distrobox_image" /usr/share/workbox/workbox.conf
+@test "its own settings: Podman and Fedora's toolbox image" {
     grep -qx "engine=podman" /usr/share/workbox/workbox.conf
+    grep -qx "image=registry.fedoraproject.org/fedora-toolbox:latest" /usr/share/workbox/workbox.conf
 }
 
-@test "create creates it from that image" {
+@test "create creates it from the image the user's settings name, over the others" {
+    mkdir -p "$HOME/.config/workbox"
+    printf '[General]\nimage=example.org/test-image:1\n' >"$HOME/.config/workbox/workbox.conf"
     run workbox create c1 --name "Cliente 01"
     [[ $status -eq 0 ]]
     [[ $output == "Created the workbox c1 (\"Cliente 01\")." ]]
-    grep -qx "$(sed -n 's/^image=//p' /usr/share/workbox/workbox.conf)" "$FAKE_STATE/calls"
+    grep -qx "example.org/test-image:1" "$FAKE_STATE/calls"
+}
+
+@test "workbox --version is VERSION.txt's" {
+    run workbox --version
+    [[ $output =~ ^workbox\ [0-9]+\.[0-9]+\.[0-9]+$ ]]
 }
 
 @test "bash completes its commands and rm the ids workbox list gives" {
