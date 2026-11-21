@@ -147,7 +147,7 @@ the most specific that has it:
 | File | Whose |
 | --- | --- |
 | `/usr/share/workbox/workbox.conf` | workbox's own (`config/workbox.conf`) |
-| `/usr/share/defaults/workbox/workbox.conf` | a distribution's, if it has one (as Distrobox's, in `/usr/share/defaults/distrobox/`) |
+| `/usr/share/defaults/workbox/workbox.conf` | a distribution's, if it has one |
 | `~/.config/workbox/workbox.conf` | the user's |
 
 | Key | workbox's value |

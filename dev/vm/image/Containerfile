@@ -16,9 +16,8 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         spice-vdagent wl-clipboard xclip \
         gettext \
         cmake extra-cmake-modules gcc-c++ kf6-kcmutils-devel \
-        qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel kf6-kcolorscheme-devel \
+        qt6-qtdeclarative-devel kf6-ki18n-devel kf6-kconfig-devel \
         kf6-krunner-devel libplasma-devel kf6-kcoreaddons-devel kdecoration-devel \
-        kf6-kjobwidgets-devel kf6-kwidgetsaddons-devel \
         spectacle \
     && systemctl enable spice-vdagentd.socket
 

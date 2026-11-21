@@ -100,9 +100,9 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   leaves the last ones in place, with the error in the log.
 - What `image/Containerfile` compiles (today, System Settings > BrescaOS
   Updates, `image/src/updates-kcm/`, autotiling, `image/src/autotile/`,
-  Welcome, `image/src/welcome/`, the distroboxes' terminal colors, applet and KRunner plugin,
-  `image/src/distrobox/`, BrescaOS's KRunner plugin, `image/src/bresca-krunner/`, and
-  Hexa's QML module and window decoration, `image/src/hexa/`:
+  Welcome, `image/src/welcome/`, BrescaOS's KRunner plugin, `image/src/bresca-krunner/`,
+  Hexa's QML module and window decoration, `image/src/hexa/`, and workbox,
+  `image/src/workbox/`:
   every `image/src/` component with a `CMakeLists.txt`) is compiled again in the VM when its sources or its
   translations change, as the image's stage does, into
   `/var/cache/bresca-dev/build/<component>/`; it persists, so only what

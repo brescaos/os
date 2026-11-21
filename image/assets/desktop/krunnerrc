@@ -2,4 +2,4 @@
 #
 # Favorite plugins' results come first.
 [Plugins][Favorites]
-plugins=krunner_brescaos,krunner_distrobox,krunner_services
+plugins=krunner_brescaos,krunner_services

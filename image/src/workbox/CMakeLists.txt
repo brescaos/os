@@ -52,8 +52,8 @@ add_library(workbox-engines STATIC lib/engines/engines.cpp lib/engines/podman/po
 target_include_directories(workbox-engines PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/engines ${CMAKE_CURRENT_SOURCE_DIR}/lib/engines/podman)
 target_link_libraries(workbox-engines PUBLIC workbox-core PRIVATE KF6::I18n)
 
-# workbox's own settings, under a distribution's (as Distrobox's, in
-# <datadir>/defaults/) and the user's.
+# workbox's own settings, under a distribution's (in <datadir>/defaults/)
+# and the user's.
 target_compile_definitions(workbox-core
                            PRIVATE SETTINGS_FILE="${KDE_INSTALL_FULL_DATADIR}/workbox/workbox.conf"
                                    DISTRIBUTION_SETTINGS_FILE="${KDE_INSTALL_FULL_DATADIR}/defaults/workbox/workbox.conf")

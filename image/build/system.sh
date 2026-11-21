@@ -76,14 +76,6 @@ firewall-offline-cmd --check-config \
     || die "firewalld's configuration doesn't load (firewall-offline-cmd --check-config)"
 systemctl enable firewalld.service
 
-# --- Distrobox -------------------------------------------------------------------------
-# Distrobox's default image is Fedora's toolbox image at :latest: use this
-# system's Fedora release instead. In /usr, so it follows the image; Distrobox
-# reads /etc/distrobox/distrobox.conf and the user's after it.
-mkdir -p /usr/share/distrobox
-printf 'container_image_default="registry.fedoraproject.org/fedora-toolbox:%s"\n' "$fedora_version" \
-    >/usr/share/distrobox/distrobox.conf
-
 # --- workbox ---------------------------------------------------------------------------
 # Set default image of workbox.
 mkdir -p /usr/share/defaults/workbox
