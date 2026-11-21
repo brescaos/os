@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 14:34+0000\n"
+"POT-Creation-Date: 2026-11-21 14:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -210,12 +210,13 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
-"Opens a shell in a workbox, starting it first if it's stopped. In a "
-"terminal, the background takes the workbox's hue, and the prompt shows its "
-"name.\n"
+"Opens a shell in a workbox, or runs a command in it (after --), starting it "
+"first if it's stopped. In a terminal, a shell's background takes the "
+"workbox's hue, and its prompt shows its name.\n"
 "\n"
-"Example:\n"
-"  workbox enter c1"
+"Examples:\n"
+"  workbox enter c1\n"
+"  workbox enter c1 -- make -j4"
 msgstr ""
 
 #: cli/main.cpp
@@ -359,6 +360,10 @@ msgstr ""
 #: cli/main.cpp
 msgctxt "sudo in workbox info"
 msgid "no"
+msgstr ""
+
+#: cli/main.cpp
+msgid "nothing to run after -- (workbox enter --help)"
 msgstr ""
 
 #: cli/main.cpp

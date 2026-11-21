@@ -146,7 +146,7 @@ private Q_SLOTS:
     void enter()
     {
         writeState("exec-status", "3");
-        std::unique_ptr<EnterJob> job(PodmanEngine().enter("c1", {{"WORKBOX_NAME", "Cliente 01"}}, false));
+        std::unique_ptr<EnterJob> job(PodmanEngine().enter("c1", {}, {{"WORKBOX_NAME", "Cliente 01"}}, false));
         job->setAutoDelete(false);
         QVERIFY(job->exec());
         QCOMPARE(job->exitStatus(), 3);
@@ -166,9 +166,21 @@ private Q_SLOTS:
 
     void enterAsRoot()
     {
-        QCOMPARE(run(PodmanEngine().enter("c1", {}, true)), QString());
+        QCOMPARE(run(PodmanEngine().enter("c1", {}, {}, true)), QString());
         QCOMPARE(calls(),
                  (QList<QStringList>{{"exec", "--interactive", "--user", "root", "--workdir", "/root", "--env", "TERM", "c1", "bash", "--login"}}));
+    }
+
+    // A command runs straight, its arguments as they are, and its status is
+    // enter's.
+    void enterACommand()
+    {
+        writeState("exec-status", "2");
+        std::unique_ptr<EnterJob> job(PodmanEngine().enter("c1", {"grep", "-r", "two words", "$HOME"}, {}, false));
+        job->setAutoDelete(false);
+        QVERIFY(job->exec());
+        QCOMPARE(job->exitStatus(), 2);
+        QCOMPARE(calls().first().mid(calls().first().indexOf("c1")), (QStringList{"c1", "grep", "-r", "two words", "$HOME"}));
     }
 
     // Its root writes the rule, by the user's uid, and it's left stopped.
@@ -277,7 +289,7 @@ private Q_SLOTS:
             ++ticks;
         });
         ticker.start(20);
-        QCOMPARE(run(PodmanEngine().enter("c1", {}, false)), QString());
+        QCOMPARE(run(PodmanEngine().enter("c1", {}, {}, false)), QString());
         QVERIFY2(ticks >= 10, QByteArray::number(ticks));
     }
 

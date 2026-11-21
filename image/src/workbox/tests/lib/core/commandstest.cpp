@@ -115,7 +115,7 @@ public:
         return new FakeJob([] { });
     }
 
-    EnterJob *enter(const QString &, const QMap<QString, QString> &, bool) override
+    EnterJob *enter(const QString &, const QStringList &, const QMap<QString, QString> &, bool) override
     {
         return new FakeEnterJob;
     }

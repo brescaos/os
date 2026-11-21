@@ -151,7 +151,7 @@ EngineJob *PodmanEngine::remove(const Workbox &workbox)
     return new PodmanJob(removeCommands(workbox));
 }
 
-EnterJob *PodmanEngine::enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot)
+EnterJob *PodmanEngine::enter(const QString &id, const QStringList &command, const QMap<QString, QString> &environment, bool asRoot)
 {
     // keep-id runs it as the user unless --user says otherwise. --tty only on
     // a terminal: podman refuses it without one. TERM as the terminal's, for
@@ -169,6 +169,7 @@ EnterJob *PodmanEngine::enter(const QString &id, const QMap<QString, QString> &e
     for (auto variable = environment.begin(); variable != environment.end(); ++variable) {
         arguments << QStringLiteral("--env") << variable.key() + QLatin1Char('=') + variable.value();
     }
-    arguments << id << QStringLiteral("bash") << QStringLiteral("--login");
+    // The command straight, as Toolbox and Distrobox do: no login shell.
+    arguments << id << (command.isEmpty() ? QStringList{QStringLiteral("bash"), QStringLiteral("--login")} : command);
     return new PodmanEnterJob(arguments);
 }

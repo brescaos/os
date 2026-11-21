@@ -32,9 +32,10 @@ public:
     // its named ones and its anonymous ones.
     virtual EngineJob *remove(const Workbox &workbox) = 0;
 
-    // Runs a login shell in the running workbox, as the user in their home
+    // Runs command (a program and its arguments, as they are) or, without
+    // one, a login shell in the running workbox, as the user in their home
     // or, with asRoot, as root in /root, on this process's terminal (its
     // standard input, output and error), with environment added to the
-    // shell's. The job ends when the shell exits, with its exit status.
-    virtual EnterJob *enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot) = 0;
+    // image's. The job ends when it exits, with its exit status.
+    virtual EnterJob *enter(const QString &id, const QStringList &command, const QMap<QString, QString> &environment, bool asRoot) = 0;
 };

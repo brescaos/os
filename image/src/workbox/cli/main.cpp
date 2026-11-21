@@ -294,20 +294,30 @@ int enter(const QStringList &arguments)
 {
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        i18n("Opens a shell in a workbox, starting it first if it's stopped. In a terminal, the background "
-             "takes the workbox's hue, and the prompt shows its name.\n"
+        i18n("Opens a shell in a workbox, or runs a command in it (after --), starting it first if it's stopped. "
+             "In a terminal, a shell's background takes the workbox's hue, and its prompt shows its name.\n"
              "\n"
-             "Example:\n"
-             "  workbox enter c1"));
+             "Examples:\n"
+             "  workbox enter c1\n"
+             "  workbox enter c1 -- make -j4"));
     const QCommandLineOption rootOption(QStringLiteral("root"),
                                         i18n("As the workbox's root, in /root: root only inside it, the user outside it."));
     parser.addOption(rootOption);
-    const QString id = parseId(parser, QStringLiteral("enter"), arguments);
+    // What follows -- is the command, as it is: none of it is workbox's.
+    const qsizetype separator = arguments.indexOf(QStringLiteral("--"), 2);
+    const QStringList command = separator < 0 ? QStringList() : arguments.mid(separator + 1);
+    const QString id = parseId(parser, QStringLiteral("enter"), separator < 0 ? arguments : arguments.first(separator));
+    if (separator >= 0 && command.isEmpty()) {
+        throw WorkboxError{i18n("nothing to run after -- (workbox enter --help)")};
+    }
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
     const Workbox workbox = Commands::find(listWorkboxes(*engine), id);
     if (!workbox.isRunning) {
         runToEnd(engine->start(id));
+    }
+    if (!command.isEmpty()) {
+        return runToEnd(engine->enter(id, command, {}, parser.isSet(rootOption)))->exitStatus();
     }
 
     // The terminal's background and text (OSC 11 and 10) while the shell
@@ -331,7 +341,7 @@ int enter(const QStringList &arguments)
                                .arg(colors.label.red())
                                .arg(colors.label.green())
                                .arg(colors.label.blue());
-    return runToEnd(engine->enter(id, {{QStringLiteral("PS1"), prompt}, {QStringLiteral("WORKBOX_NAME"), workbox.name}}, parser.isSet(rootOption)))
+    return runToEnd(engine->enter(id, {}, {{QStringLiteral("PS1"), prompt}, {QStringLiteral("WORKBOX_NAME"), workbox.name}}, parser.isSet(rootOption)))
         ->exitStatus();
 }
 

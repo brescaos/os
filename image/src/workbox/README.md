@@ -67,10 +67,19 @@ cmake --install build
 - `workbox start <id>` and `workbox stop <id>` start and stop it, and say
   so when it already is (not an error). Stopping it stops everything in it.
   `workbox stop --all` stops every running one.
-- `workbox enter <id> [--root]` opens a login bash in it, in the user's
-  home, starting it first if it's stopped (see [Terminal](#terminal)). Its
-  exit status is the shell's. `--root`, as the workbox's root in `/root`,
-  with or without `--sudo`.
+- `workbox enter <id> [--root] [-- <command>…]` opens a login bash in it,
+  in the user's home, starting it first if it's stopped (see
+  [Terminal](#terminal)), or runs the command after `--`: straight, its
+  arguments as they are (no shell reads them), without the login shell's
+  profile nor the terminal's colors, as Toolbox and Distrobox do, but none
+  of the host's environment but `TERM`. Its exit status is the shell's or
+  the command's. `--root`, as the workbox's root in `/root`, with or
+  without `--sudo`:
+
+  ```bash
+  workbox enter c1 -- make -j4
+  workbox enter c1 --root -- dnf -y install htop
+  ```
 - `workbox rm <id>|--all [--yes]` stops it if it runs and removes it and its
   volumes (its home too), after asking to type its id, unless `--yes`.
   `--all` removes every workbox, after asking `[y/N]` with their ids,
@@ -297,7 +306,8 @@ before the first `list()`, so no change between them is missed.
   --env PS1=… --env WORKBOX_NAME=… <id> bash --login` (`--tty` only on a
   terminal), run on workbox's own terminal, so the shell reads and writes
   it; keep-id runs it as the user. `--root` adds `--user root` and
-  `--workdir /root`.
+  `--workdir /root`. With a command, `<id> <command>…` in place of
+  `bash --login`, and no `PS1` or `WORKBOX_NAME`.
 - Podman's standard error is the job's output, so on the command line it
   shows as it did; the job's error says which command failed.
 

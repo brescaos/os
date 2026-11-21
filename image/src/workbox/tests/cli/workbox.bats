@@ -65,6 +65,16 @@ setup() {
     [[ $output == *"Removed the workbox c1."* && $output == *"Removed the workbox c2."* ]]
 }
 
+@test "enter -- runs a command straight, its arguments as they are, with its status" {
+    printf '%s' '[{"Names": ["c1"], "State": "running", "Labels": {"com.brescaos.workbox.name": "c1", "com.brescaos.workbox.color": "#3584e4"}}]' \
+        >"$FAKE_STATE/ps.json"
+    echo 4 >"$FAKE_STATE/exec-status"
+    run workbox enter c1 -- grep -r "two words" .
+    [[ $status -eq 4 ]]
+    grep -qx "two words" "$FAKE_STATE/calls"
+    ! grep -qx -- "--login" "$FAKE_STATE/calls"
+}
+
 @test "info shows a workbox's settings" {
     printf '%s' '[{"Names": ["c1"], "State": "running", "Image": "example.org/image:1", "Labels": {"com.brescaos.workbox.name": "Cliente 01", "com.brescaos.workbox.color": "#3584e4", "com.brescaos.workbox.sudo": "true"}}]' \
         >"$FAKE_STATE/ps.json"

@@ -13,5 +13,5 @@ public:
     EngineJob *start(const QString &id) override;
     EngineJob *stop(const QString &id) override;
     EngineJob *remove(const Workbox &workbox) override;
-    EnterJob *enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot) override;
+    EnterJob *enter(const QString &id, const QStringList &command, const QMap<QString, QString> &environment, bool asRoot) override;
 };
