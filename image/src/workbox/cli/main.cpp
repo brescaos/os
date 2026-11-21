@@ -146,7 +146,10 @@ int create(const QStringList &arguments)
                                                "with keys or what the host runs at login; in ~/.config and ~/.local, only "
                                                "read-only."),
                                           i18nc("value of --volume", "[folder|name:]target[:options]"));
-    parser.addOptions({nameOption, colorOption, sudoOption, volumeOption});
+    const QCommandLineOption waylandOption(QStringLiteral("wayland"),
+                                           i18n("Let its apps show windows in your Wayland session, with the GPU. Wayland keeps "
+                                                "them from reading other apps' windows and keyboard."));
+    parser.addOptions({nameOption, colorOption, sudoOption, volumeOption, waylandOption});
     const QString id = parseId(parser, QStringLiteral("create"), arguments);
     const auto optionValue = [&parser](const QCommandLineOption &option) {
         return parser.isSet(option) ? std::optional(parser.value(option)) : std::nullopt;
@@ -157,10 +160,11 @@ int create(const QStringList &arguments)
     const Workbox workbox =
         runToEnd(new Commands::CreateJob(*engine,
                                          id,
-                                         optionValue(nameOption),
-                                         optionValue(colorOption),
-                                         parser.isSet(sudoOption),
-                                         parser.values(volumeOption),
+                                         {.name = optionValue(nameOption),
+                                          .color = optionValue(colorOption),
+                                          .hasSudo = parser.isSet(sudoOption),
+                                          .volumes = parser.values(volumeOption),
+                                          .hasWayland = parser.isSet(waylandOption)},
                                          settings.image))
             ->workbox();
     printLine(stdout, i18n("Created the workbox %1 (\"%2\").", workbox.id, workbox.name));
@@ -412,6 +416,8 @@ int info(const QStringList &arguments)
         {i18nc("field of workbox info", "Status"), paintedStatus(workbox)},
         {i18nc("field of workbox info", "Image"), workbox.image},
         {i18nc("field of workbox info", "Sudo"), workbox.hasSudo ? i18nc("sudo in workbox info", "yes") : i18nc("sudo in workbox info", "no")},
+        {i18nc("field of workbox info", "Wayland"),
+         workbox.hasWayland ? i18nc("wayland in workbox info", "yes") : i18nc("wayland in workbox info", "no")},
         {i18nc("field of workbox info", "Home"), volumeName(workbox.id, homeVolume)},
     };
     // One line per volume, the first with the label.

@@ -8,8 +8,9 @@
 namespace
 {
 const QString colorLabel = QStringLiteral("com.brescaos.workbox.color");
-// Only on the workboxes with sudo.
+// Only on the workboxes with sudo, with Wayland.
 const QString sudoLabel = QStringLiteral("com.brescaos.workbox.sudo");
+const QString waylandLabel = QStringLiteral("com.brescaos.workbox.wayland");
 // Only on the workboxes with volumes: JSON,
 // [{"source": ..., "name": ..., "target": ..., "readOnly": ...}].
 const QString volumesLabel = QStringLiteral("com.brescaos.workbox.volumes");
@@ -38,6 +39,9 @@ QMap<QString, QString> labelsOf(const Workbox &workbox)
     if (workbox.hasSudo) {
         labels.insert(sudoLabel, QStringLiteral("true"));
     }
+    if (workbox.hasWayland) {
+        labels.insert(waylandLabel, QStringLiteral("true"));
+    }
     if (!workbox.volumes.isEmpty()) {
         QJsonArray volumes;
         for (const Volume &volume : workbox.volumes) {
@@ -64,5 +68,6 @@ Workbox workboxFromLabels(const QString &id, const QMap<QString, QString> &label
             .name = labels.value(nameLabel),
             .color = QColor(labels.value(colorLabel)),
             .hasSudo = labels.value(sudoLabel) == QLatin1String("true"),
+            .hasWayland = labels.value(waylandLabel) == QLatin1String("true"),
             .volumes = volumes};
 }

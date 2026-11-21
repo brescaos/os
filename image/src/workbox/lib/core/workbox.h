@@ -26,6 +26,8 @@ struct Workbox {
     QColor color;
     // The user can use sudo in it, without a password.
     bool hasSudo = false;
+    // Its apps can show windows in the user's Wayland session, with the GPU.
+    bool hasWayland = false;
     QList<Volume> volumes;
     bool isRunning = false;
     QString image;

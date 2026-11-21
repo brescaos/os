@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 14:54+0000\n"
+"POT-Creation-Date: 2026-11-21 15:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -166,6 +166,12 @@ msgstr ""
 msgid ""
 "Its color: #rgb, #rrggbb or r,g,b, each 0-255 (default: the palette's color "
 "that looks the most different from the other workboxes')."
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
+"Let its apps show windows in your Wayland session, with the GPU. Wayland "
+"keeps them from reading other apps' windows and keyboard."
 msgstr ""
 
 #: cli/main.cpp
@@ -343,6 +349,11 @@ msgid "Volumes"
 msgstr ""
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Wayland"
+msgstr ""
+
+#: cli/main.cpp
 msgctxt "value of --volume"
 msgid "[folder|name:]target[:options]"
 msgstr ""
@@ -359,6 +370,11 @@ msgstr ""
 
 #: cli/main.cpp
 msgctxt "sudo in workbox info"
+msgid "no"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "wayland in workbox info"
 msgid "no"
 msgstr ""
 
@@ -406,8 +422,18 @@ msgctxt "sudo in workbox info"
 msgid "yes"
 msgstr ""
 
+#: cli/main.cpp
+msgctxt "wayland in workbox info"
+msgid "yes"
+msgstr ""
+
 #: lib/core/commands.cpp
 msgid "a workbox with the id \"%1\" already exists"
+msgstr ""
+
+#: lib/core/commands.cpp
+msgid ""
+"can't give it Wayland: there's no Wayland session here (WAYLAND_DISPLAY)"
 msgstr ""
 
 #: lib/core/commands.cpp

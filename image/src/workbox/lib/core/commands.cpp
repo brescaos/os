@@ -12,21 +12,12 @@
 namespace Commands
 {
 
-CreateJob::CreateJob(Engine &engine,
-                     const QString &id,
-                     const std::optional<QString> &name,
-                     const std::optional<QString> &color,
-                     bool hasSudo,
-                     const QStringList &volumes,
-                     const QString &image,
-                     QObject *parent)
+CreateJob::CreateJob(Engine &engine, const QString &id, const CreateOptions &options, const QString &image, QObject *parent)
     : EngineJob(parent)
     , m_engine(engine)
-    , m_name(name)
-    , m_color(color)
-    , m_volumes(volumes)
+    , m_options(options)
     , m_image(image)
-    , m_workbox{.id = id, .name = name.value_or(id), .hasSudo = hasSudo}
+    , m_workbox{.id = id, .name = options.name.value_or(id), .hasSudo = options.hasSudo, .hasWayland = options.hasWayland}
 {
 }
 
@@ -40,19 +31,23 @@ void CreateJob::start()
                 fail(i18n("invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not starting with a hyphen", m_workbox.id));
                 return;
             }
-            if (m_name && m_name->trimmed().isEmpty()) {
+            if (m_options.name && m_options.name->trimmed().isEmpty()) {
                 fail(i18n("the name can't be empty"));
                 return;
             }
-            if (m_color) {
-                const std::optional<QColor> givenColor = WorkboxColor::parse(*m_color);
+            if (m_options.color) {
+                const std::optional<QColor> givenColor = WorkboxColor::parse(*m_options.color);
                 if (!givenColor) {
-                    fail(i18n("invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)", *m_color));
+                    fail(i18n("invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)", *m_options.color));
                     return;
                 }
                 m_workbox.color = *givenColor;
             }
-            for (const QString &argument : std::as_const(m_volumes)) {
+            if (m_options.hasWayland && qEnvironmentVariableIsEmpty("WAYLAND_DISPLAY")) {
+                fail(i18n("can't give it Wayland: there's no Wayland session here (WAYLAND_DISPLAY)"));
+                return;
+            }
+            for (const QString &argument : std::as_const(m_options.volumes)) {
                 Volume volume;
                 try {
                     volume = parseVolume(argument, QDir::homePath());
@@ -86,7 +81,7 @@ void CreateJob::createFrom(const QList<Workbox> &workboxes)
         }
         colorsInUse.append(workbox.color);
     }
-    if (!m_color) {
+    if (!m_options.color) {
         m_workbox.color = WorkboxColor::pickFromPalette(colorsInUse);
     }
     runStep(m_engine.create(m_workbox, m_image), [this] {

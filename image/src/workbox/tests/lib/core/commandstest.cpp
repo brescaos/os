@@ -129,7 +129,7 @@ std::pair<Workbox, QString> create(FakeEngine &engine,
                                    bool hasSudo = false,
                                    const QStringList &volumes = {})
 {
-    Commands::CreateJob job(engine, id, name, color, hasSudo, volumes, image);
+    Commands::CreateJob job(engine, id, {.name = name, .color = color, .hasSudo = hasSudo, .volumes = volumes}, image);
     job.setAutoDelete(false);
     job.exec();
     return {job.workbox(), job.error() ? job.errorText() : QString()};
@@ -221,12 +221,31 @@ private Q_SLOTS:
         qputenv("HOME", previousHome);
     }
 
+    // Wayland only with a Wayland session.
+    void createWayland()
+    {
+        const QByteArray previousDisplay = qgetenv("WAYLAND_DISPLAY");
+        FakeEngine engine;
+        qputenv("WAYLAND_DISPLAY", "wayland-0");
+        Commands::CreateJob job(engine, "c1", {.hasWayland = true}, image);
+        job.setAutoDelete(false);
+        QVERIFY(job.exec());
+        QVERIFY(engine.workboxes.first().hasWayland);
+
+        qunsetenv("WAYLAND_DISPLAY");
+        Commands::CreateJob refused(engine, "c2", {.hasWayland = true}, image);
+        refused.setAutoDelete(false);
+        QVERIFY(!refused.exec());
+        QVERIFY(refused.errorText().contains("no Wayland session"));
+        qputenv("WAYLAND_DISPLAY", previousDisplay);
+    }
+
     // The engine's output and error are the job's.
     void createPassesOnTheEngine()
     {
         FakeEngine engine;
         engine.createFailure = QStringLiteral("podman create failed");
-        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, {}, image);
+        Commands::CreateJob job(engine, "c1", {}, image);
         job.setAutoDelete(false);
         QStringList output;
         connect(&job, &EngineJob::output, this, [&output](const QString &line) {
@@ -241,7 +260,7 @@ private Q_SLOTS:
     void createOutputToTerminal()
     {
         FakeEngine engine;
-        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, {}, image);
+        Commands::CreateJob job(engine, "c1", {}, image);
         job.setAutoDelete(false);
         job.setOutputToTerminal(true);
         QStringList output;
@@ -256,7 +275,7 @@ private Q_SLOTS:
     void createDoesntBlock()
     {
         FakeEngine engine;
-        auto *job = new Commands::CreateJob(engine, "c1", std::nullopt, std::nullopt, false, {}, image);
+        auto *job = new Commands::CreateJob(engine, "c1", {}, image);
         bool hasFinished = false;
         connect(job, &KJob::result, this, [&hasFinished] {
             hasFinished = true;

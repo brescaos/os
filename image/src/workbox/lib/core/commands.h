@@ -10,26 +10,31 @@
 namespace Commands
 {
 
+// What create takes besides the id, as the user gives it.
+struct CreateOptions {
+    // Without it, its id.
+    std::optional<QString> name;
+    // #rgb, #rrggbb or r,g,b; without it, the palette's farthest from the
+    // others'.
+    std::optional<QString> color;
+    // The user can use sudo in it.
+    bool hasSudo = false;
+    // -v's, "[folder|name:]target[:options]" (volumes.h).
+    QStringList volumes;
+    // Its apps can show windows in the user's Wayland session: there must be
+    // one (WAYLAND_DISPLAY).
+    bool hasWayland = false;
+};
+
 // Creates the workbox id from image: lists the workboxes, then creates it.
-// Without a name, its name is its id; without a color (#rgb, #rrggbb or
-// r,g,b), the palette's farthest from the others'. With hasSudo, the user can
-// use sudo in it. volumes are -v's, "[folder|name:]target[:options]"
-// (volumes.h).
-// Fails without creating anything when an argument is wrong or the id is
+// Fails without creating anything when an option is wrong or the id is
 // taken. Its output() is the engine's.
 class CreateJob : public EngineJob
 {
     Q_OBJECT
 
 public:
-    CreateJob(Engine &engine,
-              const QString &id,
-              const std::optional<QString> &name,
-              const std::optional<QString> &color,
-              bool hasSudo,
-              const QStringList &volumes,
-              const QString &image,
-              QObject *parent = nullptr);
+    CreateJob(Engine &engine, const QString &id, const CreateOptions &options, const QString &image, QObject *parent = nullptr);
 
     void start() override;
 
@@ -49,9 +54,7 @@ private:
     void runStep(EngineJob *job, const std::function<void()> &then);
 
     Engine &m_engine;
-    std::optional<QString> m_name;
-    std::optional<QString> m_color;
-    QStringList m_volumes;
+    CreateOptions m_options;
     QString m_image;
     Workbox m_workbox;
     EngineJob *m_step = nullptr;

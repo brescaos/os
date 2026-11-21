@@ -134,6 +134,30 @@ private Q_SLOTS:
             "--volume workbox-c1.cache:/home/u/cache:ro "));
     }
 
+    // Only its socket, at its own path; its own runtime folder; the GPU.
+    void createWithWayland()
+    {
+        const QByteArray previousDisplay = qgetenv("WAYLAND_DISPLAY");
+        const QByteArray previousRuntime = qgetenv("XDG_RUNTIME_DIR");
+        qputenv("WAYLAND_DISPLAY", "wayland-0");
+        qputenv("XDG_RUNTIME_DIR", "/run/user/1000");
+        QCOMPARE(run(PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasWayland = true}, "image")), QString());
+        const QString arguments = calls().first().join(' ');
+        QVERIFY(arguments.contains("--volume /run/user/1000/wayland-0:/run/workbox/wayland-0:z --env WAYLAND_DISPLAY=/run/workbox/wayland-0"));
+        QVERIFY(arguments.contains(
+            QStringLiteral("--mount type=tmpfs,destination=/run/user/%1,tmpfs-mode=0700,U=true --env XDG_RUNTIME_DIR=/run/user/%1").arg(getuid())));
+        QVERIFY(arguments.contains("--device /dev/dri --env QT_QPA_PLATFORM=wayland"));
+        QVERIFY(arguments.contains("com.brescaos.workbox.wayland=true"));
+
+        // An absolute WAYLAND_DISPLAY is the socket.
+        qputenv("WAYLAND_DISPLAY", "/tmp/wayland-socket");
+        QFile::remove(state.filePath("calls"));
+        QCOMPARE(run(PodmanEngine().create({.id = "c2", .name = "c2", .color = Qt::red, .hasWayland = true}, "image")), QString());
+        QVERIFY(calls().first().join(' ').contains("--volume /tmp/wayland-socket:/run/workbox/wayland-0:z"));
+        qputenv("WAYLAND_DISPLAY", previousDisplay);
+        qputenv("XDG_RUNTIME_DIR", previousRuntime);
+    }
+
     void startAndStop()
     {
         PodmanEngine engine;

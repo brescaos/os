@@ -75,6 +75,16 @@ setup() {
     ! grep -qx -- "--login" "$FAKE_STATE/calls"
 }
 
+@test "create --wayland mounts only the session's socket and the GPU, and needs a session" {
+    WAYLAND_DISPLAY=wayland-0 XDG_RUNTIME_DIR=/run/user/1000 run workbox create c1 --wayland
+    [[ $status -eq 0 ]]
+    grep -qx "/run/user/1000/wayland-0:/run/workbox/wayland-0:z" "$FAKE_STATE/calls"
+    grep -qx "/dev/dri" "$FAKE_STATE/calls"
+    WAYLAND_DISPLAY= run workbox create c2 --wayland
+    [[ $status -eq 1 ]]
+    [[ $output == *"no Wayland session"* ]]
+}
+
 @test "info shows a workbox's settings" {
     printf '%s' '[{"Names": ["c1"], "State": "running", "Image": "example.org/image:1", "Labels": {"com.brescaos.workbox.name": "Cliente 01", "com.brescaos.workbox.color": "#3584e4", "com.brescaos.workbox.sudo": "true"}}]' \
         >"$FAKE_STATE/ps.json"

@@ -69,6 +69,14 @@ private Q_SLOTS:
         QVERIFY(!labelsOf(Workbox{.id = "c1"}).contains("com.brescaos.workbox.volumes"));
     }
 
+    void labelsKeepWayland()
+    {
+        const Workbox workbox{.id = "c1", .name = "c1", .color = Qt::red, .hasWayland = true};
+        QCOMPARE(labelsOf(workbox).value("com.brescaos.workbox.wayland"), QStringLiteral("true"));
+        QVERIFY(workboxFromLabels("c1", labelsOf(workbox)).hasWayland);
+        QVERIFY(!labelsOf(Workbox{.id = "c1"}).contains("com.brescaos.workbox.wayland"));
+    }
+
     void labelsKeepSudo()
     {
         const Workbox workbox{.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true};

@@ -51,18 +51,19 @@ cmake --install build
 ## Commands
 
 - `workbox create <id> [--name <name>] [--color <color>] [--sudo]
-  [-v [<folder>|<name>:]<target>[:<options>]]…` creates the container and
+  [-v [<folder>|<name>:]<target>[:<options>]]… [--wayland]` creates the container and
   its home, the volume `workbox-<id>.home`, mounted at the same path as the
   user's home. The
   image is downloaded the first time. `-v` gives it a folder of the
   user's home, or volumes of its own (see [Volumes](#volumes)).
   Inside, the user is the user outside (keep-id), not root. `--sudo` lets
   them use sudo in it without a password, to install packages with dnf:
-  whatever runs in it as the user can then be its root.
+  whatever runs in it as the user can then be its root. `--wayland` lets
+  its apps show windows (see [Wayland](#wayland)).
 - `workbox list [--quiet]` shows every workbox by id, with its name
   and its status.
 - `workbox info <id>` shows it: id, name, color, status, image, whether
-  it has `--sudo`, its home and its volumes. In a terminal, the id in its color
+  it has `--sudo` and `--wayland`, its home and its volumes. In a terminal, the id in its color
   and the status in green or red, as `list`.
 - `workbox start <id>` and `workbox stop <id>` start and stop it, and say
   so when it already is (not an error). Stopping it stops everything in it.
@@ -221,6 +222,36 @@ workbox doesn't relabel its folders back: `restorecon -R <folder>` does.
 What isn't shared keeps its label, so the workbox can't read it, even if a
 process escapes the container. Without SELinux, `z` does nothing.
 
+### Wayland
+
+`--wayland` lets the workbox's apps show windows in the user's Wayland
+session, with the GPU, as Flatpak's `--socket=wayland` and `--device=dri`:
+
+```bash
+workbox create c1 --wayland
+workbox enter c1 -- dolphin
+```
+
+- Only the session's socket (`$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY`), not the
+  user's whole runtime folder, where PipeWire, the session bus and the SSH
+  agent are too: it's at `/run/workbox/wayland-0`, which `WAYLAND_DISPLAY`
+  names (libwayland takes an absolute path).
+- A runtime folder of its own, `/run/user/<uid>` (a `tmpfs`, the user's,
+  0700), as Qt and GTK want one; the GPU (`/dev/dri`); and
+  `QT_QPA_PLATFORM=wayland`, as there's no X11.
+- What it opens: windows and the GPU. Wayland keeps them from reading other
+  apps' windows and keyboard; an app of the workbox can read the clipboard
+  while it has the focus, as any app.
+- `create --wayland` needs a Wayland session (`WAYLAND_DISPLAY`). Podman
+  mounts the socket when the workbox starts, so after a new login it's the
+  new session's; if KWin restarts while the workbox runs, its apps can't
+  open windows until it's stopped and started again.
+- **SELinux (not checked yet).** The socket is mounted with `z`, as a
+  shared folder, so a confined workbox (`container_t`) can use it; whether
+  that's enough to connect to KWin (`unconfined_t`) only shows on an
+  installed system. If it isn't, it needs a policy of its own or
+  `--unconfined`.
+
 ## Settings
 
 `workbox.conf` (KConfig, group `[General]`), on three levels, each key from
@@ -306,7 +337,10 @@ before the first `list()`, so no change between them is missed.
   --env PS1=… --env WORKBOX_NAME=… <id> bash --login` (`--tty` only on a
   terminal), run on workbox's own terminal, so the shell reads and writes
   it; keep-id runs it as the user. `--root` adds `--user root` and
-  `--workdir /root`. With a command, `<id> <command>…` in place of
+  `--workdir /root`. With `--wayland`, `create` adds `--volume
+  <socket>:/run/workbox/wayland-0:z`, `--mount
+  type=tmpfs,destination=/run/user/<uid>,tmpfs-mode=0700,U=true`,
+  `--device /dev/dri` and their `--env`s. With a command, `<id> <command>…` in place of
   `bash --login`, and no `PS1` or `WORKBOX_NAME`.
 - Podman's standard error is the job's output, so on the command line it
   shows as it did; the job's error says which command failed.

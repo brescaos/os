@@ -39,6 +39,35 @@ QStringList stopCommand(const QString &id)
     return {QStringLiteral("stop"), QStringLiteral("--time"), QStringLiteral("0"), id};
 }
 
+// The user's Wayland session in the workbox, as Flatpak gives it to an app:
+// only its socket, not the user's whole runtime folder (PipeWire, the session
+// bus, the SSH agent...), at a path of its own that WAYLAND_DISPLAY names
+// (libwayland takes an absolute one); a runtime folder of the workbox's own,
+// the user's, 0700, as apps want one; the GPU; Qt on Wayland, as there's no
+// X11. z: SELinux labels the socket so the workbox can use it, as a shared
+// folder; Podman mounts the socket when the workbox starts, so after a new
+// login it's the new session's.
+QStringList waylandArguments()
+{
+    const QString display = qEnvironmentVariable("WAYLAND_DISPLAY");
+    const QString socket = QDir::isAbsolutePath(display) ? display : qEnvironmentVariable("XDG_RUNTIME_DIR") + QLatin1Char('/') + display;
+    const QString runtimeFolder = QStringLiteral("/run/user/%1").arg(getuid());
+    return {QStringLiteral("--volume"),
+            socket + QStringLiteral(":/run/workbox/wayland-0:z"),
+            QStringLiteral("--env"),
+            QStringLiteral("WAYLAND_DISPLAY=/run/workbox/wayland-0"),
+            // U: Podman gives it to the container's user, the user (keep-id);
+            // --tmpfs takes no owner.
+            QStringLiteral("--mount"),
+            QStringLiteral("type=tmpfs,destination=%1,tmpfs-mode=0700,U=true").arg(runtimeFolder),
+            QStringLiteral("--env"),
+            QStringLiteral("XDG_RUNTIME_DIR=") + runtimeFolder,
+            QStringLiteral("--device"),
+            QStringLiteral("/dev/dri"),
+            QStringLiteral("--env"),
+            QStringLiteral("QT_QPA_PLATFORM=wayland")};
+}
+
 QList<QStringList> removeCommands(const Workbox &workbox)
 {
     // --volumes: its anonymous volumes go with it; then its home and its
@@ -105,6 +134,9 @@ EngineJob *PodmanEngine::create(const Workbox &workbox, const QString &image)
                 + (volume.isReadOnly ? QStringLiteral(":ro") : QString());
         }
         arguments << QStringLiteral("--volume") << argument;
+    }
+    if (workbox.hasWayland) {
+        arguments << waylandArguments();
     }
     const QMap<QString, QString> labels = labelsOf(workbox);
     for (auto label = labels.begin(); label != labels.end(); ++label) {

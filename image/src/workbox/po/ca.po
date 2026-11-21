@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 14:54+0000\n"
+"POT-Creation-Date: 2026-11-21 15:10+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -186,6 +186,12 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
+"Let its apps show windows in your Wayland session, with the GPU. Wayland "
+"keeps them from reading other apps' windows and keyboard."
+msgstr "Permet que les seves aplicacions mostrin finestres a la teva sessió de Wayland, amb la GPU. Wayland els impedeix llegir les finestres i el teclat d'altres aplicacions."
+
+#: cli/main.cpp
+msgid ""
 "Let the user use sudo in it, without a password: whatever runs in it can "
 "then be its root."
 msgstr ""
@@ -239,7 +245,14 @@ msgid ""
 "Examples:\n"
 "  workbox enter c1\n"
 "  workbox enter c1 -- make -j4"
-msgstr "Obre un shell en un workbox, o hi executa una ordre (després de --), i abans l'engega si està aturat. En un terminal, el fons del shell pren la tonalitat del workbox i l'indicador mostra el seu nom.\n\nExemples:\n  workbox enter c1\n  workbox enter c1 -- make -j4"
+msgstr ""
+"Obre un shell en un workbox, o hi executa una ordre (després de --), i abans "
+"l'engega si està aturat. En un terminal, el fons del shell pren la tonalitat "
+"del workbox i l'indicador mostra el seu nom.\n"
+"\n"
+"Exemples:\n"
+"  workbox enter c1\n"
+"  workbox enter c1 -- make -j4"
 
 #: cli/main.cpp
 msgid ""
@@ -407,6 +420,11 @@ msgid "Volumes"
 msgstr "Volums"
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Wayland"
+msgstr "Wayland"
+
+#: cli/main.cpp
 msgctxt "value of --volume"
 msgid "[folder|name:]target[:options]"
 msgstr "[carpeta|nom:]destí[:opcions]"
@@ -423,6 +441,11 @@ msgstr "nom"
 
 #: cli/main.cpp
 msgctxt "sudo in workbox info"
+msgid "no"
+msgstr "no"
+
+#: cli/main.cpp
+msgctxt "wayland in workbox info"
 msgid "no"
 msgstr "no"
 
@@ -470,9 +493,19 @@ msgctxt "sudo in workbox info"
 msgid "yes"
 msgstr "sí"
 
+#: cli/main.cpp
+msgctxt "wayland in workbox info"
+msgid "yes"
+msgstr "sí"
+
 #: lib/core/commands.cpp
 msgid "a workbox with the id \"%1\" already exists"
 msgstr "ja hi ha un workbox amb l'id «%1»"
+
+#: lib/core/commands.cpp
+msgid ""
+"can't give it Wayland: there's no Wayland session here (WAYLAND_DISPLAY)"
+msgstr "no se li pot donar Wayland: aquí no hi ha cap sessió de Wayland (WAYLAND_DISPLAY)"
 
 #: lib/core/commands.cpp
 msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
