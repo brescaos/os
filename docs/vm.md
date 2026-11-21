@@ -109,11 +109,16 @@ journalctl -fu bresca-dev-hotreload   # in the VM
   changed recompiles. A notification says it's compiling and stays until it
   finishes; if it doesn't compile, it says so, with the error in the log.
   A changed System Settings module, or its translations, closes System
-  Settings if it's open and opens it again on that module.
+  Settings if it's open and opens it again on that module. A changed
+  workbox app (`workbox-app`, which has workbox's library in it), or
+  workbox's translations, closes it if it's open and opens it again; the
+  shells of its terminals end with it.
 - A changed systemd unit (a service, a timer…) is reloaded (`systemctl
   daemon-reload`); a service that is already running keeps the old one until
   it restarts. A changed Plasma applet, or a QML module it imports, restarts
-  plasmashell. A changed KRunner plugin, its translations or `krunnerrc` restarts
+  plasmashell. A changed app icon (`hicolor/*/apps/`) restarts plasmashell
+  and KWin, which keeps the icons it loaded for the title bars; the apps
+  reconnect to it. A changed KRunner plugin, its translations or `krunnerrc` restarts
   plasmashell and quits KRunner, which starts again on the next Alt+Space. A changed KWin script is unloaded and KWin loads it again if
   it's on.
 - `/usr` is only writable until the next boot (`bootc usr-overlay`): after a

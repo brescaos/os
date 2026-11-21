@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Compiles workbox (image/src/workbox/: its library, command line and tray
-# applet) with its tests into build/workbox/ and runs them (make
-# check-workbox). The applet's metadata is installed translated, as
-# image/Containerfile's workbox-build stage does.
+# Compiles workbox (image/src/workbox/: its library, command line and app)
+# with its tests into build/workbox/ and runs them (make check-workbox). The
+# app's .desktop is installed translated, as image/Containerfile's
+# workbox-build stage does.
 set -euo pipefail
 . "$(dirname "$0")/lib/common.sh"
 

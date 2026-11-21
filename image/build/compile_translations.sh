@@ -16,7 +16,8 @@
 #   autotile/kcm_brescaos_autotile.json, the KRunner plugins'
 #   bresca-krunner/krunner_brescaos.json,
 #   Hexa's window decoration's hexa/com.brescaos.hexa.decoration.json, and
-#   workbox's applet's workbox/metadata.json, with "Name[<lang>]" and the like.
+#   workbox's app's workbox/com.brescaos.workbox.desktop, with "Name[<lang>]"
+#   and the like.
 # Every metadata.json and KCM JSON also gets the version in its component's
 # VERSION.txt.
 # Runs in image/Containerfile's translations stage and in the development VM's
@@ -95,8 +96,8 @@ translate_desktop_file "$welcome_dir/com.brescaos.welcome.desktop.in" "$welcome_
 translate_desktop_file "$welcome_dir/com.brescaos.welcome-autostart.desktop.in" "$welcome_dir/po" \
     "$out_dir/etc/xdg/autostart/com.brescaos.welcome-autostart.desktop"
 
-translate_metadata "$src_dir/workbox/applet/metadata.json.in" "$src_dir/workbox/po" \
-    "$metadata_dir/workbox/metadata.json"
+translate_desktop_file "$src_dir/workbox/app/com.brescaos.workbox.desktop.in" "$src_dir/workbox/po" \
+    "$metadata_dir/workbox/com.brescaos.workbox.desktop"
 
 translate_metadata "$src_dir/bresca-krunner/krunner_brescaos.json.in" "$src_dir/bresca-krunner/po" \
     "$metadata_dir/bresca-krunner/krunner_brescaos.json"

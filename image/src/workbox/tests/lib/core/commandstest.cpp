@@ -119,6 +119,11 @@ public:
     {
         return new FakeEnterJob;
     }
+
+    QStringList shellCommandLine(const QString &, const QMap<QString, QString> &) override
+    {
+        return {};
+    }
 };
 
 // Runs Commands::CreateJob to its end; its workbox, or its error.

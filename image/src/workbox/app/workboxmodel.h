@@ -1,8 +1,8 @@
-// The applet's list (README.md): every workbox, running or not, by id. It
-// follows the engine's watch() and lists again on every change, wherever it
-// changed, and it starts, stops and removes workboxes, one operation at a
-// time per workbox. Nothing blocks: each is an engine's job. QML creates it as
-// WorkboxModel (com.brescaos.workbox, workboxmodelqml.h).
+// The app's list (README.md), its window's and its tray icon's: every
+// workbox, running or not, by id. It follows the engine's watch() and lists
+// again on every change, wherever it changed, and it starts, stops and removes
+// workboxes, one operation at a time per workbox. Nothing blocks: each is an
+// engine's job.
 #pragma once
 
 #include "engine.h"
@@ -38,6 +38,8 @@ public:
         // The last one, if it failed, and why, until the next one starts.
         FailedOperationRole,
         ErrorTextRole,
+        // The whole Workbox, for C++.
+        WorkboxRole,
     };
 
     // With the engine workbox.conf names.
@@ -46,16 +48,20 @@ public:
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
-    QHash<int, QByteArray> roleNames() const override;
 
     int runningCount() const;
     QString problem() const;
 
     // Each one does nothing while the workbox has an operation going on.
-    Q_INVOKABLE void start(const QString &id);
-    Q_INVOKABLE void stop(const QString &id);
-    // Without asking: the applet asks first.
-    Q_INVOKABLE void remove(const QString &id);
+    void start(const QString &id);
+    void stop(const QString &id);
+    // Without asking: the window asks first.
+    void remove(const QString &id);
+
+    // For a terminal emulator: the program and its arguments that open a
+    // login shell in the running workbox, with its prompt
+    // (terminalcolors.h). Empty when there's no such workbox.
+    QStringList shellCommandLine(const QString &id) const;
 
 Q_SIGNALS:
     void runningCountChanged();

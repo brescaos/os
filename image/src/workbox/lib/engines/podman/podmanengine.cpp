@@ -32,6 +32,29 @@ QList<Workbox> workboxesFromJson(const QByteArray &json)
     return workboxes;
 }
 
+// podman exec's arguments for enter() and shellCommandLine(). keep-id runs
+// it as the user unless --user says otherwise. TERM as the terminal's, for
+// the shell's programs.
+QStringList execArguments(const QString &id, const QStringList &command, const QMap<QString, QString> &environment, bool asRoot, bool hasTerminal)
+{
+    QStringList arguments{QStringLiteral("exec"), QStringLiteral("--interactive")};
+    if (hasTerminal) {
+        arguments << QStringLiteral("--tty");
+    }
+    if (asRoot) {
+        arguments << QStringLiteral("--user") << QStringLiteral("root") << QStringLiteral("--workdir") << QStringLiteral("/root");
+    } else {
+        arguments << QStringLiteral("--workdir") << QDir::homePath();
+    }
+    arguments << QStringLiteral("--env") << QStringLiteral("TERM");
+    for (auto variable = environment.begin(); variable != environment.end(); ++variable) {
+        arguments << QStringLiteral("--env") << variable.key() + QLatin1Char('=') + variable.value();
+    }
+    // The command straight, as Toolbox and Distrobox do: no login shell.
+    arguments << id << (command.isEmpty() ? QStringList{QStringLiteral("bash"), QStringLiteral("--login")} : command);
+    return arguments;
+}
+
 // --time 0: sleep, a workbox's first process, ignores SIGTERM, so Podman
 // would wait 10 seconds before killing it anyway.
 QStringList stopCommand(const QString &id)
@@ -185,23 +208,11 @@ EngineJob *PodmanEngine::remove(const Workbox &workbox)
 
 EnterJob *PodmanEngine::enter(const QString &id, const QStringList &command, const QMap<QString, QString> &environment, bool asRoot)
 {
-    // keep-id runs it as the user unless --user says otherwise. --tty only on
-    // a terminal: podman refuses it without one. TERM as the terminal's, for
-    // the shell's programs.
-    QStringList arguments{QStringLiteral("exec"), QStringLiteral("--interactive")};
-    if (isatty(STDIN_FILENO)) {
-        arguments << QStringLiteral("--tty");
-    }
-    if (asRoot) {
-        arguments << QStringLiteral("--user") << QStringLiteral("root") << QStringLiteral("--workdir") << QStringLiteral("/root");
-    } else {
-        arguments << QStringLiteral("--workdir") << QDir::homePath();
-    }
-    arguments << QStringLiteral("--env") << QStringLiteral("TERM");
-    for (auto variable = environment.begin(); variable != environment.end(); ++variable) {
-        arguments << QStringLiteral("--env") << variable.key() + QLatin1Char('=') + variable.value();
-    }
-    // The command straight, as Toolbox and Distrobox do: no login shell.
-    arguments << id << (command.isEmpty() ? QStringList{QStringLiteral("bash"), QStringLiteral("--login")} : command);
-    return new PodmanEnterJob(arguments);
+    // --tty only on a terminal: podman refuses it without one.
+    return new PodmanEnterJob(execArguments(id, command, environment, asRoot, isatty(STDIN_FILENO)));
+}
+
+QStringList PodmanEngine::shellCommandLine(const QString &id, const QMap<QString, QString> &environment)
+{
+    return QStringList{QStringLiteral("podman")} + execArguments(id, {}, environment, false, true);
 }

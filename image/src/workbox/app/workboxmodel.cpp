@@ -3,6 +3,7 @@
 #include "commands.h"
 #include "engines.h"
 #include "settings.h"
+#include "terminalcolors.h"
 
 #include <algorithm>
 
@@ -57,21 +58,10 @@ QVariant WorkboxModel::data(const QModelIndex &index, int role) const
         return static_cast<int>(row.failedOperation);
     case ErrorTextRole:
         return row.errorText;
+    case WorkboxRole:
+        return QVariant::fromValue(row.workbox);
     }
     return {};
-}
-
-QHash<int, QByteArray> WorkboxModel::roleNames() const
-{
-    return {
-        {IdRole, "id"},
-        {NameRole, "name"},
-        {ColorRole, "color"},
-        {RunningRole, "running"},
-        {OperationRole, "operation"},
-        {FailedOperationRole, "failedOperation"},
-        {ErrorTextRole, "errorText"},
-    };
 }
 
 int WorkboxModel::runningCount() const
@@ -104,6 +94,16 @@ void WorkboxModel::remove(const QString &id)
     if (m_engine && row >= 0) {
         beginOperation(id, Operation::Removing, m_engine->remove(m_rows[row].workbox));
     }
+}
+
+QStringList WorkboxModel::shellCommandLine(const QString &id) const
+{
+    const int row = rowOf(id);
+    if (!m_engine || row < 0) {
+        return {};
+    }
+    const Workbox &workbox = m_rows[row].workbox;
+    return m_engine->shellCommandLine(id, promptEnvironment(workbox.name, terminalColorsFor(workbox.color)));
 }
 
 void WorkboxModel::list()

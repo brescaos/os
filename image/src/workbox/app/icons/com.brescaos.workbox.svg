@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- workbox's app icon: a briefcase whose flap takes every color. Light
+     leather with an outline, so it reads at 32 px in a dock, and lit from
+     above: highlights on top, soft shade below and at the sides. Only
+     gradients and layers, no filters, which Qt's SVG renderer doesn't draw
+     everywhere. -->
+<!-- The view box is the bag's outline (x 10–54, y 12–51.5) with 3 units of
+     margin, square and centered. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="7 6.75 50 50">
+  <defs>
+    <linearGradient id="spectrum" x1="11" y1="37" x2="50" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd60a"/>
+      <stop offset="0.25" stop-color="#ff8a1f"/>
+      <stop offset="0.5" stop-color="#ff2bd6"/>
+      <stop offset="0.75" stop-color="#4a46ff"/>
+      <stop offset="1" stop-color="#00d6ff"/>
+    </linearGradient>
+    <linearGradient id="leather" x1="0" y1="28" x2="0" y2="51" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e9a262"/>
+      <stop offset="0.55" stop-color="#cf7e3f"/>
+      <stop offset="1" stop-color="#a85a27"/>
+    </linearGradient>
+    <linearGradient id="handleLeather" x1="0" y1="13" x2="0" y2="23" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0b073"/>
+      <stop offset="1" stop-color="#c47236"/>
+    </linearGradient>
+    <linearGradient id="flapLeather" x1="0" y1="26" x2="0" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eba564"/>
+      <stop offset="1" stop-color="#cc7a3c"/>
+    </linearGradient>
+    <!-- Light from above, over the flap. -->
+    <linearGradient id="gloss" x1="0" y1="21.5" x2="0" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <!-- The flap's lower edge, curving away: darker, in the leather's brown
+         so the colors stay bright. -->
+    <linearGradient id="flapRim" x1="0" y1="34" x2="0" y2="37.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a2c12" stop-opacity="0"/>
+      <stop offset="1" stop-color="#5a2c12" stop-opacity="0.18"/>
+    </linearGradient>
+    <!-- The highlights, from the top left: brightest at the corner, fading
+         along the top and down the side. -->
+    <radialGradient id="flapHighlight" cx="0" cy="0" r="1" gradientTransform="matrix(11 0 0 5.5 13.2 23.4)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="handleHighlight" cx="0" cy="0" r="1" gradientTransform="matrix(7 0 0 5.5 23.8 14.4)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- The flap's shadow on the body, fading down. -->
+    <linearGradient id="flapShadow" x1="0" y1="37" x2="0" y2="41.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3d1a07" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#3d1a07" stop-opacity="0"/>
+    </linearGradient>
+    <!-- The body's sides, rounding away. -->
+    <linearGradient id="sides" x1="11" y1="0" x2="53" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a2c12" stop-opacity="0.22"/>
+      <stop offset="0.14" stop-color="#5a2c12" stop-opacity="0"/>
+      <stop offset="0.86" stop-color="#5a2c12" stop-opacity="0"/>
+      <stop offset="1" stop-color="#5a2c12" stop-opacity="0.28"/>
+    </linearGradient>
+    <!-- The flap: rounded on top, less below, where it lies on the body. -->
+    <clipPath id="flapShape">
+      <path d="M10.5 25.5 A4 4 0 0 1 14.5 21.5 H49.5 A4 4 0 0 1 53.5 25.5 V35.5 A2 2 0 0 1 51.5 37.5 H12.5 A2 2 0 0 1 10.5 35.5 Z"/>
+    </clipPath>
+    <clipPath id="bodyShape">
+      <rect x="11" y="28" width="42" height="23" rx="4"/>
+    </clipPath>
+  </defs>
+
+  <!-- The handle: outlined, lit on top. -->
+  <path fill="none" stroke="#5a2c12" stroke-width="5" stroke-linecap="round"
+        d="M23.5 22.5 V17.5 A3 3 0 0 1 26.5 14.5 H37.5 A3 3 0 0 1 40.5 17.5 V22.5"/>
+  <path fill="none" stroke="url(#handleLeather)" stroke-width="3.4" stroke-linecap="round"
+        d="M23.5 22.5 V17.5 A3 3 0 0 1 26.5 14.5 H37.5 A3 3 0 0 1 40.5 17.5 V22.5"/>
+  <!-- Its highlight: round its top left corner, where the light comes
+       from, fading to the right; the handle's path moved out. -->
+  <path fill="none" stroke="url(#handleHighlight)" stroke-width="0.7" stroke-linecap="round"
+        d="M22.6 20 V17.5 A3.9 3.9 0 0 1 26.5 13.6 H30.5"/>
+
+  <!-- The body: its leather, darker towards the bottom and at the sides. -->
+  <g clip-path="url(#bodyShape)">
+    <rect x="11" y="28" width="42" height="23" fill="url(#leather)"/>
+    <rect x="11" y="28" width="42" height="23" fill="url(#sides)"/>
+    <rect x="11" y="37" width="42" height="4.5" fill="url(#flapShadow)"/>
+  </g>
+  <rect x="11" y="28" width="42" height="23" rx="4" fill="none" stroke="#5a2c12" stroke-width="1"/>
+
+  <!-- The flap: every color, leather below its wave; lit on top, darker
+       where it curves down, outlined. -->
+  <g clip-path="url(#flapShape)">
+    <rect x="10.5" y="21.5" width="43" height="16" fill="url(#spectrum)"/>
+    <!-- The leather's shadow on the colors, along its wave, as if they were
+         behind it: wider strokes fainter, a blur without filters; the
+         leather covers their lower half. -->
+    <g fill="none" stroke="#3d1a07" stroke-opacity="0.045">
+      <path stroke-width="2.4" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="2.2" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="2.0" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="1.8" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="1.6" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="1.4" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="1.2" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="1.0" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="0.8" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+      <path stroke-width="0.6" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5"/>
+    </g>
+    <path fill="url(#flapLeather)" d="M10 35 C17 35 24.5 33 31 30.5 C37.5 28 44 25.8 54 26.5 V38 H10 Z"/>
+    <!-- The leather's edge, catching the light: its wave moved down. -->
+    <path fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.6"
+          d="M10 35.45 C17 35.45 24.5 33.45 31 30.95 C37.5 28.45 44 26.25 54 26.95"/>
+    <rect x="10.5" y="21.5" width="43" height="16" fill="url(#gloss)"/>
+    <rect x="10.5" y="21.5" width="43" height="16" fill="url(#flapRim)"/>
+  </g>
+  <!-- The flap's highlight: round its top left corner, where the light
+       comes from, fading to the right and down; the flap's outline moved in. -->
+  <path fill="none" stroke="url(#flapHighlight)" stroke-width="0.8" stroke-linecap="round"
+        d="M11.7 29 V25.5 A2.8 2.8 0 0 1 14.5 22.7 H24.5"/>
+  <path fill="none" stroke="#5a2c12" stroke-width="1"
+        d="M10.5 25.5 A4 4 0 0 1 14.5 21.5 H49.5 A4 4 0 0 1 53.5 25.5 V35.5 A2 2 0 0 1 51.5 37.5 H12.5 A2 2 0 0 1 10.5 35.5 Z"/>
+
+  <!-- The clasp, light, with its shadow. -->
+  <rect x="28.6" y="34.6" width="7.6" height="7" rx="1.8" fill="#000000" fill-opacity="0.25"/>
+  <rect x="28" y="33.8" width="8" height="7" rx="1.8" fill="#f6e0c2" stroke="#5a2c12" stroke-width="1"/>
+</svg>

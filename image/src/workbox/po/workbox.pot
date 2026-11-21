@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 15:10+0000\n"
+"POT-Creation-Date: 2026-11-21 17:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,82 +18,286 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: applet/metadata.json.in
-msgid "Start, stop and remove your workboxes"
-msgstr ""
-
-#: applet/metadata.json.in
+#: app/com.brescaos.workbox.desktop.in
 msgid "Workbox"
 msgstr ""
 
-#. Search keywords: each one followed by a semicolon, no spaces
-#: applet/metadata.json.in
-msgid "workbox;container;podman;"
+#: app/com.brescaos.workbox.desktop.in
+msgid "Workspaces in Containers"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
+#: app/com.brescaos.workbox.desktop.in
+msgid "Start, stop, remove and open terminals in your workboxes"
+msgstr ""
+
+#: app/com.brescaos.workbox.desktop.in
+msgid "workbox;container;podman;terminal;"
+msgstr ""
+
+#: app/window/main.cpp app/window/trayicon.cpp
+msgctxt "@title the app's name"
+msgid "Workbox"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "%1 is stopped"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info running workboxes of all"
+msgid "%1 of %2 running"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info a workbox's id and status"
+msgid "%1 · %2"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgid ""
+"A workbox is a separate place to work: it doesn't see your home folder or "
+"the rest of the system, only what you share with it."
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Color:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Create"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Create Workbox"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Home:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Image:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title:tab"
+msgid "Information"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgid ""
+"Its container, its home and its volumes will be removed, once it's stopped. "
+"This can't be undone."
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgid ""
+"Its container, its home and its volumes will be removed. This can't be "
+"undone."
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgid "Konsole couldn't be started."
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info an option of a workbox"
+msgid "No"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "No terminal open"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "No workboxes yet"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info a workbox's volumes"
+msgid "None"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info:tooltip"
+msgid "Not available yet"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Open a Terminal"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info:tooltip"
+msgid "Open a shell in the workbox in a Konsole window of its own"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Open in Konsole"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button a workbox"
+msgid "Remove"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title:window"
+msgid "Remove Workbox"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "Remove “%1”?"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info:placeholder"
+msgid "Search…"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button a workbox"
+msgid "Start"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Start and Open a Terminal"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgid ""
+"Start it to open a terminal in it. Its home and its volumes are still there."
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button a workbox"
+msgid "Stop"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Sudo:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title:tab"
+msgid "Terminal"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgid "Type <b>%1</b> to confirm:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Volumes:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Wayland:"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "Workboxes"
+msgstr ""
+
+#: app/window/mainwindow.cpp
+msgctxt "@info an option of a workbox"
+msgid "Yes"
+msgstr ""
+
+#: app/window/terminals.cpp
+msgid "Konsole's terminal couldn't be loaded: %1"
+msgstr ""
+
+#: app/window/terminals.cpp
+msgctxt "@action:button"
+msgid "New terminal"
+msgstr ""
+
+#: app/window/terminals.cpp
+msgctxt "@info:tooltip"
+msgid "New terminal"
+msgstr ""
+
+#: app/window/terminals.cpp
+msgctxt "@title:tab a terminal"
+msgid "Shell"
+msgstr ""
+
+#: app/window/terminals.cpp
+msgctxt "@title:tab a terminal"
+msgid "Shell %1"
+msgstr ""
+
+#: app/window/trayicon.cpp
 msgid "%1 workbox running"
 msgid_plural "%1 workboxes running"
 msgstr[0] ""
 msgstr[1] ""
 
-#: applet/package/contents/ui/main.qml
-msgid "Can't list the workboxes"
-msgstr ""
-
-#: applet/package/contents/ui/main.qml
-msgid "Cancel"
-msgstr ""
-
-#: applet/package/contents/ui/main.qml
-msgid "Couldn't remove it."
-msgstr ""
-
-#: applet/package/contents/ui/main.qml
-msgid "Couldn't start it."
-msgstr ""
-
-#: applet/package/contents/ui/main.qml
-msgid "Couldn't stop it."
-msgstr ""
-
-#: applet/package/contents/ui/main.qml
-msgid "Create one with “workbox create <id>” in a terminal."
-msgstr ""
-
-#: applet/package/contents/ui/main.qml
+#: app/window/trayicon.cpp
+msgctxt "@info in the tray's menu"
 msgid "No workboxes"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
-msgid "Remove"
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu"
+msgid "Open a Terminal"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
-msgid "Remove the workbox “%1”? Everything in it and in its home will be lost."
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu"
+msgid "Quit"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu a workbox"
 msgid "Start"
 msgstr ""
 
-#: applet/package/contents/ui/main.qml
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu a workbox"
 msgid "Stop"
 msgstr ""
 
-#: cli/main.cpp
-msgctxt "an unnamed volume of the workbox's own in workbox info"
-msgid "%1 (its own)"
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Removing…"
 msgstr ""
 
-#: cli/main.cpp
-msgctxt "a volume in workbox info"
-msgid "%1 (read-only)"
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Running"
 msgstr ""
 
-#: cli/main.cpp
-msgctxt "a volume of the workbox's own in workbox info"
-msgid "%1 → %2 (volume)"
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Starting…"
+msgstr ""
+
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Stopped"
+msgstr ""
+
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Stopping…"
 msgstr ""
 
 #: cli/main.cpp
@@ -460,6 +664,21 @@ msgstr ""
 
 #: lib/core/settings.cpp
 msgid "no %1 in %2"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgctxt "an unnamed volume of the workbox's own in workbox info"
+msgid "%1 (its own)"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgctxt "a volume in workbox info"
+msgid "%1 (read-only)"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgctxt "a volume of the workbox's own in workbox info"
+msgid "%1 → %2 (volume)"
 msgstr ""
 
 #: lib/core/volumes.cpp

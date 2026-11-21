@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-# workbox, its own settings, its bash completion, its tray applet and its
-# translations are installed, and it creates a workbox from the image its
+# workbox, its own settings, its bash completion, its app (its window and
+# tray icon) and its translations are installed, and it creates a workbox from the image its
 # settings name (with the fake podman of fakes/).
 
 setup() {
@@ -29,14 +29,16 @@ setup() {
     grep -qx "example.org/test-image:1" "$FAKE_STATE/calls"
 }
 
-@test "the tray applet, its QML module and its icon are installed, translated" {
-    local plasmoid=/usr/share/plasma/plasmoids/com.brescaos.workbox
-    [[ -f $plasmoid/contents/ui/main.qml ]]
-    [[ -f $plasmoid/contents/icons/workbox-symbolic.svg ]]
-    [[ -f /usr/lib64/qt6/qml/com/brescaos/workbox/qmldir ]]
+@test "the app's icon and its toolbox, the tray icon's, are installed" {
     [[ -f /usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox.svg ]]
-    jq -e '.KPlugin.Id == "com.brescaos.workbox" and .KPlugin["Name[es]"] != null and ."X-Plasma-NotificationArea" == "true"' \
-        "$plasmoid/metadata.json"
+    [[ -f /usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox-symbolic.svg ]]
+}
+
+@test "the app, its .desktop and Konsole's part for its terminals are installed, translated" {
+    [[ -x /usr/bin/workbox-app ]]
+    grep -qx "Exec=workbox-app" /usr/share/applications/com.brescaos.workbox.desktop
+    grep -q "^Comment\[es\]=" /usr/share/applications/com.brescaos.workbox.desktop
+    [[ -f /usr/lib64/qt6/plugins/kf6/parts/konsolepart.so ]]
 }
 
 @test "create -v shares a folder of the home, or gives volumes of its own, and refuses the home" {

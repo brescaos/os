@@ -163,3 +163,13 @@ Volume parseVolume(const QString &argument, const QString &home)
             .target = targetPath(target, realHome),
             .isReadOnly = isReadOnly};
 }
+
+QString volumeDescription(const Volume &volume)
+{
+    const QString folders = !volume.name.isEmpty()
+        ? i18nc("a volume of the workbox's own in workbox info", "%1 → %2 (volume)", volume.name, volume.target)
+        : volume.source.isEmpty()        ? i18nc("an unnamed volume of the workbox's own in workbox info", "%1 (its own)", volume.target)
+        : volume.target == volume.source ? volume.source
+                                         : volume.source + QStringLiteral(" → ") + volume.target;
+    return volume.isReadOnly ? i18nc("a volume in workbox info", "%1 (read-only)", folders) : folders;
+}

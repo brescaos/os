@@ -120,6 +120,12 @@ note_copied_file() {
             /usr/share/plasma/desktoptheme/hexa/*)
             is_hexa_changed=true
             ;;
+        # An app's icon: KWin keeps the one it loaded for its windows' title
+        # bars, and plasmashell for the panel and the launcher.
+        /usr/share/icons/hicolor/*/apps/*)
+            is_plasma_changed=true
+            is_kwin_changed=true
+            ;;
         # Icons too: the panel and the launcher take them when plasmashell starts.
         /usr/share/plasma/* | /usr/share/locale/*/LC_MESSAGES/plasma_applet_* | /usr/share/knotifications6/* | \
             /usr/lib64/qt6/qml/* | /usr/share/icons/*)
@@ -142,6 +148,8 @@ note_copied_file() {
             changed_kwin_script=${changed_kwin_script%%/*}
             ;;
         /usr/lib64/qt6/plugins/plasma/kcms/systemsettings/*.so) changed_settings_module=$(basename "$1" .so) ;;
+        # workbox's app; its library is in it (static).
+        /usr/bin/workbox-app | /usr/share/locale/*/LC_MESSAGES/workbox.mo) is_workbox_app_changed=true ;;
         /usr/share/locale/*/LC_MESSAGES/kcm_*.mo) changed_settings_module=$(basename "$1" .mo) ;;
     esac
 }
@@ -249,7 +257,7 @@ reload_kwin_script() {
 }
 
 # Has KWin exit for kwin_wayland_wrapper to start it again, so that it loads
-# the window decoration's new build; the apps and plasmashell reconnect to the
+# the window decoration's new build or the apps' new icons; the apps and plasmashell reconnect to the
 # new one, without logging out.
 restart_kwin() {
     if run_in_user_session kwin_wayland --replace; then
@@ -283,9 +291,19 @@ reopen_settings() {
     fi
 }
 
+# Closes workbox's app, if it's open, and opens it again, so that it runs its
+# new build and translations. Its terminals' shells end with it.
+reopen_workbox_app() {
+    pkill -x workbox-app || return 0
+    timeout 5 sh -c 'while pgrep -x workbox-app >/dev/null; do sleep 0.2; done' || true
+    if run_in_user_session systemd-run --user --quiet --collect workbox-app; then
+        echo "reopened workbox-app"
+    fi
+}
+
 copy_changed_files() {
     local mode source destination project count_before cmake_lists
-    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false is_kwin_changed=false is_hexa_changed=false is_hexa_layout_changed=false changed_settings_module='' changed_kwin_script=''
+    local is_unit_changed=false is_plasma_changed=false is_krunner_changed=false is_kwin_changed=false is_hexa_changed=false is_hexa_layout_changed=false is_workbox_app_changed=false changed_settings_module='' changed_kwin_script=''
     local copied_count=0
     local updated_projects=''
 
@@ -345,6 +363,9 @@ copy_changed_files() {
     fi
     if [[ -n $changed_settings_module ]]; then
         reopen_settings "$changed_settings_module"
+    fi
+    if $is_workbox_app_changed; then
+        reopen_workbox_app
     fi
     if ((copied_count == 1)); then
         show_notification "Hot reload: $updated_projects" "Updated 1 file"

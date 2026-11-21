@@ -195,6 +195,25 @@ private Q_SLOTS:
                  (QList<QStringList>{{"exec", "--interactive", "--user", "root", "--workdir", "/root", "--env", "TERM", "c1", "bash", "--login"}}));
     }
 
+    // For a terminal emulator: podman itself, always with a terminal.
+    void shellCommandLine()
+    {
+        QCOMPARE(PodmanEngine().shellCommandLine("c1", {{"WORKBOX_NAME", "Cliente 01"}}),
+                 (QStringList{"podman",
+                              "exec",
+                              "--interactive",
+                              "--tty",
+                              "--workdir",
+                              QDir::homePath(),
+                              "--env",
+                              "TERM",
+                              "--env",
+                              "WORKBOX_NAME=Cliente 01",
+                              "c1",
+                              "bash",
+                              "--login"}));
+    }
+
     // A command runs straight, its arguments as they are, and its status is
     // enter's.
     void enterACommand()

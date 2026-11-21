@@ -4,8 +4,9 @@
 example one per client), that share nothing with the host but the folders
 they're given: no home folder, no SSH agent, no display, no host network.
 Distrobox does the opposite. Today it creates, lists, starts, stops, enters
-and removes them, from a terminal or its tray applet; the other options that
-share something with the host come next.
+and removes them, from a terminal or its app (a window with their terminals,
+and its icon in the system tray); the other options that share something with the host
+come next.
 
 ```bash
 workbox create c1 --name "Cliente 01" --color '#3584e4'
@@ -26,24 +27,29 @@ their options and the ids `info`, `start`, `stop`, `enter` and `rm` take.
 | `lib/`, `cli/` | `/usr/bin/workbox` |
 | `cli/completion.bash` | `/usr/share/bash-completion/completions/workbox` |
 | `config/workbox.conf` | `/usr/share/workbox/workbox.conf` |
-| `applet/workboxmodel*` | `/usr/lib64/qt6/qml/com/brescaos/workbox/` (QML module `com.brescaos.workbox`) |
-| `applet/package/`, `applet/metadata.json.in` (translated) | `/usr/share/plasma/plasmoids/com.brescaos.workbox/` |
-| `applet/package/contents/icons/workbox-symbolic.svg` | also `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox.svg`, the icon its metadata names |
+| `app/workboxmodel*`, `app/window/` | `/usr/bin/workbox-app` |
+| `app/com.brescaos.workbox.desktop.in` (translated) | `/usr/share/applications/com.brescaos.workbox.desktop` |
+| `app/icons/com.brescaos.workbox.svg` | `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox.svg`, the app's icon (its `.desktop`, its window, no workboxes) |
+| `app/icons/workbox-symbolic.svg` | `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox-symbolic.svg`, the toolbox of the tray icon and of each workbox's color in the window |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/workbox.mo` |
 
 Its version is in `VERSION.txt`; `workbox --version` shows it.
 
-It's C++ (Qt, KF6 Config, CoreAddons and I18n): a library, the command
-line and a Plasma tray applet on it, and later an app on the same library.
-It runs `podman` (rootless) and, for workboxes, Fedora's toolbox image; the
-applet needs Plasma 6. Building it needs cmake, extra-cmake-modules,
-gcc-c++, qt6-qtbase-devel, qt6-qtdeclarative-devel, kf6-kconfig-devel,
-kf6-kcoreaddons-devel and kf6-ki18n-devel, and the applet's metadata.json
-with its translations, from `applet/metadata.json.in` (this repository's
+It's C++ (Qt, KF6 Config, CoreAddons and I18n): a library, and the command
+line and an app on it (Qt Widgets, KF6 Parts, StatusNotifierItem,
+WidgetsAddons and ColorScheme). It runs `podman` (rootless) and, for
+workboxes, Fedora's toolbox image; the app needs Konsole's part
+(`konsolepart`, Fedora's `konsole-part`) for its terminals, and its tray
+icon a system tray with StatusNotifierItems (Plasma's). Building it needs
+cmake, extra-cmake-modules, gcc-c++, qt6-qtbase-devel, kf6-kconfig-devel,
+kf6-kcoreaddons-devel, kf6-ki18n-devel, kf6-kparts-devel (which brings
+WidgetsAddons' and ColorScheme's) and kf6-kstatusnotifieritem-devel, and the
+app's `com.brescaos.workbox.desktop` with its translations, from
+`app/com.brescaos.workbox.desktop.in` (this repository's
 `image/build/compile_translations.sh` writes it):
 
 ```bash
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr -DTRANSLATED_METADATA_DIR=<folder with metadata.json>
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr -DTRANSLATED_METADATA_DIR=<folder with the .desktop>
 cmake --build build
 cmake --install build
 ```
@@ -130,35 +136,61 @@ workbox's name, bold in a light shade of that hue:
   `~/.bashrc` wins; zsh and fish don't show it.
 - 🧰 is an emoji: it shows with the terminal's emoji font.
 
-## Tray applet
+## App
 
-The system tray shows a toolbox (`workbox-symbolic.svg`), monochrome like
-the tray's other symbols, with the number of running workboxes in a badge
-on its corner ("9+" from ten on), none while none runs; its tooltip says
-how many run. It's a notification area applet (`X-Plasma-NotificationArea`),
-enabled by default.
+`workbox-app` (Workbox, in the apps' menu) shows every workbox on the left,
+by id, with its color, name, id and status, how many run, and a search by
+name or id; the first one is selected. On the right, the selected one:
 
-Clicking it lists every workbox, running or not, by id: the toolbox in the
-workbox's color, its name and, when it's not the same, its id, muted while
-it's stopped, and two buttons:
+- Its color, name, id and status, and its buttons: **Start**, or **Stop**
+  and **Open in Konsole** (a shell in it in a Konsole window of its own)
+  while it runs, and **Remove**, which asks to type its id first, as
+  `workbox rm`. While one of them is under way, they're disabled. A failure shows
+  over its tabs, with the job's error, until its next operation.
+- **Terminal**: its shells, each a tab of Konsole's part, in its terminal
+  colors and with its prompt, as `workbox enter` (see [Terminal](#terminal)),
+  and **+** for another. The first time it's shown running, and when it's
+  started from the window, a shell opens in it; a tab goes when its shell
+  ends (`exit`, or the workbox stopped). Stopped, **Start and Open a
+  Terminal**. Each workbox keeps its shells while another is selected.
+- **Information**: its image, home, color, sudo, Wayland and volumes, as
+  `workbox info`.
 
-- **Start** or **Stop**.
-- **Remove**, which asks in the row itself, not in a dialog, so the list
-  stays open: everything in the workbox and its home is lost.
+**Create** is there, disabled, until creating has a form. With no workboxes,
+it says what one is; when workbox can't run (its settings, its engine),
+why.
 
-While one runs, a spinner takes its button's place and the row's other
-button is disabled: one operation at a time per workbox, others don't wait.
-Once it's done, the row shows the new state at once (removed, the row goes).
-A failure stays in the row, with the job's error, until its next operation.
-With no workboxes, the list says how to create one; when workbox can't run
-(its settings, its engine), it says why.
+The terminal is Konsole's part, which runs `sh` to set the colors (OSC 11
+and 10, as `workbox enter` does) and then `Engine::shellCommandLine()`'s
+command, `podman exec --tty … bash --login`, with its prompt in `PS1` and
+`WORKBOX_NAME`: the part is the terminal. **Open in Konsole** runs `konsole
+-e` with the same command. Nothing blocks: every operation is the list's
+(`WorkboxModel`) job.
 
-**The list (`WorkboxModel`, `applet/workboxmodel.h`)** is the library's:
-the engine `workbox.conf` names, its `watch()` started before the first
-`list()`, and a list again on each change, wherever it changed (the applet,
-a terminal, another program). Its rows change one by one, so a row asking
-to remove keeps asking while others change. Nothing blocks plasmashell:
-every operation is the engine's job.
+### Tray icon
+
+While the app runs, and only then, the system tray shows its icon: the
+toolbox (`com.brescaos.workbox-symbolic`, which the tray colors as its other
+symbols), with the number of running workboxes in a badge on its corner
+("9+" from ten on), none while none runs; its tooltip says how many run. It
+goes when the app quits, with its window. It's a StatusNotifierItem
+(`KStatusNotifierItem`, `app/window/trayicon.h`), its badge an overlay the
+app draws in the palette's highlight.
+
+- A click shows the window, and raises it.
+- Its menu has a submenu per workbox, by id, with its color and its status
+  in a tooltip: **Start** or **Stop**, and **Open a Terminal**, which shows
+  the window on its terminals with a new shell, starting it first if it's
+  stopped. Both are disabled while an operation is under way. Removing is
+  only in the window, which asks to type the id. Then **Quit**. With no
+  workboxes, or when workbox can't run, it says so.
+
+**The list (`WorkboxModel`, `app/workboxmodel.h`)** is the app's, the
+window's and the tray icon's, on the library: the engine `workbox.conf` names,
+its `watch()` started before the first `list()`, and a list again on each
+change, wherever it changed (the app, a terminal, another program). Its rows
+change one by one, so a row asking to remove keeps asking while others
+change. Nothing blocks the app: every operation is the engine's job.
 
 ### Volumes
 
@@ -273,14 +305,15 @@ install prefix (`<datadir>/workbox/`, `<datadir>/defaults/workbox/`).
 
 ## How it works
 
-Three parts: the library (`lib/`), the command line (`cli/`) and, later, an
-applet and an app. The library is static, one folder per layer, each a
-library the next one links, so the tests and every part use the same code.
+Three parts: the library (`lib/`), the command line (`cli/`) and the app
+(`app/`: its window and its tray icon). The library is static, one folder
+per layer, each a library the next one links, so the tests and every part
+use the same code; the command line and the app don't know each other.
 
 **Nothing blocks.** Every engine operation is a job, an
 `EngineJob` (`lib/core/enginejob.h`): a `KJob` that runs without waiting and
-says when it's done with its `result()` signal, so an applet or an app can
-use the engine without freezing. On failure, its `errorText()` says why,
+says when it's done with its `result()` signal, so the app can use the
+engine without freezing. On failure, its `errorText()` says why,
 translated. Its `output(line)` signal gives what the engine prints as it
 goes (Podman's standard error: an image's download, its errors), for
 whoever wants to show it, or, with `setOutputToTerminal(true)`, goes
@@ -291,7 +324,9 @@ progress bars; elsewhere (a pipe, a file), printing its output to stderr
 line by line.
 `enter`'s job (`EnterJob`) runs the shell on the process's terminal, which
 podman reads and writes itself, and ends when the shell exits, with its
-exit status: the shell failing isn't the job failing.
+exit status: the shell failing isn't the job failing. For a terminal that
+isn't the process's (the app's), `Engine::shellCommandLine()` gives the
+command that opens the shell, for the terminal to run.
 
 **Following changes.** `Engine::watch()`'s job (`WatchJob`) runs until it's
 killed and emits `changed()` when a workbox may have changed, wherever it
@@ -302,9 +337,9 @@ before the first `list()`, so no change between them is missed.
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and what only the engine knows: whether it's running, its image), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
+| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and what only the engine knows: whether it's running, its image), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox, what sets them, and the prompt. `volumes.h`: `-v`, the folders that can be shared, and how a volume is shown. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
 | `lib/engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `lib/engines/<name>/` |
-| `applet/` | `workbox-applet-model`, the QML module `com.brescaos.workbox` | `WorkboxModel`, the applet's list on the library (out of the QML module so the tests link it), and the plasmoid (`package/`, `metadata.json.in`) |
+| `app/` | `workbox-model`, `workbox-window` | `workboxmodel.h`: `WorkboxModel`, the list of the window and the tray icon on the library. `window/`: the window (`mainwindow.h`), its rows and swatch (`workboxdelegate.h`), its terminals, Konsole's part (`terminals.h`), and the tray icon (`trayicon.h`), out of the program (`main.cpp`) so the tests link them. `icons/`: the app's icon and the toolbox. `com.brescaos.workbox.desktop.in`: the app's `.desktop` |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages, `--version`. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name`,
@@ -347,8 +382,8 @@ before the first `list()`, so no change between them is missed.
 
 ## Translations
 
-`i18n()` and `i18nc()` in the C++, `i18nd("workbox", …)` in the applet's
-QML, and `applet/metadata.json.in`, all in the domain `workbox`:
+`i18n()`, `i18nc()` and `i18np()` in the C++ and
+`app/com.brescaos.workbox.desktop.in`, all in the domain `workbox`:
 `po/<lang>.po`, for now with the rest of the repository's
 ([`docs/translations.md`](../../../docs/translations.md)). The commands and
 options aren't translated; Qt's own words in the help (`Usage:`,
@@ -362,8 +397,13 @@ options aren't translated; Qt's own words in the help (`Usage:`,
   colors and their contrast, the settings, which folders can be shared
   (`tests/lib/core/sharestest.cpp`), the commands on a fake engine,
   `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`, and
-  the applet's list on it (`tests/applet/`): its rows, following events,
-  each operation, its failure and the problem without settings.
+  the app's list on it (`tests/app/`): its rows, following events,
+  each operation, its failure and the problem without settings; and its
+  window, offscreen (`tests/app/window/`): the list, its search, start,
+  stop, remove only once the id is typed, opening a terminal from the tray,
+  no workboxes, the problem, and the command line that sets the terminal's
+  colors; and its tray icon: how many run, its badge and its menu. Konsole's
+  part and Plasma's tray themselves aren't tested.
   They also check that nothing blocks: results come after `start()`
   returns, and the event loop keeps running while podman does; a job's
   output, and killing it; that several events are one change, and that
@@ -372,7 +412,7 @@ options aren't translated; Qt's own words in the help (`Usage:`,
   repository's image (`tests/Containerfile`, `make test`): its own settings,
   that `create` takes the image the user's settings name over the others,
   `-v`'s mounts and refusals, `info`,
-  `--version`, its translations, its bash completion and the tray applet
-  installed, with the fake `podman`.
+  `--version`, its translations, its bash completion, the app, its
+  `.desktop`, its icons and Konsole's part installed, with the fake `podman`.
 
 Neither runs the real Podman.

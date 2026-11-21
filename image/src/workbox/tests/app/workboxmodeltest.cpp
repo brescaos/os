@@ -6,7 +6,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 
-// The applet's list on the fake podman of fakes/, with the user's settings
+// The app's list on the fake podman of fakes/, with the user's settings
 // naming it.
 class WorkboxModelTest : public QObject
 {
@@ -89,6 +89,7 @@ private Q_SLOTS:
         QTRY_COMPARE(ids(model), (QStringList{"c1", "c2"}));
         QCOMPARE(data(model, "c1", WorkboxModel::NameRole).toString(), QStringLiteral("Cliente 01"));
         QCOMPARE(data(model, "c1", WorkboxModel::ColorRole).value<QColor>(), QColor("#3584e4"));
+        QCOMPARE(data(model, "c1", WorkboxModel::WorkboxRole).value<Workbox>().name, QStringLiteral("Cliente 01"));
         QVERIFY(!data(model, "c1", WorkboxModel::RunningRole).toBool());
         QCOMPARE(model.runningCount(), 1);
         QCOMPARE(model.problem(), QString());
@@ -134,6 +135,19 @@ private Q_SLOTS:
         QTRY_COMPARE(model.rowCount(), 2);
         model.remove("c1");
         QTRY_COMPARE(ids(model), QStringList{"c2"});
+    }
+
+    // podman exec's login shell, with the workbox's prompt; none for a
+    // workbox that isn't there.
+    void shellCommandLine()
+    {
+        WorkboxModel model;
+        QTRY_COMPARE(model.rowCount(), 2);
+        const QStringList commandLine = model.shellCommandLine("c1");
+        QCOMPARE(commandLine.mid(0, 2), (QStringList{"podman", "exec"}));
+        QVERIFY(commandLine.contains("WORKBOX_NAME=Cliente 01"));
+        QCOMPARE(commandLine.mid(commandLine.size() - 3), (QStringList{"c1", "bash", "--login"}));
+        QCOMPARE(model.shellCommandLine("c9"), QStringList());
     }
 
     // The event loop keeps running while podman does.

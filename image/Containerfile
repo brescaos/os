@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         gettext jq cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
         kf6-kcmutils-devel kf6-kconfig-devel kf6-kcoreaddons-devel \
-        kf6-ki18n-devel kf6-krunner-devel \
+        kf6-ki18n-devel kf6-kparts-devel kf6-krunner-devel kf6-kstatusnotifieritem-devel \
         libplasma-devel kdecoration-devel
 
 # The translations of src/ (docs/translations.md), compiled with gettext:
@@ -74,7 +74,7 @@ RUN --mount=type=bind,source=src/hexa,target=/tmp/src \
     && DESTDIR=/out cmake --install /tmp/build
 
 # workbox: its command line, its bash completion, its own settings and its
-# tray applet.
+# app (its window and its tray icon).
 FROM build-base AS workbox-build
 RUN --mount=type=bind,source=src/workbox,target=/tmp/src \
     --mount=type=bind,from=translations,source=/metadata/workbox,target=/tmp/metadata \

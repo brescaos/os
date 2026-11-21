@@ -58,14 +58,10 @@ extract_strings() {
             extract_metadata_strings krunner_brescaos.json.in "$pot"
             ;;
         workbox)
-            find lib cli applet -name '*.cpp' | sort \
+            find lib cli app -name '*.cpp' | sort \
                 | xargs xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 \
                     -o "$pot"
-            # The applet's QML names the domain (i18nd).
-            find applet -name '*.qml' | sort \
-                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript -j --keyword= \
-                    --keyword=i18nd:2 --keyword=i18ndp:2,3 -o "$pot"
-            extract_metadata_strings applet/metadata.json.in "$pot"
+            xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" app/com.brescaos.workbox.desktop.in
             ;;
         bresca-cli)
             # xgettext warns about every $"...": bash used to expand what a

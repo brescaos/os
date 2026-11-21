@@ -38,4 +38,9 @@ public:
     // standard input, output and error), with environment added to the
     // image's. The job ends when it exits, with its exit status.
     virtual EnterJob *enter(const QString &id, const QStringList &command, const QMap<QString, QString> &environment, bool asRoot) = 0;
+
+    // The program and its arguments that open a login shell in the running
+    // workbox, as the user in their home, with environment added to the
+    // image's, for a terminal emulator to run on a terminal of its own.
+    virtual QStringList shellCommandLine(const QString &id, const QMap<QString, QString> &environment) = 0;
 };

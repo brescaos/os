@@ -4,6 +4,7 @@
 #include "engines.h"
 #include "settings.h"
 #include "terminalcolors.h"
+#include "volumes.h"
 
 #include <KLocalizedString>
 
@@ -330,7 +331,7 @@ int enter(const QStringList &arguments)
     const TerminalColors colors = terminalColorsFor(workbox.color);
     const bool isTerminal = isatty(STDOUT_FILENO);
     if (isTerminal) {
-        QTextStream(stdout) << QStringLiteral("\x1b]11;%1\x07\x1b]10;%2\x07").arg(colors.background.name(), colors.text.name()) << Qt::flush;
+        QTextStream(stdout) << colorsSequence(colors) << Qt::flush;
     }
     const auto restoreColors = qScopeGuard([isTerminal] {
         if (isTerminal) {
@@ -338,15 +339,7 @@ int enter(const QStringList &arguments)
         }
     });
 
-    // "🧰 name [user@id dir]$ ", the name bold in the label's color. The name
-    // goes in its own variable: bash expands it in the prompt without reading
-    // what's in it as escapes or commands.
-    const QString prompt = QStringLiteral("\\[\\e[1;38;2;%1;%2;%3m\\]\U0001F9F0 ${WORKBOX_NAME}\\[\\e[0m\\] [\\u@\\h \\W]\\$ ")
-                               .arg(colors.label.red())
-                               .arg(colors.label.green())
-                               .arg(colors.label.blue());
-    return runToEnd(engine->enter(id, {}, {{QStringLiteral("PS1"), prompt}, {QStringLiteral("WORKBOX_NAME"), workbox.name}}, parser.isSet(rootOption)))
-        ->exitStatus();
+    return runToEnd(engine->enter(id, {}, promptEnvironment(workbox.name, colors), parser.isSet(rootOption)))->exitStatus();
 }
 
 int list(const QStringList &arguments)
@@ -422,14 +415,7 @@ int info(const QStringList &arguments)
     };
     // One line per volume, the first with the label.
     for (qsizetype index = 0; index < workbox.volumes.size(); ++index) {
-        const Volume &volume = workbox.volumes[index];
-        const QString folders = !volume.name.isEmpty()
-            ? i18nc("a volume of the workbox's own in workbox info", "%1 → %2 (volume)", volume.name, volume.target)
-            : volume.source.isEmpty()       ? i18nc("an unnamed volume of the workbox's own in workbox info", "%1 (its own)", volume.target)
-            : volume.target == volume.source ? volume.source
-                                           : volume.source + QStringLiteral(" → ") + volume.target;
-        fields.append({index == 0 ? i18nc("field of workbox info", "Volumes") : QString(),
-                       volume.isReadOnly ? i18nc("a volume in workbox info", "%1 (read-only)", folders) : folders});
+        fields.append({index == 0 ? i18nc("field of workbox info", "Volumes") : QString(), volumeDescription(workbox.volumes[index])});
     }
     qsizetype labelWidth = 0;
     for (const auto &[label, value] : fields) {

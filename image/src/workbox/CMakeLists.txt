@@ -1,5 +1,5 @@
-# workbox (README.md): its library, its command line, its tray applet and
-# their tests (with -DBUILD_TESTING=ON).
+# workbox (README.md): its library, its command line, its app (a window and
+# its icon in the system tray) and their tests (with -DBUILD_TESTING=ON).
 cmake_minimum_required(VERSION 3.22)
 
 file(STRINGS VERSION.txt WORKBOX_VERSION LIMIT_COUNT 1)
@@ -7,8 +7,6 @@ project(workbox VERSION ${WORKBOX_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# The static libraries go into the applet's QML plugin too.
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # The tests only with -DBUILD_TESTING=ON.
 set(BUILD_TESTING OFF CACHE BOOL "Build the tests")
@@ -18,22 +16,21 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
-include(ECMQmlModule)
 
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Qml)
-find_package(KF6 6.0 REQUIRED COMPONENTS Config CoreAddons I18n)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(KF6 6.0 REQUIRED COMPONENTS ColorScheme Config CoreAddons I18n Parts StatusNotifierItem WidgetsAddons)
 
 add_compile_definitions(TRANSLATION_DOMAIN="workbox")
 
-# The applet's metadata.json, with its translations (from metadata.json.in,
-# by the repository's translations script).
-set(TRANSLATED_METADATA_DIR "" CACHE PATH "Folder with the translated metadata.json")
-if(NOT EXISTS "${TRANSLATED_METADATA_DIR}/metadata.json")
-    message(FATAL_ERROR "TRANSLATED_METADATA_DIR has no metadata.json")
+# The app's .desktop, with its translations (from its *.in, by the
+# repository's translations script).
+set(TRANSLATED_METADATA_DIR "" CACHE PATH "Folder with the translated com.brescaos.workbox.desktop")
+if(NOT EXISTS "${TRANSLATED_METADATA_DIR}/com.brescaos.workbox.desktop")
+    message(FATAL_ERROR "TRANSLATED_METADATA_DIR has no com.brescaos.workbox.desktop")
 endif()
 
-# The library (lib/), static: the command line, its tests and, later, an
-# applet and an app link it.
+# The library (lib/), static: the command line, the app and their tests link
+# it.
 # What no engine knows: the model, the settings, the Engine interface and the
 # commands (lib/core/).
 add_library(workbox-core STATIC
@@ -67,24 +64,30 @@ target_link_libraries(workbox PRIVATE workbox-engines KF6::I18n)
 install(TARGETS workbox DESTINATION ${KDE_INSTALL_BINDIR})
 install(FILES cli/completion.bash DESTINATION ${KDE_INSTALL_DATADIR}/bash-completion/completions RENAME workbox)
 
-# The tray applet (applet/): its list, out of the QML module so the tests can
-# link it, the QML module com.brescaos.workbox, and the plasmoid, whose icon
-# its metadata names as a theme icon too.
-add_library(workbox-applet-model STATIC applet/workboxmodel.cpp)
-target_include_directories(workbox-applet-model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/applet)
-target_link_libraries(workbox-applet-model PUBLIC workbox-engines)
-qt_extract_metatypes(workbox-applet-model)
+# The app (app/): its list of workboxes, out of the program so the tests can
+# link it; its window, with Konsole's part for its terminals, and its icon in
+# the system tray (a StatusNotifierItem, there while the app runs); its
+# .desktop and its icons: the app's, and the toolbox the tray and the window
+# draw.
+add_library(workbox-model STATIC app/workboxmodel.cpp)
+target_include_directories(workbox-model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app)
+target_link_libraries(workbox-model PUBLIC workbox-engines)
 
-ecm_add_qml_module(workbox-qml URI com.brescaos.workbox GENERATE_PLUGIN_SOURCE)
-target_sources(workbox-qml PRIVATE applet/workboxmodelqml.h)
-target_link_libraries(workbox-qml PRIVATE workbox-applet-model Qt6::Qml)
-ecm_finalize_qml_module(workbox-qml DESTINATION ${KDE_INSTALL_QMLDIR})
+add_library(workbox-window STATIC app/window/mainwindow.cpp app/window/terminals.cpp app/window/trayicon.cpp
+                                  app/window/workboxdelegate.cpp)
+target_include_directories(workbox-window PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app/window)
+target_link_libraries(workbox-window
+                      PUBLIC workbox-model Qt6::Widgets
+                      PRIVATE KF6::ColorScheme KF6::I18n KF6::Parts KF6::StatusNotifierItem KF6::WidgetsAddons)
 
-install(DIRECTORY applet/package/ DESTINATION ${KDE_INSTALL_DATADIR}/plasma/plasmoids/com.brescaos.workbox)
-install(FILES ${TRANSLATED_METADATA_DIR}/metadata.json DESTINATION ${KDE_INSTALL_DATADIR}/plasma/plasmoids/com.brescaos.workbox)
-install(FILES applet/package/contents/icons/workbox-symbolic.svg
+add_executable(workbox-app app/window/main.cpp)
+target_link_libraries(workbox-app PRIVATE workbox-window KF6::I18n)
+install(TARGETS workbox-app DESTINATION ${KDE_INSTALL_BINDIR})
+install(FILES ${TRANSLATED_METADATA_DIR}/com.brescaos.workbox.desktop DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES app/icons/com.brescaos.workbox.svg DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps)
+install(FILES app/icons/workbox-symbolic.svg
         DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps
-        RENAME com.brescaos.workbox.svg)
+        RENAME com.brescaos.workbox-symbolic.svg)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

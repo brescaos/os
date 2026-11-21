@@ -4,6 +4,7 @@
 #pragma once
 
 #include <QColor>
+#include <QMap>
 
 struct TerminalColors {
     QColor background;
@@ -12,3 +13,11 @@ struct TerminalColors {
 };
 
 TerminalColors terminalColorsFor(const QColor &workboxColor);
+
+// What sets a terminal's background and text to colors' (OSC 11 and 10).
+QString colorsSequence(const TerminalColors &colors);
+
+// A login shell's environment for its prompt in the workbox named
+// workboxName, "🧰 name [user@id dir]$ ", the name bold in the label's color:
+// PS1 and WORKBOX_NAME.
+QMap<QString, QString> promptEnvironment(const QString &workboxName, const TerminalColors &colors);

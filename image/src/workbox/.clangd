@@ -36,13 +36,29 @@ CompileFlags:
     - -Ipodman
 ---
 If:
-  PathMatch: (cli|applet)/.*
+  PathMatch: cli/.*
 CompileFlags:
   Add:
     - -I../lib/core
     - -I../lib/engines
     - -I../lib/engines/podman
     - -DWORKBOX_VERSION="0"
+---
+If:
+  PathMatch: app/[^/]*
+CompileFlags:
+  Add:
+    - -I../lib/core
+    - -I../lib/engines
+    - -I../lib/engines/podman
+---
+If:
+  PathMatch: app/window/.*
+CompileFlags:
+  Add:
+    - -I..
+    - -I../../lib/core
+    - -I../../lib/engines
 ---
 If:
   PathMatch: lib/core/.*
@@ -60,12 +76,12 @@ CompileFlags:
     - -I../../../lib/core
 ---
 If:
-  PathMatch: tests/applet/.*
+  PathMatch: tests/app/[^/]*
 CompileFlags:
   Add:
     - -I../../lib/core
     - -I../../lib/engines
-    - -I../../applet
+    - -I../../app
     - -DFAKES_DIR="../fakes"
 ---
 If:
@@ -75,3 +91,13 @@ CompileFlags:
     - -I../../../../lib/core
     - -I../../../../lib/engines/podman
     - -DFAKES_DIR="../../../fakes"
+---
+If:
+  PathMatch: tests/app/window/.*
+CompileFlags:
+  Add:
+    - -I../../../lib/core
+    - -I../../../lib/engines
+    - -I../../../app
+    - -I../../../app/window
+    - -DFAKES_DIR="../../fakes"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 15:10+0000\n"
+"POT-Creation-Date: 2026-11-21 17:25+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,85 +17,296 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: applet/metadata.json.in
-msgid "Start, stop and remove your workboxes"
-msgstr "Engega, atura i elimina els teus workboxes"
-
-#: applet/metadata.json.in
+#: app/com.brescaos.workbox.desktop.in
 msgid "Workbox"
 msgstr "Workbox"
 
-#. Search keywords: each one followed by a semicolon, no spaces
-#: applet/metadata.json.in
-msgid "workbox;container;podman;"
-msgstr "workbox;contenidor;podman;"
+#: app/com.brescaos.workbox.desktop.in
+msgid "Workspaces in Containers"
+msgstr "Espais de treball en contenidors"
 
-#: applet/package/contents/ui/main.qml
+#: app/com.brescaos.workbox.desktop.in
+msgid "Start, stop, remove and open terminals in your workboxes"
+msgstr "Engega, atura, elimina i obre terminals als teus workboxes"
+
+#: app/com.brescaos.workbox.desktop.in
+msgid "workbox;container;podman;terminal;"
+msgstr "workbox;contenidor;podman;terminal;"
+
+#: app/window/main.cpp app/window/trayicon.cpp
+msgctxt "@title the app's name"
+msgid "Workbox"
+msgstr "Workbox"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "%1 is stopped"
+msgstr "%1 està aturat"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info running workboxes of all"
+msgid "%1 of %2 running"
+msgstr "%1 de %2 en marxa"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info a workbox's id and status"
+msgid "%1 · %2"
+msgstr "%1 · %2"
+
+#: app/window/mainwindow.cpp
+msgid ""
+"A workbox is a separate place to work: it doesn't see your home folder or "
+"the rest of the system, only what you share with it."
+msgstr ""
+"Un workbox és un lloc a part per treballar: no veu la teva carpeta personal "
+"ni la resta del sistema, només el que hi comparteixis."
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Color:"
+msgstr "Color:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Create"
+msgstr "Crea"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Create Workbox"
+msgstr "Crea un workbox"
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Home:"
+msgstr "Carpeta personal:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Image:"
+msgstr "Imatge:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title:tab"
+msgid "Information"
+msgstr "Informació"
+
+#: app/window/mainwindow.cpp
+msgid ""
+"Its container, its home and its volumes will be removed, once it's stopped. "
+"This can't be undone."
+msgstr ""
+"S'eliminaran el seu contenidor, la seva carpeta personal i els seus volums, "
+"després d'aturar-lo. No es pot desfer."
+
+#: app/window/mainwindow.cpp
+msgid ""
+"Its container, its home and its volumes will be removed. This can't be "
+"undone."
+msgstr ""
+"S'eliminaran el seu contenidor, la seva carpeta personal i els seus volums. "
+"No es pot desfer."
+
+#: app/window/mainwindow.cpp
+msgid "Konsole couldn't be started."
+msgstr "No s'ha pogut iniciar el Konsole."
+
+#: app/window/mainwindow.cpp
+msgctxt "@info an option of a workbox"
+msgid "No"
+msgstr "No"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "No terminal open"
+msgstr "No hi ha cap terminal obert"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "No workboxes yet"
+msgstr "Encara no hi ha cap workbox"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info a workbox's volumes"
+msgid "None"
+msgstr "Cap"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info:tooltip"
+msgid "Not available yet"
+msgstr "Encara no està disponible"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Open a Terminal"
+msgstr "Obre un terminal"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info:tooltip"
+msgid "Open a shell in the workbox in a Konsole window of its own"
+msgstr ""
+"Obre un intèrpret d'ordres al workbox en una finestra de Konsole a part"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Open in Konsole"
+msgstr "Obre al Konsole"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button a workbox"
+msgid "Remove"
+msgstr "Elimina"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title:window"
+msgid "Remove Workbox"
+msgstr "Elimina el workbox"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "Remove “%1”?"
+msgstr "Vols eliminar «%1»?"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info:placeholder"
+msgid "Search…"
+msgstr "Cerca…"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button a workbox"
+msgid "Start"
+msgstr "Engega"
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Start and Open a Terminal"
+msgstr "Engega i obre un terminal"
+
+#: app/window/mainwindow.cpp
+msgid ""
+"Start it to open a terminal in it. Its home and its volumes are still there."
+msgstr ""
+"Engega'l per obrir-hi un terminal. La seva carpeta personal i els seus "
+"volums hi continuen."
+
+#: app/window/mainwindow.cpp
+msgctxt "@action:button a workbox"
+msgid "Stop"
+msgstr "Atura"
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Sudo:"
+msgstr "Sudo:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title:tab"
+msgid "Terminal"
+msgstr "Terminal"
+
+#: app/window/mainwindow.cpp
+msgid "Type <b>%1</b> to confirm:"
+msgstr "Escriu <b>%1</b> per confirmar:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Volumes:"
+msgstr "Volums:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Wayland:"
+msgstr "Wayland:"
+
+#: app/window/mainwindow.cpp
+msgctxt "@title"
+msgid "Workboxes"
+msgstr "Workboxes"
+
+#: app/window/mainwindow.cpp
+msgctxt "@info an option of a workbox"
+msgid "Yes"
+msgstr "Sí"
+
+#: app/window/terminals.cpp
+msgid "Konsole's terminal couldn't be loaded: %1"
+msgstr "No s'ha pogut carregar el terminal del Konsole: %1"
+
+#: app/window/terminals.cpp
+msgctxt "@action:button"
+msgid "New terminal"
+msgstr "Terminal nou"
+
+#: app/window/terminals.cpp
+msgctxt "@info:tooltip"
+msgid "New terminal"
+msgstr "Terminal nou"
+
+#: app/window/terminals.cpp
+msgctxt "@title:tab a terminal"
+msgid "Shell"
+msgstr "Shell"
+
+#: app/window/terminals.cpp
+msgctxt "@title:tab a terminal"
+msgid "Shell %1"
+msgstr "Shell %1"
+
+#: app/window/trayicon.cpp
 msgid "%1 workbox running"
 msgid_plural "%1 workboxes running"
 msgstr[0] "%1 workbox en marxa"
 msgstr[1] "%1 workboxes en marxa"
 
-#: applet/package/contents/ui/main.qml
-msgid "Can't list the workboxes"
-msgstr "No es poden llistar els workboxes"
-
-#: applet/package/contents/ui/main.qml
-msgid "Cancel"
-msgstr "Cancel·la"
-
-#: applet/package/contents/ui/main.qml
-msgid "Couldn't remove it."
-msgstr "No s'ha pogut eliminar."
-
-#: applet/package/contents/ui/main.qml
-msgid "Couldn't start it."
-msgstr "No s'ha pogut engegar."
-
-#: applet/package/contents/ui/main.qml
-msgid "Couldn't stop it."
-msgstr "No s'ha pogut aturar."
-
-#: applet/package/contents/ui/main.qml
-msgid "Create one with “workbox create <id>” in a terminal."
-msgstr "Crea'n un amb «workbox create <id>» en un terminal."
-
-#: applet/package/contents/ui/main.qml
+#: app/window/trayicon.cpp
+msgctxt "@info in the tray's menu"
 msgid "No workboxes"
 msgstr "No hi ha cap workbox"
 
-#: applet/package/contents/ui/main.qml
-msgid "Remove"
-msgstr "Elimina"
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu"
+msgid "Open a Terminal"
+msgstr "Obre un terminal"
 
-#: applet/package/contents/ui/main.qml
-msgid "Remove the workbox “%1”? Everything in it and in its home will be lost."
-msgstr ""
-"Vols eliminar el workbox «%1»? Es perdrà tot el que hi ha a dins i a la seva "
-"carpeta personal."
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu"
+msgid "Quit"
+msgstr "Surt"
 
-#: applet/package/contents/ui/main.qml
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu a workbox"
 msgid "Start"
 msgstr "Engega"
 
-#: applet/package/contents/ui/main.qml
+#: app/window/trayicon.cpp
+msgctxt "@action:inmenu a workbox"
 msgid "Stop"
 msgstr "Atura"
 
-#: cli/main.cpp
-msgctxt "an unnamed volume of the workbox's own in workbox info"
-msgid "%1 (its own)"
-msgstr "%1 (propi)"
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Removing…"
+msgstr "S'està eliminant…"
 
-#: cli/main.cpp
-msgctxt "a volume in workbox info"
-msgid "%1 (read-only)"
-msgstr "%1 (només lectura)"
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Running"
+msgstr "En marxa"
 
-#: cli/main.cpp
-msgctxt "a volume of the workbox's own in workbox info"
-msgid "%1 → %2 (volume)"
-msgstr "%1 → %2 (volum)"
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Starting…"
+msgstr "S'està engegant…"
+
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Stopped"
+msgstr "Aturat"
+
+#: app/window/workboxdelegate.cpp
+msgctxt "@info:status a workbox"
+msgid "Stopping…"
+msgstr "S'està aturant…"
 
 #: cli/main.cpp
 msgid ""
@@ -188,7 +399,10 @@ msgstr ""
 msgid ""
 "Let its apps show windows in your Wayland session, with the GPU. Wayland "
 "keeps them from reading other apps' windows and keyboard."
-msgstr "Permet que les seves aplicacions mostrin finestres a la teva sessió de Wayland, amb la GPU. Wayland els impedeix llegir les finestres i el teclat d'altres aplicacions."
+msgstr ""
+"Permet que les seves aplicacions mostrin finestres a la teva sessió de "
+"Wayland, amb la GPU. Wayland els impedeix llegir les finestres i el teclat "
+"d'altres aplicacions."
 
 #: cli/main.cpp
 msgid ""
@@ -505,7 +719,9 @@ msgstr "ja hi ha un workbox amb l'id «%1»"
 #: lib/core/commands.cpp
 msgid ""
 "can't give it Wayland: there's no Wayland session here (WAYLAND_DISPLAY)"
-msgstr "no se li pot donar Wayland: aquí no hi ha cap sessió de Wayland (WAYLAND_DISPLAY)"
+msgstr ""
+"no se li pot donar Wayland: aquí no hi ha cap sessió de Wayland "
+"(WAYLAND_DISPLAY)"
 
 #: lib/core/commands.cpp
 msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
@@ -535,6 +751,21 @@ msgstr "hi ha dos volums a %1"
 #: lib/core/settings.cpp
 msgid "no %1 in %2"
 msgstr "no hi ha %1 a %2"
+
+#: lib/core/volumes.cpp
+msgctxt "an unnamed volume of the workbox's own in workbox info"
+msgid "%1 (its own)"
+msgstr "%1 (propi)"
+
+#: lib/core/volumes.cpp
+msgctxt "a volume in workbox info"
+msgid "%1 (read-only)"
+msgstr "%1 (només lectura)"
+
+#: lib/core/volumes.cpp
+msgctxt "a volume of the workbox's own in workbox info"
+msgid "%1 → %2 (volume)"
+msgstr "%1 → %2 (volum)"
 
 #: lib/core/volumes.cpp
 msgid "a volume can't be both ro and rw"

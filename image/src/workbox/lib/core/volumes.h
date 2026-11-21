@@ -17,3 +17,8 @@
 // ~/.config or ~/.local without ro; a target that isn't a clean path in home;
 // or an option workbox doesn't allow (Z, U, the others).
 Volume parseVolume(const QString &argument, const QString &home);
+
+// What the workbox sees and where, for the user, translated: "<folder> →
+// <target>", "<name> → <target> (volume)" or "<target> (its own)", and
+// "(read-only)".
+QString volumeDescription(const Volume &volume);

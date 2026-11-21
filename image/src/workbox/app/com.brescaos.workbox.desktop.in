@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Workbox
+GenericName=Workspaces in Containers
+Comment=Start, stop, remove and open terminals in your workboxes
+Exec=workbox-app
+Icon=com.brescaos.workbox
+Categories=Qt;KDE;System;Utility;
+Keywords=workbox;container;podman;terminal;

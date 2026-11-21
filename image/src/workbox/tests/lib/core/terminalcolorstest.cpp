@@ -61,6 +61,21 @@ private Q_SLOTS:
         QVERIFY(WorkboxColor::distance(dark.background, light.background) < 0.02);
         QVERIFY(contrastRatio(dark.label, dark.background) >= 7);
     }
+
+    void colorsSequence()
+    {
+        QCOMPARE(::colorsSequence({.background = QColor(0x10, 0x20, 0x30), .text = QColor(0xfc, 0xfc, 0xfc)}),
+                 QStringLiteral("\x1b]11;#102030\x07\x1b]10;#fcfcfc\x07"));
+    }
+
+    // The name is only in WORKBOX_NAME, which PS1 expands: never read as
+    // escapes or commands.
+    void promptEnvironment()
+    {
+        const QMap<QString, QString> environment = ::promptEnvironment("$(rm -rf ~) \\u", {.label = QColor(1, 2, 3)});
+        QCOMPARE(environment.value("WORKBOX_NAME"), QStringLiteral("$(rm -rf ~) \\u"));
+        QCOMPARE(environment.value("PS1"), QStringLiteral("\\[\\e[1;38;2;1;2;3m\\]\U0001F9F0 ${WORKBOX_NAME}\\[\\e[0m\\] [\\u@\\h \\W]\\$ "));
+    }
 };
 
 QTEST_GUILESS_MAIN(TerminalColorsTest)
