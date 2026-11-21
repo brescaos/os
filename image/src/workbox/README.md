@@ -33,9 +33,8 @@ qt6-qtbase-devel, kf6-kconfig-devel and kf6-ki18n-devel.
 - `workbox create <id> [--name <name>] [--color <color>]` creates the
   container and its home volume, `workbox-<id>-home`, mounted at the same
   path as the user's home. The image is downloaded the first time.
-- `workbox list [--quiet]` shows every workbox by id, with its name and
-  color, in columns; `--quiet` (`-q`), only the ids, one per line, for
-  scripts and the completion.
+- `workbox list [--quiet]` shows every workbox by id, with its name
+  and its status.
 - `workbox rm <id> [--yes]` stops it if it runs and removes it and its
   home volume, after asking (`[y/N]`) unless `--yes`.
 
@@ -75,7 +74,7 @@ tests (and later a KDE app) use the same code as the command line:
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `engine.h`: what workbox needs from an engine (list, create, remove). `commands.h`: what `create`, `list` and `rm` do, on any engine |
+| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `engine.h`: what workbox needs from an engine (list, create, remove). `commands.h`: what `create`, `list` and `rm` do, on any engine |
 | `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands. Another engine would go in `engines/<name>/` |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages. `completion.bash`, its bash completion: keep it in sync with the commands and options; `rm`'s ids come from `workbox list --quiet` |
 

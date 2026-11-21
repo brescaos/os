@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:14+0000\n"
+"POT-Creation-Date: 2026-11-21 08:23+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -109,11 +109,11 @@ msgstr "Se ha eliminado el workbox %1."
 
 #: cli/main.cpp
 msgid ""
-"Lists the workboxes, by id, with their names and colors.\n"
+"Lists the workboxes.\n"
 "\n"
 "Example:\n"
 "  workbox list"
-msgstr "Lista los workboxes, por id, con sus nombres y colores.\n\nEjemplo:\n  workbox list"
+msgstr "Lista los workboxes.\n\nEjemplo:\n  workbox list"
 
 #: cli/main.cpp
 msgid "Only their ids, one per line."
@@ -134,13 +134,23 @@ msgstr "ID"
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
-msgid "NAME"
-msgstr "NOMBRE"
+msgid "STATUS"
+msgstr "ESTADO"
+
+#: cli/main.cpp
+msgctxt "status in workbox list"
+msgid "running"
+msgstr "en marcha"
+
+#: cli/main.cpp
+msgctxt "status in workbox list"
+msgid "stopped"
+msgstr "parado"
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
-msgid "COLOR"
-msgstr "COLOR"
+msgid "NAME"
+msgstr "NOMBRE"
 
 #: cli/main.cpp
 msgid ""
@@ -155,7 +165,18 @@ msgid ""
 "  rm      Remove a workbox and its home\n"
 "\n"
 "\"workbox <command> --help\" shows a command's options."
-msgstr "Uso: workbox <comando> [opciones]\n\nEjecuta contenedores, cada uno un lugar de trabajo aparte, que no comparten nada con el sistema.\n\nComandos:\n  create  Crea un workbox\n  list    Lista los workboxes\n  rm      Elimina un workbox y su carpeta personal\n\n«workbox <comando> --help» muestra las opciones de un comando."
+msgstr ""
+"Uso: workbox <comando> [opciones]\n"
+"\n"
+"Ejecuta contenedores, cada uno un lugar de trabajo aparte, que no comparten "
+"nada con el sistema.\n"
+"\n"
+"Comandos:\n"
+"  create  Crea un workbox\n"
+"  list    Lista los workboxes\n"
+"  rm      Elimina un workbox y su carpeta personal\n"
+"\n"
+"«workbox <comando> --help» muestra las opciones de un comando."
 
 #: cli/main.cpp
 msgid "unknown command \"%1\" (workbox --help)"

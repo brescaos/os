@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:14+0000\n"
+"POT-Creation-Date: 2026-11-21 08:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,7 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
-"Lists the workboxes, by id, with their names and colors.\n"
+"Lists the workboxes.\n"
 "\n"
 "Example:\n"
 "  workbox list"
@@ -120,12 +120,22 @@ msgstr ""
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
-msgid "NAME"
+msgid "STATUS"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "status in workbox list"
+msgid "running"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "status in workbox list"
+msgid "stopped"
 msgstr ""
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
-msgid "COLOR"
+msgid "NAME"
 msgstr ""
 
 #: cli/main.cpp

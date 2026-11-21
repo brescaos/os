@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <memory>
 
+#include <unistd.h>
+
 namespace
 {
 
@@ -115,7 +117,7 @@ int list(const QStringList &arguments)
 {
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        i18n("Lists the workboxes, by id, with their names and colors.\n"
+        i18n("Lists the workboxes.\n"
              "\n"
              "Example:\n"
              "  workbox list"));
@@ -141,19 +143,35 @@ int list(const QStringList &arguments)
 
     const QString idHeader = i18nc("column of workbox list", "ID");
     const QString nameHeader = i18nc("column of workbox list", "NAME");
-    const QString colorHeader = i18nc("column of workbox list", "COLOR");
+    const QString statusHeader = i18nc("column of workbox list", "STATUS");
+    const QString running = i18nc("status in workbox list", "running");
+    const QString stopped = i18nc("status in workbox list", "stopped");
     qsizetype idWidth = idHeader.size();
     qsizetype nameWidth = nameHeader.size();
     for (const Workbox &workbox : workboxes) {
         idWidth = std::max(idWidth, workbox.id.size());
         nameWidth = std::max(nameWidth, workbox.name.size());
     }
-    const auto printRow = [idWidth, nameWidth](const QString &id, const QString &name, const QString &color) {
-        printLine(stdout, id.leftJustified(idWidth) + QStringLiteral("  ") + name.leftJustified(nameWidth) + QStringLiteral("  ") + color);
+    const auto row = [idWidth, nameWidth](const QString &id, const QString &name, const QString &status) {
+        return id.leftJustified(idWidth) + QStringLiteral("  ") + name.leftJustified(nameWidth) + QStringLiteral("  ") + status;
     };
-    printRow(idHeader, nameHeader, colorHeader);
+    // In a terminal with 24-bit color (COLORTERM, as Konsole sets it) and
+    // without NO_COLOR (no-color.org): the id in the workbox's color, and the
+    // status in the terminal's green or red.
+    const QString colorTerm = qEnvironmentVariable("COLORTERM");
+    const bool isColored = isatty(STDOUT_FILENO) && qEnvironmentVariableIsEmpty("NO_COLOR")
+        && (colorTerm == QLatin1String("truecolor") || colorTerm == QLatin1String("24bit"));
+    const auto paint = [isColored](const QString &text, const QString &sgrCode) {
+        return isColored ? QStringLiteral("\x1b[%1m%2\x1b[0m").arg(sgrCode, text) : text;
+    };
+    printLine(stdout, row(idHeader, nameHeader, statusHeader));
     for (const Workbox &workbox : workboxes) {
-        printRow(workbox.id, workbox.name, workbox.color.name());
+        const QColor &color = workbox.color;
+        // Padded outside the color's codes, which take no room.
+        const QString id = paint(workbox.id, QStringLiteral("38;2;%1;%2;%3").arg(color.red()).arg(color.green()).arg(color.blue()))
+            + QString(idWidth - workbox.id.size(), QLatin1Char(' '));
+        const QString status = workbox.isRunning ? paint(running, QStringLiteral("32")) : paint(stopped, QStringLiteral("31"));
+        printLine(stdout, row(id, workbox.name, status));
     }
     return 0;
 }

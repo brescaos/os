@@ -49,14 +49,16 @@ private Q_SLOTS:
     void listReadsTheLabels()
     {
         writeState("ps.json",
-                   "[{\"Names\": [\"c1\"], \"Labels\": {\"com.brescaos.workbox.name\": \"Cliente 01\", \"com.brescaos.workbox.color\": \"#3584e4\"}},"
-                   " {\"Names\": [\"c2\"], \"Labels\": {\"com.brescaos.workbox.name\": \"c2\", \"com.brescaos.workbox.color\": \"#e5a50a\"}}]");
+                   "[{\"Names\": [\"c1\"], \"State\": \"running\", \"Labels\": {\"com.brescaos.workbox.name\": \"Cliente 01\", \"com.brescaos.workbox.color\": \"#3584e4\"}},"
+                   " {\"Names\": [\"c2\"], \"State\": \"exited\", \"Labels\": {\"com.brescaos.workbox.name\": \"c2\", \"com.brescaos.workbox.color\": \"#e5a50a\"}}]");
         const QList<Workbox> workboxes = PodmanEngine().list();
         QCOMPARE(workboxes.size(), 2);
         QCOMPARE(workboxes[0].id, QStringLiteral("c1"));
         QCOMPARE(workboxes[0].name, QStringLiteral("Cliente 01"));
         QCOMPARE(workboxes[0].color, QColor("#3584e4"));
+        QVERIFY(workboxes[0].isRunning);
         QCOMPARE(workboxes[1].id, QStringLiteral("c2"));
+        QVERIFY(!workboxes[1].isRunning);
         QCOMPARE(calls(), (QList<QStringList>{{"ps", "--all", "--filter", "label=com.brescaos.workbox.name", "--format", "json"}}));
     }
 

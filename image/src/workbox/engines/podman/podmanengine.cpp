@@ -44,7 +44,11 @@ QList<Workbox> PodmanEngine::list()
         for (auto label = labelObject.begin(); label != labelObject.end(); ++label) {
             labels.insert(label.key(), label.value().toString());
         }
-        workboxes.append(workboxFromLabels(object[QLatin1String("Names")].toArray().first().toString(), labels));
+        Workbox workbox = workboxFromLabels(object[QLatin1String("Names")].toArray().first().toString(), labels);
+        // Podman's other states (created, exited, paused…) are all stopped
+        // for workbox.
+        workbox.isRunning = object[QLatin1String("State")].toString() == QLatin1String("running");
+        workboxes.append(workbox);
     }
     return workboxes;
 }

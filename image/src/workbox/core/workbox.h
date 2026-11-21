@@ -1,5 +1,6 @@
 // A workbox in workbox's own terms (README.md), the same with any engine: its
-// id, name and color, the labels that keep them and its home volume's name.
+// id, name and color, the labels that keep them and its home volume's name,
+// and whether it's running, which only the engine knows.
 #pragma once
 
 #include <QColor>
@@ -10,6 +11,7 @@ struct Workbox {
     QString id;
     QString name;
     QColor color;
+    bool isRunning = false;
 };
 
 // What every command fails with: its message is for the user, translated.
