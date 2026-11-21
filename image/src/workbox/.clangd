@@ -9,6 +9,8 @@ CompileFlags:
     - -isystem/usr/include/qt6
     - -isystem/usr/include/qt6/QtCore
     - -isystem/usr/include/qt6/QtGui
+    - -isystem/usr/include/qt6/QtQml
+    - -isystem/usr/include/qt6/QtQmlIntegration
     - -isystem/usr/include/qt6/QtTest
     - -isystem/usr/include/KF6/KConfig
     - -isystem/usr/include/KF6/KConfigCore
@@ -27,10 +29,18 @@ CompileFlags:
     - -I../../core
 ---
 If:
-  PathMatch: cli/.*
+  PathMatch: lib/engines/[^/]*
+CompileFlags:
+  Add:
+    - -I../core
+    - -Ipodman
+---
+If:
+  PathMatch: (cli|applet)/.*
 CompileFlags:
   Add:
     - -I../lib/core
+    - -I../lib/engines
     - -I../lib/engines/podman
     - -DWORKBOX_VERSION="0"
 ---
@@ -48,6 +58,15 @@ If:
 CompileFlags:
   Add:
     - -I../../../lib/core
+---
+If:
+  PathMatch: tests/applet/.*
+CompileFlags:
+  Add:
+    - -I../../lib/core
+    - -I../../lib/engines
+    - -I../../applet
+    - -DFAKES_DIR="../fakes"
 ---
 If:
   PathMatch: tests/lib/engines/podman/.*

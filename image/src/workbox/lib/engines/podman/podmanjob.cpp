@@ -4,6 +4,21 @@
 
 #include <QProcess>
 
+namespace
+{
+
+// Kills process, which deletes itself once it has ended: deleting it while it
+// runs would leave it behind, and waiting for it would block.
+void killProcess(QProcess *process, QObject *job)
+{
+    process->disconnect(job);
+    process->setParent(nullptr);
+    QObject::connect(process, &QProcess::finished, process, &QObject::deleteLater);
+    process->kill();
+}
+
+}
+
 PodmanJob::PodmanJob(const QList<QStringList> &commands, QObject *parent)
     : ListJob(parent)
     , m_pendingCommands(commands)
@@ -91,8 +106,8 @@ bool PodmanJob::doKill()
 {
     m_pendingCommands.clear();
     if (m_process) {
-        m_process->disconnect(this);
-        m_process->kill();
+        killProcess(m_process, this);
+        m_process = nullptr;
     }
     return true;
 }
@@ -123,8 +138,8 @@ void PodmanEnterJob::start()
 bool PodmanEnterJob::doKill()
 {
     if (m_process) {
-        m_process->disconnect(this);
-        m_process->kill();
+        killProcess(m_process, this);
+        m_process = nullptr;
     }
     return true;
 }
@@ -179,8 +194,8 @@ bool PodmanWatchJob::doKill()
     m_restart.stop();
     stopNotifying();
     if (m_process) {
-        m_process->disconnect(this);
-        m_process->kill();
+        killProcess(m_process, this);
+        m_process = nullptr;
     }
     return true;
 }

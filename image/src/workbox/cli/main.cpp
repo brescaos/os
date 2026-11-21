@@ -1,7 +1,7 @@
 // workbox <command> [options] (README.md): reads each command's arguments,
 // runs it on the engine workbox.conf names and prints its result.
 #include "commands.h"
-#include "podmanengine.h"
+#include "engines.h"
 #include "settings.h"
 #include "terminalcolors.h"
 
@@ -55,10 +55,7 @@ QList<Workbox> listWorkboxes(Engine &engine)
 
 std::unique_ptr<Engine> engineFor(const Settings &settings)
 {
-    if (settings.engine != QLatin1String("podman")) {
-        throw WorkboxError{i18n("unknown engine \"%1\" in workbox.conf: only podman", settings.engine)};
-    }
-    return std::make_unique<PodmanEngine>();
+    return engineNamed(settings.engine);
 }
 
 // The id that command takes, from its arguments (behind "workbox <command>");

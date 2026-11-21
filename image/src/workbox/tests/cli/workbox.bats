@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
-# workbox, its own settings, its bash completion and its translations are
-# installed, and it creates a workbox from the image its settings name (with
-# the fake podman of fakes/).
+# workbox, its own settings, its bash completion, its tray applet and its
+# translations are installed, and it creates a workbox from the image its
+# settings name (with the fake podman of fakes/).
 
 setup() {
     export FAKE_STATE=$BATS_TEST_TMPDIR HOME=$BATS_TEST_TMPDIR LANG=C.UTF-8
@@ -27,6 +27,16 @@ setup() {
     [[ $status -eq 0 ]]
     [[ $output == "Created the workbox c1 (\"Cliente 01\")." ]]
     grep -qx "example.org/test-image:1" "$FAKE_STATE/calls"
+}
+
+@test "the tray applet, its QML module and its icon are installed, translated" {
+    local plasmoid=/usr/share/plasma/plasmoids/com.brescaos.workbox
+    [[ -f $plasmoid/contents/ui/main.qml ]]
+    [[ -f $plasmoid/contents/icons/workbox-symbolic.svg ]]
+    [[ -f /usr/lib64/qt6/qml/com/brescaos/workbox/qmldir ]]
+    [[ -f /usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox.svg ]]
+    jq -e '.KPlugin.Id == "com.brescaos.workbox" and .KPlugin["Name[es]"] != null and ."X-Plasma-NotificationArea" == "true"' \
+        "$plasmoid/metadata.json"
 }
 
 @test "workbox --version is VERSION.txt's" {

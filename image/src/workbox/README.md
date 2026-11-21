@@ -3,8 +3,8 @@
 `workbox` runs rootless Podman containers, each a separate place to work (for
 example one per client), that share nothing with the host: no home folder, no
 SSH agent, no display, no host network. Distrobox does the opposite. Today it
-creates, lists, starts, stops, enters and removes them; the options that
-share something with the host come next.
+creates, lists, starts, stops, enters and removes them, from a terminal or
+its tray applet; the options that share something with the host come next.
 
 ```bash
 workbox create c1 --name "Cliente 01" --color '#3584e4'
@@ -24,18 +24,24 @@ their options and the ids `start`, `stop`, `enter` and `rm` take.
 | `lib/`, `cli/` | `/usr/bin/workbox` |
 | `cli/completion.bash` | `/usr/share/bash-completion/completions/workbox` |
 | `config/workbox.conf` | `/usr/share/workbox/workbox.conf` |
+| `applet/workboxmodel*` | `/usr/lib64/qt6/qml/com/brescaos/workbox/` (QML module `com.brescaos.workbox`) |
+| `applet/package/`, `applet/metadata.json.in` (translated) | `/usr/share/plasma/plasmoids/com.brescaos.workbox/` |
+| `applet/package/contents/icons/workbox-symbolic.svg` | also `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox.svg`, the icon its metadata names |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/workbox.mo` |
 
 Its version is in `VERSION.txt`; `workbox --version` shows it.
 
 It's C++ (Qt, KF6 Config, CoreAddons and I18n): a library, the command
-line on it, and later an applet and an app on the same library. It runs
-`podman` (rootless) and, for workboxes, Fedora's toolbox image. Building it
-needs cmake, extra-cmake-modules, gcc-c++, qt6-qtbase-devel,
-kf6-kconfig-devel, kf6-kcoreaddons-devel and kf6-ki18n-devel:
+line and a Plasma tray applet on it, and later an app on the same library.
+It runs `podman` (rootless) and, for workboxes, Fedora's toolbox image; the
+applet needs Plasma 6. Building it needs cmake, extra-cmake-modules,
+gcc-c++, qt6-qtbase-devel, qt6-qtdeclarative-devel, kf6-kconfig-devel,
+kf6-kcoreaddons-devel and kf6-ki18n-devel, and the applet's metadata.json
+with its translations, from `applet/metadata.json.in` (this repository's
+`image/build/compile_translations.sh` writes it):
 
 ```bash
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr -DTRANSLATED_METADATA_DIR=<folder with metadata.json>
 cmake --build build
 cmake --install build
 ```
@@ -103,6 +109,36 @@ workbox's name, bold in a light shade of that hue:
   `~/.bashrc` wins; zsh and fish don't show it.
 - 🧰 is an emoji: it shows with the terminal's emoji font.
 
+## Tray applet
+
+The system tray shows a toolbox (`workbox-symbolic.svg`), monochrome like
+the tray's other symbols, with the number of running workboxes in a badge
+on its corner ("9+" from ten on), none while none runs; its tooltip says
+how many run. It's a notification area applet (`X-Plasma-NotificationArea`),
+enabled by default.
+
+Clicking it lists every workbox, running or not, by id: the toolbox in the
+workbox's color, its name and, when it's not the same, its id, muted while
+it's stopped, and two buttons:
+
+- **Start** or **Stop**.
+- **Remove**, which asks in the row itself, not in a dialog, so the list
+  stays open: everything in the workbox and its home is lost.
+
+While one runs, a spinner takes its button's place and the row's other
+button is disabled: one operation at a time per workbox, others don't wait.
+Once it's done, the row shows the new state at once (removed, the row goes).
+A failure stays in the row, with the job's error, until its next operation.
+With no workboxes, the list says how to create one; when workbox can't run
+(its settings, its engine), it says why.
+
+**The list (`WorkboxModel`, `applet/workboxmodel.h`)** is the library's:
+the engine `workbox.conf` names, its `watch()` started before the first
+`list()`, and a list again on each change, wherever it changed (the applet,
+a terminal, another program). Its rows change one by one, so a row asking
+to remove keeps asking while others change. Nothing blocks plasmashell:
+every operation is the engine's job.
+
 ## Settings
 
 `workbox.conf` (KConfig, group `[General]`), on three levels, each key from
@@ -151,6 +187,7 @@ before the first `list()`, so no change between them is missed.
 | --- | --- | --- |
 | `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
 | `lib/engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `lib/engines/<name>/` |
+| `applet/` | `workbox-applet-model`, the QML module `com.brescaos.workbox` | `WorkboxModel`, the applet's list on the library (out of the QML module so the tests link it), and the plasmoid (`package/`, `metadata.json.in`) |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages, `--version`. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name`,
@@ -184,8 +221,9 @@ before the first `list()`, so no change between them is missed.
 
 ## Translations
 
-`i18n()` and `i18nc()` in the C++, domain `workbox`: `po/<lang>.po`, for
-now with the rest of the repository's
+`i18n()` and `i18nc()` in the C++, `i18nd("workbox", …)` in the applet's
+QML, and `applet/metadata.json.in`, all in the domain `workbox`:
+`po/<lang>.po`, for now with the rest of the repository's
 ([`docs/translations.md`](../../../docs/translations.md)). The commands and
 options aren't translated; Qt's own words in the help (`Usage:`,
 `Options:`) come from Qt's translations.
@@ -196,7 +234,9 @@ options aren't translated; Qt's own words in the help (`Usage:`,
   in this repository), each in `tests/` at its source's path
   (`tests/lib/core/colortest.cpp` tests `lib/core/color.cpp`): the model, the colors and the pick, the terminal's
   colors and their contrast, the settings, the commands on a fake engine,
-  and `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`.
+  `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`, and
+  the applet's list on it (`tests/applet/`): its rows, following events,
+  each operation, its failure and the problem without settings.
   They also check that nothing blocks: results come after `start()`
   returns, and the event loop keeps running while podman does; a job's
   output, and killing it; that several events are one change, and that
@@ -204,7 +244,7 @@ options aren't translated; Qt's own words in the help (`Usage:`,
 - `tests/cli/workbox.bats` checks an installed workbox, for now in this
   repository's image (`tests/Containerfile`, `make test`): its own settings,
   that `create` takes the image the user's settings name over the others,
-  `--version`, its translations and its bash completion, with the fake
-  `podman`.
+  `--version`, its translations, its bash completion and the tray applet
+  installed, with the fake `podman`.
 
 Neither runs the real Podman.

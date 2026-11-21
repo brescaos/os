@@ -26,7 +26,7 @@ Each translated component has a `po/` folder:
 | `bresca-krunner` | `krunner_brescaos` | `kli18n()` and `i18n()` in its C++, `krunner_brescaos.json.in` and its `.desktop.in` |
 | `updates-applet` | `plasma_applet_com.brescaos.updates` | `i18n()` in its QML, `brescaos-updates.notifyrc.in` and `metadata.json.in` |
 | `updates-kcm` | `kcm_brescaos_updates` | `i18n()` in its QML and `kcm_brescaos_updates.json.in` |
-| `workbox` | `workbox` | `i18n()` and `i18nc()` in its C++ |
+| `workbox` | `workbox` | `i18n()` and `i18nc()` in its C++, `i18nd()` in its tray applet's QML, and `applet/metadata.json.in` |
 | `welcome` | `bresca-welcome` | `i18n()` in `main.cpp`, `KI18n.i18n()` in its QML, and its `.desktop.in` files |
 
 ## Translating

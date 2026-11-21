@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:38+0000\n"
+"POT-Creation-Date: 2026-11-21 09:57+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,17 +17,79 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: cli/main.cpp
-msgid "unknown engine \"%1\" in workbox.conf: only podman"
-msgstr "motor «%1» desconocido en workbox.conf: solo podman"
+#: applet/metadata.json.in
+msgid "Start, stop and remove your workboxes"
+msgstr "Arranca, detén y elimina tus workboxes"
+
+#: applet/metadata.json.in
+msgid "Workbox"
+msgstr "Workbox"
+
+#. Search keywords: each one followed by a semicolon, no spaces
+#: applet/metadata.json.in
+msgid "workbox;container;podman;"
+msgstr "workbox;contenedor;podman;"
+
+#: applet/package/contents/ui/main.qml
+msgid "%1 workbox running"
+msgid_plural "%1 workboxes running"
+msgstr[0] "%1 workbox en marcha"
+msgstr[1] "%1 workboxes en marcha"
+
+#: applet/package/contents/ui/main.qml
+msgid "Can't list the workboxes"
+msgstr "No se pueden listar los workboxes"
+
+#: applet/package/contents/ui/main.qml
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't remove it."
+msgstr "No se ha podido eliminar."
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't start it."
+msgstr "No se ha podido arrancar."
+
+#: applet/package/contents/ui/main.qml
+msgid "Couldn't stop it."
+msgstr "No se ha podido detener."
+
+#: applet/package/contents/ui/main.qml
+msgid "Create one with “workbox create <id>” in a terminal."
+msgstr "Crea uno con «workbox create <id>» en una terminal."
+
+#: applet/package/contents/ui/main.qml
+msgid "No workboxes"
+msgstr "No hay workboxes"
+
+#: applet/package/contents/ui/main.qml
+msgid "Remove"
+msgstr "Eliminar"
+
+#: applet/package/contents/ui/main.qml
+msgid "Remove the workbox “%1”? Everything in it and in its home will be lost."
+msgstr "¿Eliminar el workbox «%1»? Se perderá todo lo que hay en él y en su carpeta personal."
+
+#: applet/package/contents/ui/main.qml
+msgid "Start"
+msgstr "Arrancar"
+
+#: applet/package/contents/ui/main.qml
+msgid "Stop"
+msgstr "Detener"
 
 #: cli/main.cpp
-msgid "The workbox's id."
-msgstr "El id del workbox."
+msgid ""
+"As the workbox's root, in /root: root only inside it, the user outside it."
+msgstr ""
+"Como el root del workbox, en /root: root solo dentro de él; fuera, el "
+"usuario."
 
 #: cli/main.cpp
-msgid "workbox %1 takes one id (workbox %1 --help)"
-msgstr "workbox %1 necesita un id (workbox %1 --help)"
+msgid "Created the workbox %1 (\"%2\")."
+msgstr "Se ha creado el workbox %1 («%2»)."
 
 #: cli/main.cpp
 msgid ""
@@ -42,13 +104,13 @@ msgstr ""
 "  workbox create c1 --name \"Cliente 01\" --color '#3584e4'"
 
 #: cli/main.cpp
-msgid "The name it's shown with (default: its id)."
-msgstr "El nombre con el que se muestra (por defecto, su id)."
+msgid "Don't ask before removing it."
+msgstr "No preguntar antes de eliminarlo."
 
 #: cli/main.cpp
-msgctxt "value of --name"
-msgid "name"
-msgstr "nombre"
+msgctxt "column of workbox list"
+msgid "ID"
+msgstr "ID"
 
 #: cli/main.cpp
 msgid ""
@@ -59,11 +121,6 @@ msgstr ""
 "de la paleta que más se distingue de los de los otros workboxes)."
 
 #: cli/main.cpp
-msgctxt "value of --color"
-msgid "color"
-msgstr "color"
-
-#: cli/main.cpp
 msgid ""
 "Let the user use sudo in it, without a password: whatever runs in it can "
 "then be its root."
@@ -72,83 +129,33 @@ msgstr ""
 "se ejecute en él puede ser su root."
 
 #: cli/main.cpp
-msgid "Created the workbox %1 (\"%2\")."
-msgstr "Se ha creado el workbox %1 («%2»)."
-
-#: cli/main.cpp
 msgid ""
-"Removing the workbox %1 (\"%2\") loses everything in it and in its home.\n"
-"Type its id to remove it: "
-msgstr ""
-"Al eliminar el workbox %1 («%2») se pierde todo lo que hay en él y en su "
-"carpeta personal.\n"
-"Escribe su id para eliminarlo: "
-
-#: cli/main.cpp
-msgid ""
-"Removes a workbox and its home, stopping it first if it runs: everything in "
-"them is lost. Asks for its id first, unless --yes.\n"
+"Lists the workboxes.\n"
 "\n"
 "Example:\n"
-"  workbox rm c1"
+"  workbox list"
 msgstr ""
-"Elimina un workbox y su carpeta personal, y antes lo detiene si está en "
-"marcha: se pierde todo lo que contienen. Antes pide su id, salvo con --yes.\n"
+"Lista los workboxes.\n"
 "\n"
 "Ejemplo:\n"
-"  workbox rm c1"
+"  workbox list"
 
 #: cli/main.cpp
-msgid "Don't ask before removing it."
-msgstr "No preguntar antes de eliminarlo."
+msgctxt "column of workbox list"
+msgid "NAME"
+msgstr "NOMBRE"
+
+#: cli/main.cpp
+msgid "No workboxes yet: workbox create <id> creates one."
+msgstr "Aún no hay workboxes: workbox create <id> crea uno."
 
 #: cli/main.cpp
 msgid "Nothing removed."
 msgstr "No se ha eliminado nada."
 
 #: cli/main.cpp
-msgid "Removed the workbox %1."
-msgstr "Se ha eliminado el workbox %1."
-
-#: cli/main.cpp
-msgid ""
-"Starts a workbox.\n"
-"\n"
-"Example:\n"
-"  workbox start c1"
-msgstr ""
-"Arranca un workbox.\n"
-"\n"
-"Ejemplo:\n"
-"  workbox start c1"
-
-#: cli/main.cpp
-msgid "The workbox %1 is already running."
-msgstr "El workbox %1 ya está en marcha."
-
-#: cli/main.cpp
-msgid "Started the workbox %1."
-msgstr "Se ha arrancado el workbox %1."
-
-#: cli/main.cpp
-msgid ""
-"Stops a workbox, and everything running in it.\n"
-"\n"
-"Example:\n"
-"  workbox stop c1"
-msgstr ""
-"Detiene un workbox y todo lo que se ejecuta en él.\n"
-"\n"
-"Ejemplo:\n"
-"  workbox stop c1"
-
-#: cli/main.cpp
-msgid "The workbox %1 is already stopped."
-msgstr "El workbox %1 ya está parado."
-
-#: cli/main.cpp
-msgid "Stopped the workbox %1."
-msgstr "Se ha detenido el workbox %1."
+msgid "Only their ids, one per line."
+msgstr "Solo sus ids, uno por línea."
 
 #: cli/main.cpp
 msgid ""
@@ -167,45 +174,31 @@ msgstr ""
 "  workbox enter c1"
 
 #: cli/main.cpp
-msgid ""
-"As the workbox's root, in /root: root only inside it, the user outside it."
-msgstr ""
-"Como el root del workbox, en /root: root solo dentro de él; fuera, el "
-"usuario."
+msgid "Removed the workbox %1."
+msgstr "Se ha eliminado el workbox %1."
 
 #: cli/main.cpp
 msgid ""
-"Lists the workboxes.\n"
+"Removes a workbox and its home, stopping it first if it runs: everything in "
+"them is lost. Asks for its id first, unless --yes.\n"
 "\n"
 "Example:\n"
-"  workbox list"
+"  workbox rm c1"
 msgstr ""
-"Lista los workboxes.\n"
+"Elimina un workbox y su carpeta personal, y antes lo detiene si está en "
+"marcha: se pierde todo lo que contienen. Antes pide su id, salvo con --yes.\n"
 "\n"
 "Ejemplo:\n"
-"  workbox list"
+"  workbox rm c1"
 
 #: cli/main.cpp
-msgid "Only their ids, one per line."
-msgstr "Solo sus ids, uno por línea."
-
-#: cli/main.cpp
-msgid "workbox list takes no arguments (workbox list --help)"
-msgstr "workbox list no admite argumentos (workbox list --help)"
-
-#: cli/main.cpp
-msgid "No workboxes yet: workbox create <id> creates one."
-msgstr "Aún no hay workboxes: workbox create <id> crea uno."
-
-#: cli/main.cpp
-msgctxt "column of workbox list"
-msgid "ID"
-msgstr "ID"
-
-#: cli/main.cpp
-msgctxt "column of workbox list"
-msgid "NAME"
-msgstr "NOMBRE"
+msgid ""
+"Removing the workbox %1 (\"%2\") loses everything in it and in its home.\n"
+"Type its id to remove it: "
+msgstr ""
+"Al eliminar el workbox %1 («%2») se pierde todo lo que hay en él y en su "
+"carpeta personal.\n"
+"Escribe su id para eliminarlo: "
 
 #: cli/main.cpp
 msgctxt "column of workbox list"
@@ -213,14 +206,52 @@ msgid "STATUS"
 msgstr "ESTADO"
 
 #: cli/main.cpp
-msgctxt "status in workbox list"
-msgid "running"
-msgstr "en marcha"
+msgid "Started the workbox %1."
+msgstr "Se ha arrancado el workbox %1."
 
 #: cli/main.cpp
-msgctxt "status in workbox list"
-msgid "stopped"
-msgstr "parado"
+msgid ""
+"Starts a workbox.\n"
+"\n"
+"Example:\n"
+"  workbox start c1"
+msgstr ""
+"Arranca un workbox.\n"
+"\n"
+"Ejemplo:\n"
+"  workbox start c1"
+
+#: cli/main.cpp
+msgid "Stopped the workbox %1."
+msgstr "Se ha detenido el workbox %1."
+
+#: cli/main.cpp
+msgid ""
+"Stops a workbox, and everything running in it.\n"
+"\n"
+"Example:\n"
+"  workbox stop c1"
+msgstr ""
+"Detiene un workbox y todo lo que se ejecuta en él.\n"
+"\n"
+"Ejemplo:\n"
+"  workbox stop c1"
+
+#: cli/main.cpp
+msgid "The name it's shown with (default: its id)."
+msgstr "El nombre con el que se muestra (por defecto, su id)."
+
+#: cli/main.cpp
+msgid "The workbox %1 is already running."
+msgstr "El workbox %1 ya está en marcha."
+
+#: cli/main.cpp
+msgid "The workbox %1 is already stopped."
+msgstr "El workbox %1 ya está parado."
+
+#: cli/main.cpp
+msgid "The workbox's id."
+msgstr "El id del workbox."
 
 #: cli/main.cpp
 msgid ""
@@ -239,11 +270,62 @@ msgid ""
 "\n"
 "\"workbox <command> --help\" shows a command's options; \"workbox --"
 "version\", its version."
-msgstr "Uso: workbox <comando> [opciones]\n\nEjecuta contenedores, cada uno un lugar de trabajo aparte, que no comparten nada con el sistema.\n\nComandos:\n  create  Crea un workbox\n  list    Lista los workboxes\n  start   Arranca un workbox\n  stop    Detiene un workbox\n  enter   Abre un shell en un workbox\n  rm      Elimina un workbox y su carpeta personal\n\n«workbox <comando> --help» muestra las opciones de un comando; «workbox --version», su versión."
+msgstr ""
+"Uso: workbox <comando> [opciones]\n"
+"\n"
+"Ejecuta contenedores, cada uno un lugar de trabajo aparte, que no comparten "
+"nada con el sistema.\n"
+"\n"
+"Comandos:\n"
+"  create  Crea un workbox\n"
+"  list    Lista los workboxes\n"
+"  start   Arranca un workbox\n"
+"  stop    Detiene un workbox\n"
+"  enter   Abre un shell en un workbox\n"
+"  rm      Elimina un workbox y su carpeta personal\n"
+"\n"
+"«workbox <comando> --help» muestra las opciones de un comando; «workbox --"
+"version», su versión."
+
+#: cli/main.cpp
+msgctxt "value of --color"
+msgid "color"
+msgstr "color"
+
+#: cli/main.cpp
+msgctxt "value of --name"
+msgid "name"
+msgstr "nombre"
+
+#: cli/main.cpp
+msgctxt "status in workbox list"
+msgid "running"
+msgstr "en marcha"
+
+#: cli/main.cpp
+msgctxt "status in workbox list"
+msgid "stopped"
+msgstr "parado"
 
 #: cli/main.cpp
 msgid "unknown command \"%1\" (workbox --help)"
 msgstr "comando «%1» desconocido (workbox --help)"
+
+#: cli/main.cpp
+msgid "workbox %1 takes one id (workbox %1 --help)"
+msgstr "workbox %1 necesita un id (workbox %1 --help)"
+
+#: cli/main.cpp
+msgid "workbox list takes no arguments (workbox list --help)"
+msgstr "workbox list no admite argumentos (workbox list --help)"
+
+#: lib/core/commands.cpp
+msgid "a workbox with the id \"%1\" already exists"
+msgstr "ya hay un workbox con el id «%1»"
+
+#: lib/core/commands.cpp
+msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
+msgstr "color «%1» no válido: usa #rgb, #rrggbb o r,g,b (cada uno de 0 a 255)"
 
 #: lib/core/commands.cpp
 msgid ""
@@ -258,14 +340,6 @@ msgid "the name can't be empty"
 msgstr "el nombre no puede estar vacío"
 
 #: lib/core/commands.cpp
-msgid "invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)"
-msgstr "color «%1» no válido: usa #rgb, #rrggbb o r,g,b (cada uno de 0 a 255)"
-
-#: lib/core/commands.cpp
-msgid "a workbox with the id \"%1\" already exists"
-msgstr "ya hay un workbox con el id «%1»"
-
-#: lib/core/commands.cpp
 msgid "there's no workbox with the id \"%1\""
 msgstr "no hay ningún workbox con el id «%1»"
 
@@ -273,10 +347,14 @@ msgstr "no hay ningún workbox con el id «%1»"
 msgid "no %1 in %2"
 msgstr "no hay %1 en %2"
 
-#: lib/engines/podman/podmanjob.cpp
-msgid "podman %1 failed"
-msgstr "ha fallado podman %1"
+#: lib/engines/engines.cpp
+msgid "unknown engine \"%1\" in workbox.conf: only podman"
+msgstr "motor «%1» desconocido en workbox.conf: solo podman"
 
 #: lib/engines/podman/podmanjob.cpp
 msgid "couldn't run podman: %1"
 msgstr "no se ha podido ejecutar podman: %1"
+
+#: lib/engines/podman/podmanjob.cpp
+msgid "podman %1 failed"
+msgstr "ha fallado podman %1"

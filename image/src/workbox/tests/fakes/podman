@@ -7,7 +7,11 @@
 # line for each line appended to events, until it's killed.
 set -euo pipefail
 
-printf '%s\n' "$@" "" >>"$FAKE_STATE/calls"
+# Locked, so two fakes running at once don't mix their lines.
+{
+    flock 9
+    printf '%s\n' "$@" ""
+} 9>>"$FAKE_STATE/calls" >&9
 [[ -f $FAKE_STATE/stderr ]] && cat "$FAKE_STATE/stderr" >&2
 [[ -f $FAKE_STATE/delay ]] && sleep "$(cat "$FAKE_STATE/delay")"
 

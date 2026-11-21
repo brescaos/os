@@ -83,10 +83,13 @@ RUN --mount=type=bind,source=src/hexa,target=/tmp/src \
     && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
-# workbox: its command line, its bash completion and its own settings.
+# workbox: its command line, its bash completion, its own settings and its
+# tray applet.
 FROM build-base AS workbox-build
 RUN --mount=type=bind,source=src/workbox,target=/tmp/src \
+    --mount=type=bind,from=translations,source=/metadata/workbox,target=/tmp/metadata \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTRANSLATED_METADATA_DIR=/tmp/metadata \
     && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
