@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:52+0000\n"
+"POT-Creation-Date: 2026-11-21 08:47+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -77,23 +77,18 @@ msgstr "S'ha creat el workbox %1 («%2»)."
 
 #: cli/main.cpp
 msgid ""
-"Remove the workbox %1 (\"%2\") and its home? Everything in them will be "
-"lost. [y/N] "
-msgstr "Vols eliminar el workbox %1 («%2») i la seva carpeta personal? Es perdrà tot el que contenen. [s/N] "
-
-#: cli/main.cpp
-msgctxt "the answer to [y/N] that removes it"
-msgid "y"
-msgstr "s"
+"Removing the workbox %1 (\"%2\") loses everything in it and in its home.\n"
+"Type its id to remove it: "
+msgstr "En eliminar el workbox %1 («%2») es perd tot el que hi ha a dins i a la seva carpeta personal.\nEscriu el seu id per eliminar-lo: "
 
 #: cli/main.cpp
 msgid ""
 "Removes a workbox and its home, stopping it first if it runs: everything in "
-"them is lost. Asks before doing it, unless --yes.\n"
+"them is lost. Asks for its id first, unless --yes.\n"
 "\n"
 "Example:\n"
 "  workbox rm c1"
-msgstr "Elimina un workbox i la seva carpeta personal, i abans l'atura si està en marxa: es perd tot el que contenen. Ho pregunta abans, tret que es faci servir --yes.\n\nExemple:\n  workbox rm c1"
+msgstr "Elimina un workbox i la seva carpeta personal, i abans l'atura si està en marxa: es perd tot el que contenen. Abans en demana l'id, tret que es faci servir --yes.\n\nExemple:\n  workbox rm c1"
 
 #: cli/main.cpp
 msgid "Don't ask before removing it."

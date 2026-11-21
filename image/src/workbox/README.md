@@ -52,7 +52,7 @@ The workbox's root is root only inside it: rootless Podman maps it to the
 user outside, so it can change anything of the workbox (its packages, its
 home, what's shared with it), nothing else of the host.
 - `workbox rm <id> [--yes]` stops it if it runs and removes it and its
-  home volume, after asking (`[y/N]`) unless `--yes`.
+  home volume, after asking to type its id, unless `--yes`.
 
 The **id** (`c1`) is what every command takes: `[a-z0-9][a-z0-9-]*`, up to
 32 characters, unique, and never changes. The **name** is only shown

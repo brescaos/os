@@ -86,12 +86,14 @@ int create(const QStringList &arguments)
     return 0;
 }
 
+// The user types the workbox's id, so a removal can't be a reflex "y".
 bool confirmRemoval(const Workbox &workbox)
 {
-    QTextStream(stdout) << i18n("Remove the workbox %1 (\"%2\") and its home? Everything in them will be lost. [y/N] ", workbox.id, workbox.name)
+    QTextStream(stdout) << i18n("Removing the workbox %1 (\"%2\") loses everything in it and in its home.\nType its id to remove it: ",
+                                workbox.id,
+                                workbox.name)
                         << Qt::flush;
-    const QString answer = QTextStream(stdin).readLine().trimmed();
-    return answer.compare(i18nc("the answer to [y/N] that removes it", "y"), Qt::CaseInsensitive) == 0;
+    return QTextStream(stdin).readLine().trimmed() == workbox.id;
 }
 
 int remove(const QStringList &arguments)
@@ -99,7 +101,7 @@ int remove(const QStringList &arguments)
     QCommandLineParser parser;
     parser.setApplicationDescription(
         i18n("Removes a workbox and its home, stopping it first if it runs: everything in them is lost. "
-             "Asks before doing it, unless --yes.\n"
+             "Asks for its id first, unless --yes.\n"
              "\n"
              "Example:\n"
              "  workbox rm c1"));
