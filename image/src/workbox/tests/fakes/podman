@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Fake podman for the tests, on $FAKE_STATE (a folder): logs each call in
+# calls, one argument per line and an empty line after it; ps prints ps.json
+# (or no container); a command named in the file fail fails.
+set -euo pipefail
+
+printf '%s\n' "$@" "" >>"$FAKE_STATE/calls"
+
+if [[ -f $FAKE_STATE/fail ]] && grep -qx "$1" "$FAKE_STATE/fail"; then
+    echo "fake podman: $1 failed" >&2
+    exit 125
+fi
+
+case $1 in
+    ps) cat "$FAKE_STATE/ps.json" 2>/dev/null || echo '[]' ;;
+    create) echo 0123456789abcdef ;;
+    rm | volume) ;;
+    *)
+        echo "fake podman: unexpected command: $*" >&2
+        exit 2
+        ;;
+esac

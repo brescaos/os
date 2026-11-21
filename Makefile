@@ -12,13 +12,13 @@
 SHELL := /usr/bin/env bash
 .DEFAULT_GOAL := help
 
-.PHONY: help check check-scripts check-translations check-welcome check-autotile check-distrobox check-bresca-krunner check-hexa format pot image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
+.PHONY: help check check-scripts check-translations check-welcome check-autotile check-distrobox check-bresca-krunner check-hexa check-workbox format pot image test publish publish-dev registry-start registry-stop clean vm vm-update vm-start vm-clean
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[38;5;111m%-19s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 # make -k check runs every one even when one fails (the CI does).
-check: check-scripts check-translations check-welcome check-autotile check-distrobox check-bresca-krunner check-hexa ## check-scripts, check-translations, check-welcome, check-autotile, check-distrobox, check-bresca-krunner and check-hexa
+check: check-scripts check-translations check-welcome check-autotile check-distrobox check-bresca-krunner check-hexa check-workbox ## check-scripts, check-translations, check-welcome, check-autotile, check-distrobox, check-bresca-krunner, check-hexa and check-workbox
 
 check-scripts: ## shellcheck, shfmt and syntax on every script
 	@scripts/check.sh
@@ -40,6 +40,9 @@ check-bresca-krunner: ## Compile the KRunner plugin and run its tests (offscreen
 
 check-hexa: ## Compile Hexa's QML module and run its tests
 	@scripts/check_hexa.sh
+
+check-workbox: ## Compile workbox's command line and run its tests
+	@scripts/check_workbox.sh
 
 pot: ## Extract the strings of image/src/ into each po/*.pot and merge them into every .po
 	@scripts/translations.sh pot

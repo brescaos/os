@@ -68,6 +68,10 @@ extract_strings() {
             xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" com.brescaos.bresca-krunner.desktop.in
             extract_metadata_strings krunner_brescaos.json.in "$pot"
             ;;
+        workbox)
+            find core engines cli -name '*.cpp' | sort \
+                | xargs xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=i18nc:1c,2 -o "$pot"
+            ;;
         bresca-cli)
             # xgettext warns about every $"...": bash used to expand what a
             # translation has, which lib/messages.sh turns off

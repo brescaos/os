@@ -1,0 +1,49 @@
+# For clangd in the editor, without a build: the include folders of the
+# headers the sources and tests use, as Fedora installs them. A new one goes
+# here too.
+# pp_file_not_found: the tests' .moc files only exist in a build.
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -fPIC
+    - -isystem/usr/include/qt6
+    - -isystem/usr/include/qt6/QtCore
+    - -isystem/usr/include/qt6/QtGui
+    - -isystem/usr/include/qt6/QtTest
+    - -isystem/usr/include/KF6/KConfig
+    - -isystem/usr/include/KF6/KConfigCore
+    - -isystem/usr/include/KF6/KI18n
+    - -DTRANSLATION_DOMAIN="workbox"
+Diagnostics:
+  Suppress: pp_file_not_found
+---
+# Each layer includes the headers of the ones below it, as CMakeLists.txt's
+# include folders (the compile command's folder is the file's).
+If:
+  PathMatch: engines/podman/.*
+CompileFlags:
+  Add:
+    - -I../../core
+---
+If:
+  PathMatch: cli/.*
+CompileFlags:
+  Add:
+    - -I../core
+    - -I../engines/podman
+---
+# The tests mirror the sources' folders under tests/; FAKES_DIR comes from
+# tests/CMakeLists.txt.
+If:
+  PathMatch: tests/core/.*
+CompileFlags:
+  Add:
+    - -I../../core
+---
+If:
+  PathMatch: tests/engines/podman/.*
+CompileFlags:
+  Add:
+    - -I../../../core
+    - -I../../../engines/podman
+    - -DFAKES_DIR="../../fakes"

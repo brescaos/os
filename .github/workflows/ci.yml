@@ -23,6 +23,7 @@ jobs:
       # the distroboxes' terminal colors and KRunner plugin (make check-distrobox).
       # kf6-krunner-devel: the KRunner plugin (make check-bresca-krunner).
       # libplasma-devel (with kf6-kconfig-devel and kf6-kcoreaddons-devel, above) and kdecoration-devel: Hexa's QML module and window decoration (make check-hexa).
+      # kf6-ki18n-devel and kf6-kconfig-devel (above): workbox's command line (make check-workbox).
       - name: Install dependencies
         run: |
           dnf -y install --setopt=install_weak_deps=False \
