@@ -3,7 +3,8 @@
 # calls, one argument per line and an empty line after it; ps prints ps.json
 # (or no container); exec exits with the status in exec-status (or 0); a
 # command named in the file fail fails. Before that, it prints stderr's
-# content to its standard error, and waits delay's seconds.
+# content to its standard error, and waits delay's seconds. events prints a
+# line for each line appended to events, until it's killed.
 set -euo pipefail
 
 printf '%s\n' "$@" "" >>"$FAKE_STATE/calls"
@@ -18,6 +19,7 @@ fi
 case $1 in
     ps) cat "$FAKE_STATE/ps.json" 2>/dev/null || echo '[]' ;;
     create) echo 0123456789abcdef ;;
+    events) exec tail -n 0 -F "$FAKE_STATE/events" 2>/dev/null ;;
     exec) exit "$(cat "$FAKE_STATE/exec-status" 2>/dev/null || echo 0)" ;;
     start | stop | rm | volume) ;;
     *)

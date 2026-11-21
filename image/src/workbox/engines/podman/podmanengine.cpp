@@ -58,6 +58,17 @@ ListJob *PodmanEngine::list()
     return job;
 }
 
+WatchJob *PodmanEngine::watch()
+{
+    return new PodmanWatchJob({QStringLiteral("events"),
+                               QStringLiteral("--format"),
+                               QStringLiteral("json"),
+                               QStringLiteral("--filter"),
+                               QStringLiteral("type=container"),
+                               QStringLiteral("--filter"),
+                               QStringLiteral("label=") + nameLabel});
+}
+
 EngineJob *PodmanEngine::create(const Workbox &workbox, const QString &image)
 {
     // The same uid inside, so the files in shared folders keep their owner;

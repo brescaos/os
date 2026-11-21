@@ -1,4 +1,5 @@
 #include "podmanengine.h"
+#include "podmanjob.h"
 
 #include <QDir>
 #include <QFile>
@@ -38,6 +39,15 @@ class PodmanEngineTest : public QObject
         return calls;
     }
 
+    void appendEvents(int count)
+    {
+        QFile file(state.filePath("events"));
+        QVERIFY(file.open(QIODevice::Append));
+        for (int event = 0; event < count; ++event) {
+            file.write("{\"Status\": \"start\"}\n");
+        }
+    }
+
     // Runs job to its end: its error, if any.
     template<typename Job>
     QString run(Job *job, QStringList *output = nullptr)
@@ -62,7 +72,7 @@ private Q_SLOTS:
 
     void init()
     {
-        for (const QString &name : {"calls", "ps.json", "fail", "exec-status", "delay", "stderr"}) {
+        for (const QString &name : {"calls", "ps.json", "fail", "exec-status", "delay", "stderr", "events"}) {
             QFile::remove(state.filePath(name));
         }
     }
@@ -230,6 +240,50 @@ private Q_SLOTS:
         ticker.start(20);
         QCOMPARE(run(PodmanEngine().enter("c1", {}, false)), QString());
         QVERIFY2(ticks >= 10, QByteArray::number(ticks));
+    }
+
+    // Several events in a row are one change, 100 ms after the last; a later
+    // one, another.
+    void watch()
+    {
+        writeState("events", "");
+        std::unique_ptr<WatchJob> job(PodmanEngine().watch());
+        job->setAutoDelete(false);
+        int changes = 0;
+        connect(job.get(), &WatchJob::changed, this, [&changes] {
+            ++changes;
+        });
+        job->start();
+        QTRY_COMPARE(calls(),
+                     (QList<QStringList>{
+                         {"events", "--format", "json", "--filter", "type=container", "--filter", "label=com.brescaos.workbox.name"}}));
+        // tail starts following the file a moment after it's run.
+        QTest::qWait(200);
+
+        appendEvents(3);
+        QTRY_COMPARE(changes, 1);
+        QTest::qWait(300);
+        QCOMPARE(changes, 1);
+        appendEvents(1);
+        QTRY_COMPARE(changes, 2);
+        QVERIFY(job->kill());
+    }
+
+    // When podman events ends, it's started again, and that's a change: some
+    // may have been missed.
+    void watchRestarts()
+    {
+        writeState("fail", "events\n");
+        PodmanWatchJob job({"events"}, std::chrono::milliseconds(100));
+        job.setAutoDelete(false);
+        int changes = 0;
+        connect(&job, &WatchJob::changed, this, [&changes] {
+            ++changes;
+        });
+        job.start();
+        QTRY_VERIFY(calls().size() >= 2);
+        QTRY_VERIFY(changes >= 1);
+        QVERIFY(job.kill());
     }
 
     // Killed, it stops podman and gives no result.

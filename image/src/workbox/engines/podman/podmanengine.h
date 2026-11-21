@@ -8,6 +8,7 @@ class PodmanEngine : public Engine
 {
 public:
     ListJob *list() override;
+    WatchJob *watch() override;
     EngineJob *create(const Workbox &workbox, const QString &image) override;
     EngineJob *start(const QString &id) override;
     EngineJob *stop(const QString &id) override;

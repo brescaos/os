@@ -125,10 +125,17 @@ which waits in an event loop, and prints its output to stderr as it comes.
 podman reads and writes itself, and ends when the shell exits, with its
 exit status: the shell failing isn't the job failing.
 
+**Following changes.** `Engine::watch()`'s job (`WatchJob`) runs until it's
+killed and emits `changed()` when a workbox may have changed, wherever it
+changed (workbox, a terminal, another program), without polling. It doesn't
+say what changed: whoever follows lists again. Several changes in a row (one
+operation makes a few) give one `changed()`, 100 ms after the last. Start it
+before the first `list()`, so no change between them is missed.
+
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
-| `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), and `PodmanEnterJob`, `podman exec`'s shell on the terminal. Another engine would go in `engines/<name>/` |
+| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
+| `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `engines/<name>/` |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name`,
@@ -146,6 +153,12 @@ exit status: the shell failing isn't the job failing.
 - `start` is `podman start`; `stop` is `podman stop --time 0`, and `rm` is
   `podman rm --force --time 0` then `podman volume rm` (sleep ignores
   SIGTERM, so Podman would wait 10 seconds to kill it anyway).
+- `watch` is `podman events --format json --filter type=container --filter
+  label=com.brescaos.workbox.name`, running all along: each line it prints
+  is a change. Removing a workbox's volume has no label, but its container's
+  removal is an event already. If `podman events` ends (Podman updated, a
+  crash), it's started again 10 seconds later, and that's a change too,
+  since some may have been missed.
 - `enter` is `podman exec --interactive --tty --workdir $HOME --env TERM
   --env PS1=… --env WORKBOX_NAME=… <id> bash --login` (`--tty` only on a
   terminal), run on workbox's own terminal, so the shell reads and writes
@@ -170,7 +183,8 @@ options aren't translated; Qt's own words in the help (`Usage:`,
   and `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`.
   They also check that nothing blocks: results come after `start()`
   returns, and the event loop keeps running while podman does; a job's
-  output, and killing it.
+  output, and killing it; that several events are one change, and that
+  `podman events` is started again when it ends.
 - `make test` (on the host) checks in the image that `workbox` is
   installed and translated, that its settings name Distrobox's image
   and `create` uses it, and that bash completes its commands and `rm`'s

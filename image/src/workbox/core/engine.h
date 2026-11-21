@@ -16,6 +16,9 @@ public:
 
     virtual ListJob *list() = 0;
 
+    // Start it before the first list(), so no change between them is missed.
+    virtual WatchJob *watch() = 0;
+
     // Creates the workbox from image, with its home volume and, with
     // hasSudo, sudo without a password for the user. Leaves it stopped, and
     // nothing of it when it fails.

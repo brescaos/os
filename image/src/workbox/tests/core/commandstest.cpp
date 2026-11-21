@@ -58,6 +58,15 @@ public:
     }
 };
 
+// Nothing ever changes.
+class FakeWatchJob : public WatchJob
+{
+public:
+    void start() override
+    {
+    }
+};
+
 // The workboxes in memory, and the image each one was created from.
 class FakeEngine : public Engine
 {
@@ -69,6 +78,11 @@ public:
     ListJob *list() override
     {
         return new FakeJob([] { }, workboxes);
+    }
+
+    WatchJob *watch() override
+    {
+        return new FakeWatchJob;
     }
 
     EngineJob *create(const Workbox &workbox, const QString &image) override

@@ -9,6 +9,9 @@
 
 #include "enginejob.h"
 
+#include <QTimer>
+
+#include <chrono>
 #include <functional>
 
 class QProcess;
@@ -66,4 +69,28 @@ protected:
 private:
     QStringList m_arguments;
     QProcess *m_process = nullptr;
+};
+
+// podman events, following the workboxes' containers, as a WatchJob: each
+// event Podman prints is a change. If podman events ends (Podman updated, a
+// crash), it starts it again restartDelay later and says something changed,
+// as it may have missed some. Its standard error goes to output().
+class PodmanWatchJob : public WatchJob
+{
+    Q_OBJECT
+
+public:
+    explicit PodmanWatchJob(const QStringList &arguments, std::chrono::milliseconds restartDelay = std::chrono::seconds(10), QObject *parent = nullptr);
+
+    void start() override;
+
+protected:
+    bool doKill() override;
+
+private:
+    void startEvents();
+
+    QStringList m_arguments;
+    QProcess *m_process = nullptr;
+    QTimer m_restart;
 };

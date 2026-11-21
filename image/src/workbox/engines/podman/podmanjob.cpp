@@ -128,3 +128,59 @@ bool PodmanEnterJob::doKill()
     }
     return true;
 }
+
+PodmanWatchJob::PodmanWatchJob(const QStringList &arguments, std::chrono::milliseconds restartDelay, QObject *parent)
+    : WatchJob(parent)
+    , m_arguments(arguments)
+{
+    m_restart.setSingleShot(true);
+    m_restart.setInterval(restartDelay);
+    connect(&m_restart, &QTimer::timeout, this, [this] {
+        startEvents();
+        notifyChange();
+    });
+}
+
+void PodmanWatchJob::start()
+{
+    startEvents();
+}
+
+void PodmanWatchJob::startEvents()
+{
+    m_process = new QProcess(this);
+    connect(m_process, &QProcess::readyReadStandardOutput, this, [this] {
+        // Only whether there was an event: what it says, list() reads again.
+        if (!m_process->readAllStandardOutput().isEmpty()) {
+            notifyChange();
+        }
+    });
+    connect(m_process, &QProcess::readyReadStandardError, this, [this] {
+        for (const QByteArray &line : m_process->readAllStandardError().trimmed().split('\n')) {
+            Q_EMIT output(QString::fromUtf8(line));
+        }
+    });
+    const auto restartLater = [this] {
+        m_process->deleteLater();
+        m_process = nullptr;
+        m_restart.start();
+    };
+    connect(m_process, &QProcess::finished, this, restartLater);
+    connect(m_process, &QProcess::errorOccurred, this, [restartLater](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart) {
+            restartLater();
+        }
+    });
+    m_process->start(QStringLiteral("podman"), m_arguments);
+}
+
+bool PodmanWatchJob::doKill()
+{
+    m_restart.stop();
+    stopNotifying();
+    if (m_process) {
+        m_process->disconnect(this);
+        m_process->kill();
+    }
+    return true;
+}

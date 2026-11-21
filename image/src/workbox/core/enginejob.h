@@ -9,6 +9,8 @@
 
 #include <KJob>
 
+#include <QTimer>
+
 class EngineJob : public KJob
 {
     Q_OBJECT
@@ -52,6 +54,43 @@ protected:
 
 private:
     int m_exitStatus = 0;
+};
+
+// Engine::watch()'s job: it runs until it's killed, and emits changed() when
+// a workbox may have changed (created, started, stopped, removed...),
+// wherever it changed (this program, a terminal, another program), without
+// polling. What changed isn't said: list() again. Several changes in a row
+// (one operation makes a few) give one changed(), 100 ms after the last.
+class WatchJob : public EngineJob
+{
+    Q_OBJECT
+
+public:
+    explicit WatchJob(QObject *parent = nullptr)
+        : EngineJob(parent)
+    {
+        m_changeDelay.setSingleShot(true);
+        m_changeDelay.setInterval(100);
+        connect(&m_changeDelay, &QTimer::timeout, this, &WatchJob::changed);
+    }
+
+Q_SIGNALS:
+    void changed();
+
+protected:
+    // For the engine's job: something changed.
+    void notifyChange()
+    {
+        m_changeDelay.start();
+    }
+
+    void stopNotifying()
+    {
+        m_changeDelay.stop();
+    }
+
+private:
+    QTimer m_changeDelay;
 };
 
 // Engine::list()'s job: the workboxes, once it has succeeded.
