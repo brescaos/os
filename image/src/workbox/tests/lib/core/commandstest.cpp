@@ -1,6 +1,8 @@
 #include "color.h"
 #include "commands.h"
 
+#include <QDir>
+#include <QTemporaryDir>
 #include <QTest>
 
 #include <functional>
@@ -108,7 +110,7 @@ public:
         return new FakeJob([] { });
     }
 
-    EngineJob *remove(const QString &) override
+    EngineJob *remove(const Workbox &) override
     {
         return new FakeJob([] { });
     }
@@ -124,9 +126,10 @@ std::pair<Workbox, QString> create(FakeEngine &engine,
                                    const QString &id,
                                    const std::optional<QString> &name,
                                    const std::optional<QString> &color,
-                                   bool hasSudo = false)
+                                   bool hasSudo = false,
+                                   const QStringList &volumes = {})
 {
-    Commands::CreateJob job(engine, id, name, color, hasSudo, image);
+    Commands::CreateJob job(engine, id, name, color, hasSudo, volumes, image);
     job.setAutoDelete(false);
     job.exec();
     return {job.workbox(), job.error() ? job.errorText() : QString()};
@@ -192,12 +195,38 @@ private Q_SLOTS:
         QCOMPARE(engine.workboxes.size(), 1);
     }
 
+    // In the user's home, at their real paths; never twice, nor a blocked
+    // one, which creates nothing.
+    void createVolumes()
+    {
+        QTemporaryDir home;
+        const QString realHome = QDir(home.path()).canonicalPath();
+        QVERIFY(QDir(realHome).mkpath("Clients/01"));
+        QVERIFY(QDir(realHome).mkpath(".ssh"));
+        const QByteArray previousHome = qgetenv("HOME");
+        qputenv("HOME", QFile::encodeName(realHome));
+
+        FakeEngine engine;
+        const Workbox workbox = create(engine, "c1", std::nullopt, std::nullopt, false, {realHome + "/Clients/01:" + realHome + "/Clients/01:ro"}).first;
+        QCOMPARE(workbox.volumes, (QList<Volume>{{.source = realHome + "/Clients/01", .target = realHome + "/Clients/01", .isReadOnly = true}}));
+        QCOMPARE(engine.workboxes.first().volumes, workbox.volumes);
+
+        QVERIFY(create(engine, "c2", std::nullopt, std::nullopt, false, {realHome + "/Clients/01:~/p", "~/p:ro"})
+                    .second.startsWith("two volumes are at"));
+        // The same folder at two places is fine.
+        QCOMPARE(create(engine, "c4", std::nullopt, std::nullopt, false, {realHome + "/Clients/01:~/p", realHome + "/Clients/01:~/project"}).second,
+                 QString());
+        QVERIFY(create(engine, "c3", std::nullopt, std::nullopt, false, {realHome + "/.ssh:~/keys"}).second.contains("keys"));
+        QCOMPARE(engine.workboxes.size(), 2);
+        qputenv("HOME", previousHome);
+    }
+
     // The engine's output and error are the job's.
     void createPassesOnTheEngine()
     {
         FakeEngine engine;
         engine.createFailure = QStringLiteral("podman create failed");
-        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, image);
+        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, {}, image);
         job.setAutoDelete(false);
         QStringList output;
         connect(&job, &EngineJob::output, this, [&output](const QString &line) {
@@ -212,7 +241,7 @@ private Q_SLOTS:
     void createOutputToTerminal()
     {
         FakeEngine engine;
-        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, image);
+        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, {}, image);
         job.setAutoDelete(false);
         job.setOutputToTerminal(true);
         QStringList output;
@@ -227,7 +256,7 @@ private Q_SLOTS:
     void createDoesntBlock()
     {
         FakeEngine engine;
-        auto *job = new Commands::CreateJob(engine, "c1", std::nullopt, std::nullopt, false, image);
+        auto *job = new Commands::CreateJob(engine, "c1", std::nullopt, std::nullopt, false, {}, image);
         bool hasFinished = false;
         connect(job, &KJob::result, this, [&hasFinished] {
             hasFinished = true;

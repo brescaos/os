@@ -1,8 +1,11 @@
 #include "commands.h"
 
 #include "color.h"
+#include "volumes.h"
 
 #include <KLocalizedString>
+
+#include <QDir>
 
 #include <algorithm>
 
@@ -14,12 +17,14 @@ CreateJob::CreateJob(Engine &engine,
                      const std::optional<QString> &name,
                      const std::optional<QString> &color,
                      bool hasSudo,
+                     const QStringList &volumes,
                      const QString &image,
                      QObject *parent)
     : EngineJob(parent)
     , m_engine(engine)
     , m_name(name)
     , m_color(color)
+    , m_volumes(volumes)
     , m_image(image)
     , m_workbox{.id = id, .name = name.value_or(id), .hasSudo = hasSudo}
 {
@@ -46,6 +51,22 @@ void CreateJob::start()
                     return;
                 }
                 m_workbox.color = *givenColor;
+            }
+            for (const QString &argument : std::as_const(m_volumes)) {
+                Volume volume;
+                try {
+                    volume = parseVolume(argument, QDir::homePath());
+                } catch (const WorkboxError &error) {
+                    fail(error.message);
+                    return;
+                }
+                if (std::ranges::any_of(m_workbox.volumes, [&volume](const Volume &other) {
+                        return other.target == volume.target;
+                    })) {
+                    fail(i18n("two volumes are at %1", volume.target));
+                    return;
+                }
+                m_workbox.volumes.append(volume);
             }
             ListJob *listJob = m_engine.list();
             runStep(listJob, [this, listJob] {

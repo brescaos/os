@@ -33,9 +33,16 @@ private Q_SLOTS:
         QCOMPARE(isValidId(id), isValid);
     }
 
-    void homeVolumeName()
+    // Ids have no dots: two workboxes' volumes never have the same name.
+    void volumeNames()
     {
-        QCOMPARE(::homeVolumeName("c1"), QStringLiteral("workbox-c1-home"));
+        QCOMPARE(volumeName("c1", homeVolume), QStringLiteral("workbox-c1.home"));
+        QCOMPARE(volumeName("c1", "x-home"), QStringLiteral("workbox-c1.x-home"));
+        QVERIFY(volumeName("c1", "x-home") != volumeName("c1-x", homeVolume));
+        QVERIFY(isValidVolume("cache"));
+        QVERIFY(!isValidVolume(homeVolume));
+        QVERIFY(!isValidVolume("a.b"));
+        QVERIFY(!isValidVolume("-a"));
     }
 
     void labelsKeepNameAndColor()
@@ -51,6 +58,15 @@ private Q_SLOTS:
         QCOMPARE(read.color, workbox.color);
         QVERIFY(!read.hasSudo);
         QVERIFY(!labels.contains("com.brescaos.workbox.sudo"));
+    }
+
+    void labelsKeepShares()
+    {
+        const QList<Volume> volumes{{.source = "/home/u/Clients, 01", .target = "/home/u/project", .isReadOnly = false},
+                                  {.source = "/home/u/.config/gh", .target = "/home/u/.config/gh", .isReadOnly = true}};
+        const Workbox workbox{.id = "c1", .name = "c1", .color = Qt::red, .volumes = volumes};
+        QCOMPARE(workboxFromLabels("c1", labelsOf(workbox)).volumes, volumes);
+        QVERIFY(!labelsOf(Workbox{.id = "c1"}).contains("com.brescaos.workbox.volumes"));
     }
 
     void labelsKeepSudo()

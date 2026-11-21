@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 11:35+0000\n"
+"POT-Creation-Date: 2026-11-21 13:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,6 +82,31 @@ msgid "Stop"
 msgstr ""
 
 #: cli/main.cpp
+msgctxt "an unnamed volume of the workbox's own in workbox info"
+msgid "%1 (its own)"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "a volume in workbox info"
+msgid "%1 (read-only)"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "a volume of the workbox's own in workbox info"
+msgid "%1 → %2 (volume)"
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
+"A volume, as Podman's -v: folder:target shares a folder of your home at "
+"target, a folder of the workbox's home (absolute or ~/…); name:target gives "
+"the workbox a volume of its own with that name, and target alone an unnamed "
+"one, removed with it. Options: ro or rw. Can be given more than once. Not "
+"your whole home, nor a folder with keys or what the host runs at login; in "
+"~/.config and ~/.local, only read-only."
+msgstr ""
+
+#: cli/main.cpp
 msgid ""
 "As the workbox's root, in /root: root only inside it, the user outside it."
 msgstr ""
@@ -97,10 +122,12 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
-"Creates a workbox: a container that shares nothing with the host.\n"
+"Creates a workbox: a container that shares nothing with the host but the "
+"folders given with -v.\n"
 "\n"
 "Example:\n"
-"  workbox create c1 --name \"Client 01\" --color '#3584e4'"
+"  workbox create c1 --name \"Client 01\" --color '#3584e4' -v ~/Clients/01:~/"
+"project"
 msgstr ""
 
 #: cli/main.cpp
@@ -282,6 +309,16 @@ msgid ""
 msgstr ""
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Volumes"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "value of --volume"
+msgid "[folder|name:]target[:options]"
+msgstr ""
+
+#: cli/main.cpp
 msgctxt "value of --color"
 msgid "color"
 msgstr ""
@@ -345,8 +382,90 @@ msgstr ""
 msgid "there's no workbox with the id \"%1\""
 msgstr ""
 
+#: lib/core/commands.cpp
+msgid "two volumes are at %1"
+msgstr ""
+
 #: lib/core/settings.cpp
 msgid "no %1 in %2"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "a volume can't be both ro and rw"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1 to write in it: it holds an app's settings; add :ro"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid ""
+"can't share %1 whole: it holds other apps' settings; share one of its "
+"folders, with :ro"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it holds %2, with keys or what the host runs at login"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it holds keys or what the host runs at login"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it isn't a folder"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it's outside the home folder"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it's the whole home folder"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: its path has a “:” or a “,”"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share at %1: give an absolute path, without “..”"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid ""
+"can't share at %1: it must be a folder in the home folder, not the home "
+"folder itself"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "can't share at %1: its path has a “:” or a “,”"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "invalid volume %1: use [folder|name:]target[:options]"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid ""
+"invalid volume name %1: up to 32 lowercase letters (a-z), digits and "
+"hyphens, not starting with a hyphen, and not home"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid "the volume option %1 isn't supported: only ro and rw"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid ""
+"the volume option U isn't allowed: it would change the owner of the host's "
+"files"
+msgstr ""
+
+#: lib/core/volumes.cpp
+msgid ""
+"the volume option Z isn't allowed: it would take the folder from other "
+"workboxes that share it"
 msgstr ""
 
 #: lib/engines/engines.cpp

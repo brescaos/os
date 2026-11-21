@@ -1,10 +1,11 @@
 # workbox
 
 `workbox` runs rootless Podman containers, each a separate place to work (for
-example one per client), that share nothing with the host: no home folder, no
-SSH agent, no display, no host network. Distrobox does the opposite. Today it
-creates, lists, starts, stops, enters and removes them, from a terminal or
-its tray applet; the options that share something with the host come next.
+example one per client), that share nothing with the host but the folders
+they're given: no home folder, no SSH agent, no display, no host network.
+Distrobox does the opposite. Today it creates, lists, starts, stops, enters
+and removes them, from a terminal or its tray applet; the other options that
+share something with the host come next.
 
 ```bash
 workbox create c1 --name "Cliente 01" --color '#3584e4'
@@ -49,16 +50,19 @@ cmake --install build
 
 ## Commands
 
-- `workbox create <id> [--name <name>] [--color <color>] [--sudo]` creates
-  the container and its home volume, `workbox-<id>-home`, mounted at the
-  same path as the user's home. The image is downloaded the first time.
+- `workbox create <id> [--name <name>] [--color <color>] [--sudo]
+  [-v [<folder>|<name>:]<target>[:<options>]]…` creates the container and
+  its home, the volume `workbox-<id>.home`, mounted at the same path as the
+  user's home. The
+  image is downloaded the first time. `-v` gives it a folder of the
+  user's home, or volumes of its own (see [Volumes](#volumes)).
   Inside, the user is the user outside (keep-id), not root. `--sudo` lets
   them use sudo in it without a password, to install packages with dnf:
   whatever runs in it as the user can then be its root.
 - `workbox list [--quiet]` shows every workbox by id, with its name
   and its status.
 - `workbox info <id>` shows it: id, name, color, status, image, whether
-  it has `--sudo`, and its home volume. In a terminal, the id in its color
+  it has `--sudo`, its home and its volumes. In a terminal, the id in its color
   and the status in green or red, as `list`.
 - `workbox start <id>` and `workbox stop <id>` start and stop it, and say
   so when it already is (not an error). Stopping it stops everything in it.
@@ -67,7 +71,7 @@ cmake --install build
   exit status is the shell's. `--root`, as the workbox's root in `/root`,
   with or without `--sudo`.
 - `workbox rm <id> [--yes]` stops it if it runs and removes it and its
-  home volume, after asking to type its id, unless `--yes`.
+  volumes (its home too), after asking to type its id, unless `--yes`.
 
 The workbox's root is root only inside it: rootless Podman maps it to the
 user outside, so it can change anything of the workbox (its packages, its
@@ -143,6 +147,68 @@ a terminal, another program). Its rows change one by one, so a row asking
 to remove keeps asking while others change. Nothing blocks plasmashell:
 every operation is the engine's job.
 
+### Volumes
+
+`-v`/`--volume [<folder>|<name>:]<target>[:<options>]` works as Podman's
+`-v`, with workbox's rules:
+
+- `-v <folder>:<target>` mounts a folder of the user's home at `target`;
+- `-v <name>:<target>` gives the workbox a volume of its own, Podman's
+  `workbox-<id>.<name>` (created if it's missing): the name is only the
+  workbox's, so a workbox can't reach another's volumes, its home among
+  them, nor other programs'. `[a-z0-9][a-z0-9-]*`, up to 32 characters, and
+  not `home`, its home's;
+- `-v <target>` alone gives the workbox an unnamed one there (Podman's
+  anonymous volume);
+- options, comma-separated: `ro` (read-only) or `rw`; `z` is accepted, as
+  workbox always adds it. Everything else is refused: `Z` would take the
+  folder from other workboxes that share it, `U` would change the owner of
+  the host's files, and the rest aren't needed yet;
+
+`target` is a folder of the workbox's home, absolute or `~/…` (workbox
+expands the `~`, which the shell doesn't after a `:`), never the home
+itself, whose volume it would hide, without `..`, `:` or `,`; two volumes
+can't have the same target, but the same folder can be at two. Several
+workboxes can share the same folder. Only when it's created, for now:
+changing them means creating the container again. A workbox's volumes,
+named or not, its home too, are removed with it. `info` shows
+`<folder> → <target>`, `<name> → <target> (volume)` or `<target> (its own)`:
+
+```bash
+workbox create c1 -v ~/Clients/01:~/project -v ~/.config/gh:~/.config/gh:ro -v cache:~/.cache -v ~/tmp
+```
+
+Every volume of a workbox is `workbox-<id>.<name>`, its home
+`workbox-<id>.home`: ids have no dots, so two workboxes' volumes never have
+the same name.
+
+`lib/core/volumes.h` decides which folders can be shared, at their real path
+(links resolved, so a link can't get round it), and refuses:
+
+- what isn't a folder, and what's outside the home folder;
+- the home folder itself, and any folder that holds a blocked one;
+- keys, `~/.ssh` and `~/.gnupg` (the SSH agent will be the way to use them);
+- what the host runs code from, where a workbox that can write would run
+  code on the host at the next login: `~/.config/autostart`,
+  `~/.config/systemd`, `~/.config/environment.d`,
+  `~/.config/plasma-workspace`, `~/.local/bin`,
+  `~/.local/share/applications`, `~/.local/share/kservices5`,
+  `~/.local/share/kservices6` and `~/.local/share/plasma` (the shell's own
+  files, `~/.bashrc` and the like, are in the home folder itself);
+- `~/.config` and `~/.local` whole (other apps' settings and tokens), and
+  their other folders unless read-only (`~/.config/gh:ro`);
+- paths with `:` or `,`, which Podman's `--volume` can't take.
+
+**SELinux.** A container (`container_t`) can't read the files of a home
+folder (`user_home_t`), so a folder mounted into it stays unreadable unless
+it's relabeled. workbox mounts each one with Podman's `z`, which relabels it
+on the host as `container_file_t`, readable by containers; the host's apps
+use it as before. Not `Z`, which labels a folder for one container only, so
+a second workbox sharing it would take it from the first. Removing a
+workbox doesn't relabel its folders back: `restorecon -R <folder>` does.
+What isn't shared keeps its label, so the workbox can't read it, even if a
+process escapes the container. Without SELinux, `z` does nothing.
+
 ## Settings
 
 `workbox.conf` (KConfig, group `[General]`), on three levels, each key from
@@ -202,16 +268,21 @@ before the first `list()`, so no change between them is missed.
   `com.brescaos.workbox.color` and, with `--sudo`,
   `com.brescaos.workbox.sudo=true`, the only copy of its settings; the
   name's label is how workbox finds its containers.
-- `podman create --userns=keep-id --network=pasta` with its labels and
-  `--volume workbox-<id>-home:$HOME`, running `sleep infinity`: the same uid
-  inside, its own network (outgoing only), nothing of the host shared.
+- `podman create --userns=keep-id --network=pasta` with its labels,
+  `--volume workbox-<id>.home:$HOME`, and per volume `--volume
+  <folder>:<target>:z[,ro]`, `--volume workbox-<id>.<name>:<target>[:ro]`
+  or `--volume <target>[:ro]`, running `sleep infinity`: the same uid inside, so files
+  in shared folders keep their owner, its own network (outgoing only),
+  nothing else of the host. The volumes are a label too,
+  `com.brescaos.workbox.volumes` (JSON).
 - With `--sudo`, `create` starts it, its root writes
   `#<uid> ALL=(ALL) NOPASSWD: ALL` to `/etc/sudoers.d/workbox` (mode 0440)
   and stops it. A file mounted from the host wouldn't be owned by the
   workbox's root, and sudo would refuse it. If that fails, it removes the
   workbox: nothing is left half done.
 - `start` is `podman start`; `stop` is `podman stop --time 0`, and `rm` is
-  `podman rm --force --time 0` then `podman volume rm` (sleep ignores
+  `podman rm --force --time 0 --volumes` (its anonymous volumes too) then
+  `podman volume rm` of its home and its named volumes (sleep ignores
   SIGTERM, so Podman would wait 10 seconds to kill it anyway).
 - `watch` is `podman events --format json --filter type=container --filter
   label=com.brescaos.workbox.name`, running all along: each line it prints
@@ -241,7 +312,8 @@ options aren't translated; Qt's own words in the help (`Usage:`,
 - With `-DBUILD_TESTING=ON`, `ctest` runs its tests (`make check-workbox`
   in this repository), each in `tests/` at its source's path
   (`tests/lib/core/colortest.cpp` tests `lib/core/color.cpp`): the model, the colors and the pick, the terminal's
-  colors and their contrast, the settings, the commands on a fake engine,
+  colors and their contrast, the settings, which folders can be shared
+  (`tests/lib/core/sharestest.cpp`), the commands on a fake engine,
   `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`, and
   the applet's list on it (`tests/applet/`): its rows, following events,
   each operation, its failure and the problem without settings.
@@ -252,6 +324,7 @@ options aren't translated; Qt's own words in the help (`Usage:`,
 - `tests/cli/workbox.bats` checks an installed workbox, for now in this
   repository's image (`tests/Containerfile`, `make test`): its own settings,
   that `create` takes the image the user's settings name over the others,
+  `-v`'s mounts and refusals, `info`,
   `--version`, its translations, its bash completion and the tray applet
   installed, with the fake `podman`.
 

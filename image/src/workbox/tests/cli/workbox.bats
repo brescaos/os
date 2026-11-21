@@ -39,6 +39,21 @@ setup() {
         "$plasmoid/metadata.json"
 }
 
+@test "create -v shares a folder of the home, or gives volumes of its own, and refuses the home" {
+    mkdir -p "$HOME/Clients/01"
+    run workbox create c1 -v "$HOME/Clients/01:$HOME/Clients/01:ro"
+    [[ $status -eq 0 ]]
+    grep -qx "$HOME/Clients/01:$HOME/Clients/01:z,ro" "$FAKE_STATE/calls"
+    run workbox create c3 --volume "$HOME/Clients/01:~/project" -v "$HOME/data" -v cache:~/cache
+    [[ $status -eq 0 ]]
+    grep -qx "$HOME/Clients/01:$HOME/project:z" "$FAKE_STATE/calls"
+    grep -qx "$HOME/data" "$FAKE_STATE/calls"
+    grep -qx "workbox-c3.cache:$HOME/cache" "$FAKE_STATE/calls"
+    run workbox create c2 -v "$HOME:$HOME/x"
+    [[ $status -eq 1 ]]
+    [[ $output == *"it's the whole home folder"* ]]
+}
+
 @test "info shows a workbox's settings" {
     printf '%s' '[{"Names": ["c1"], "State": "running", "Image": "example.org/image:1", "Labels": {"com.brescaos.workbox.name": "Cliente 01", "com.brescaos.workbox.color": "#3584e4", "com.brescaos.workbox.sudo": "true"}}]' \
         >"$FAKE_STATE/ps.json"
@@ -49,7 +64,7 @@ setup() {
     [[ $output == *"Status:  running"* ]]
     [[ $output == *"Image:   example.org/image:1"* ]]
     [[ $output == *"Sudo:    yes"* ]]
-    [[ $output == *"Home:    workbox-c1-home"* ]]
+    [[ $output == *"Home:    workbox-c1.home"* ]]
 }
 
 @test "workbox --version is VERSION.txt's" {

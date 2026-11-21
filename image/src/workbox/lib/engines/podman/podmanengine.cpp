@@ -39,10 +39,19 @@ QStringList stopCommand(const QString &id)
     return {QStringLiteral("stop"), QStringLiteral("--time"), QStringLiteral("0"), id};
 }
 
-QList<QStringList> removeCommands(const QString &id)
+QList<QStringList> removeCommands(const Workbox &workbox)
 {
-    return {{QStringLiteral("rm"), QStringLiteral("--force"), QStringLiteral("--time"), QStringLiteral("0"), id},
-            {QStringLiteral("volume"), QStringLiteral("rm"), homeVolumeName(id)}};
+    // --volumes: its anonymous volumes go with it; then its home and its
+    // named ones.
+    QList<QStringList> commands{{QStringLiteral("rm"), QStringLiteral("--force"), QStringLiteral("--time"), QStringLiteral("0"), QStringLiteral("--volumes"), workbox.id}};
+    QStringList volumes{QStringLiteral("volume"), QStringLiteral("rm"), volumeName(workbox.id, homeVolume)};
+    for (const Volume &volume : workbox.volumes) {
+        if (!volume.name.isEmpty()) {
+            volumes << volumeName(workbox.id, volume.name);
+        }
+    }
+    commands.append(volumes);
+    return commands;
 }
 
 }
@@ -83,7 +92,20 @@ EngineJob *PodmanEngine::create(const Workbox &workbox, const QString &image)
                           QStringLiteral("--userns=keep-id"),
                           QStringLiteral("--network=pasta"),
                           QStringLiteral("--volume"),
-                          homeVolumeName(workbox.id) + QLatin1Char(':') + QDir::homePath()};
+                          volumeName(workbox.id, homeVolume) + QLatin1Char(':') + QDir::homePath()};
+    // z: SELinux labels a shared folder so containers can read it, and so can
+    // every workbox that shares it (Z would give it to one). Its volumes,
+    // named or not, Podman labels itself, and creates if they're missing.
+    for (const Volume &volume : workbox.volumes) {
+        QString argument;
+        if (!volume.source.isEmpty()) {
+            argument = volume.source + QLatin1Char(':') + volume.target + (volume.isReadOnly ? QStringLiteral(":z,ro") : QStringLiteral(":z"));
+        } else {
+            argument = (volume.name.isEmpty() ? QString() : volumeName(workbox.id, volume.name) + QLatin1Char(':')) + volume.target
+                + (volume.isReadOnly ? QStringLiteral(":ro") : QString());
+        }
+        arguments << QStringLiteral("--volume") << argument;
+    }
     const QMap<QString, QString> labels = labelsOf(workbox);
     for (auto label = labels.begin(); label != labels.end(); ++label) {
         arguments << QStringLiteral("--label") << label.key() + QLatin1Char('=') + label.value();
@@ -110,7 +132,7 @@ EngineJob *PodmanEngine::create(const Workbox &workbox, const QString &image)
                                 QStringLiteral("sh"),
                                 QStringLiteral("#%1 ALL=(ALL) NOPASSWD: ALL").arg(getuid())},
                                stopCommand(workbox.id)});
-    job->setCleanupCommands(removeCommands(workbox.id));
+    job->setCleanupCommands(removeCommands(workbox));
     return job;
 }
 
@@ -124,9 +146,9 @@ EngineJob *PodmanEngine::stop(const QString &id)
     return new PodmanJob({stopCommand(id)});
 }
 
-EngineJob *PodmanEngine::remove(const QString &id)
+EngineJob *PodmanEngine::remove(const Workbox &workbox)
 {
-    return new PodmanJob(removeCommands(id));
+    return new PodmanJob(removeCommands(workbox));
 }
 
 EnterJob *PodmanEngine::enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot)

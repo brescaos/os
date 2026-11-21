@@ -12,6 +12,6 @@ public:
     EngineJob *create(const Workbox &workbox, const QString &image) override;
     EngineJob *start(const QString &id) override;
     EngineJob *stop(const QString &id) override;
-    EngineJob *remove(const QString &id) override;
+    EngineJob *remove(const Workbox &workbox) override;
     EnterJob *enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot) override;
 };

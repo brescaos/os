@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 11:35+0000\n"
+"POT-Creation-Date: 2026-11-21 13:20+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -83,6 +83,31 @@ msgid "Stop"
 msgstr "Atura"
 
 #: cli/main.cpp
+msgctxt "an unnamed volume of the workbox's own in workbox info"
+msgid "%1 (its own)"
+msgstr "%1 (propi)"
+
+#: cli/main.cpp
+msgctxt "a volume in workbox info"
+msgid "%1 (read-only)"
+msgstr "%1 (només lectura)"
+
+#: cli/main.cpp
+msgctxt "a volume of the workbox's own in workbox info"
+msgid "%1 → %2 (volume)"
+msgstr "%1 → %2 (volum)"
+
+#: cli/main.cpp
+msgid ""
+"A volume, as Podman's -v: folder:target shares a folder of your home at "
+"target, a folder of the workbox's home (absolute or ~/…); name:target gives "
+"the workbox a volume of its own with that name, and target alone an unnamed "
+"one, removed with it. Options: ro or rw. Can be given more than once. Not "
+"your whole home, nor a folder with keys or what the host runs at login; in "
+"~/.config and ~/.local, only read-only."
+msgstr "Un volum, com el -v de Podman: carpeta:destí comparteix una carpeta de la teva carpeta personal a destí, una carpeta de la carpeta personal del workbox (absolut o ~/…); nom:destí dona al workbox un volum propi amb aquest nom, i destí sol, un sense nom; s'eliminen amb ell. Opcions: ro o rw. Es pot indicar més d'una vegada. No la teva carpeta personal sencera, ni una carpeta amb claus o amb el que el sistema executa en iniciar la sessió; a ~/.config i ~/.local, només de lectura."
+
+#: cli/main.cpp
 msgid ""
 "As the workbox's root, in /root: root only inside it, the user outside it."
 msgstr "Com el root del workbox, a /root: root només a dins; a fora, l'usuari."
@@ -98,15 +123,19 @@ msgstr "S'ha creat el workbox %1 («%2»)."
 
 #: cli/main.cpp
 msgid ""
-"Creates a workbox: a container that shares nothing with the host.\n"
+"Creates a workbox: a container that shares nothing with the host but the "
+"folders given with -v.\n"
 "\n"
 "Example:\n"
-"  workbox create c1 --name \"Client 01\" --color '#3584e4'"
+"  workbox create c1 --name \"Client 01\" --color '#3584e4' -v ~/Clients/01:~/"
+"project"
 msgstr ""
-"Crea un workbox: un contenidor que no comparteix res amb el sistema.\n"
+"Crea un workbox: un contenidor que no comparteix res amb el sistema tret de "
+"les carpetes indicades amb -v.\n"
 "\n"
 "Exemple:\n"
-"  workbox create c1 --name \"Client 01\" --color '#3584e4'"
+"  workbox create c1 --name \"Client 01\" --color '#3584e4' -v ~/Clients/01:~/"
+"projecte"
 
 #: cli/main.cpp
 msgid "Don't ask before removing it."
@@ -237,7 +266,11 @@ msgid ""
 "\n"
 "Example:\n"
 "  workbox info c1"
-msgstr "Mostra un workbox: el seu nom, color, estat, imatge i ajustos.\n\nExemple:\n  workbox info c1"
+msgstr ""
+"Mostra un workbox: el seu nom, color, estat, imatge i ajustos.\n"
+"\n"
+"Exemple:\n"
+"  workbox info c1"
 
 #: cli/main.cpp
 msgid "Started the workbox %1."
@@ -315,7 +348,33 @@ msgid ""
 "\n"
 "\"workbox <command> --help\" shows a command's options; \"workbox --"
 "version\", its version."
-msgstr "Ús: workbox <ordre> [opcions]\n\nExecuta contenidors, cadascun un lloc de treball a part, que no comparteixen res amb el sistema.\n\nOrdres:\n  create  Crea un workbox\n  list    Llista els workboxes\n  info    Mostra un workbox\n  start   Engega un workbox\n  stop    Atura un workbox\n  enter   Obre un shell en un workbox\n  rm      Elimina un workbox i la seva carpeta personal\n\n«workbox <ordre> --help» mostra les opcions d'una ordre; «workbox --version», la seva versió."
+msgstr ""
+"Ús: workbox <ordre> [opcions]\n"
+"\n"
+"Executa contenidors, cadascun un lloc de treball a part, que no comparteixen "
+"res amb el sistema.\n"
+"\n"
+"Ordres:\n"
+"  create  Crea un workbox\n"
+"  list    Llista els workboxes\n"
+"  info    Mostra un workbox\n"
+"  start   Engega un workbox\n"
+"  stop    Atura un workbox\n"
+"  enter   Obre un shell en un workbox\n"
+"  rm      Elimina un workbox i la seva carpeta personal\n"
+"\n"
+"«workbox <ordre> --help» mostra les opcions d'una ordre; «workbox --"
+"version», la seva versió."
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Volumes"
+msgstr "Volums"
+
+#: cli/main.cpp
+msgctxt "value of --volume"
+msgid "[folder|name:]target[:options]"
+msgstr "[carpeta|nom:]destí[:opcions]"
 
 #: cli/main.cpp
 msgctxt "value of --color"
@@ -384,9 +443,105 @@ msgstr "el nom no pot estar buit"
 msgid "there's no workbox with the id \"%1\""
 msgstr "no hi ha cap workbox amb l'id «%1»"
 
+#: lib/core/commands.cpp
+msgid "two volumes are at %1"
+msgstr "hi ha dos volums a %1"
+
 #: lib/core/settings.cpp
 msgid "no %1 in %2"
 msgstr "no hi ha %1 a %2"
+
+#: lib/core/volumes.cpp
+msgid "a volume can't be both ro and rw"
+msgstr "un volum no pot ser ro i rw alhora"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1 to write in it: it holds an app's settings; add :ro"
+msgstr ""
+"no es pot compartir %1 per escriure-hi: conté els ajustos d'una aplicació; "
+"afegeix :ro"
+
+#: lib/core/volumes.cpp
+msgid ""
+"can't share %1 whole: it holds other apps' settings; share one of its "
+"folders, with :ro"
+msgstr ""
+"no es pot compartir %1 sencera: conté els ajustos d'altres aplicacions; "
+"comparteix una de les seves carpetes, amb :ro"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it holds %2, with keys or what the host runs at login"
+msgstr ""
+"no es pot compartir %1: conté %2, amb claus o el que el sistema executa en "
+"iniciar la sessió"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it holds keys or what the host runs at login"
+msgstr ""
+"no es pot compartir %1: conté claus o el que el sistema executa en iniciar "
+"la sessió"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it isn't a folder"
+msgstr "no es pot compartir %1: no és una carpeta"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it's outside the home folder"
+msgstr "no es pot compartir %1: és fora de la carpeta personal"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: it's the whole home folder"
+msgstr "no es pot compartir %1: és la carpeta personal sencera"
+
+#: lib/core/volumes.cpp
+msgid "can't share %1: its path has a “:” or a “,”"
+msgstr "no es pot compartir %1: la seva ruta té «:» o «,»"
+
+#: lib/core/volumes.cpp
+msgid "can't share at %1: give an absolute path, without “..”"
+msgstr "no es pot compartir a %1: indica un camí absolut, sense «..»"
+
+#: lib/core/volumes.cpp
+msgid ""
+"can't share at %1: it must be a folder in the home folder, not the home "
+"folder itself"
+msgstr ""
+"no es pot compartir a %1: ha de ser una carpeta dins de la carpeta personal, "
+"no la carpeta personal mateixa"
+
+#: lib/core/volumes.cpp
+msgid "can't share at %1: its path has a “:” or a “,”"
+msgstr "no es pot compartir a %1: el seu camí té «:» o «,»"
+
+#: lib/core/volumes.cpp
+msgid "invalid volume %1: use [folder|name:]target[:options]"
+msgstr "volum %1 no vàlid: fes servir [carpeta|nom:]destí[:opcions]"
+
+#: lib/core/volumes.cpp
+msgid ""
+"invalid volume name %1: up to 32 lowercase letters (a-z), digits and "
+"hyphens, not starting with a hyphen, and not home"
+msgstr "nom de volum %1 no vàlid: fins a 32 lletres minúscules (a-z), dígits i guions, sense començar per un guió, i que no sigui home"
+
+#: lib/core/volumes.cpp
+msgid "the volume option %1 isn't supported: only ro and rw"
+msgstr "l'opció de volum %1 no s'admet: només ro i rw"
+
+#: lib/core/volumes.cpp
+msgid ""
+"the volume option U isn't allowed: it would change the owner of the host's "
+"files"
+msgstr ""
+"l'opció de volum U no es permet: canviaria el propietari dels fitxers del "
+"sistema"
+
+#: lib/core/volumes.cpp
+msgid ""
+"the volume option Z isn't allowed: it would take the folder from other "
+"workboxes that share it"
+msgstr ""
+"l'opció de volum Z no es permet: trauria la carpeta a altres workboxes que "
+"la comparteixen"
 
 #: lib/engines/engines.cpp
 msgid "unknown engine \"%1\" in workbox.conf: only podman"

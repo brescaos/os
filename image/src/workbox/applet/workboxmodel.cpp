@@ -100,8 +100,9 @@ void WorkboxModel::stop(const QString &id)
 
 void WorkboxModel::remove(const QString &id)
 {
-    if (m_engine) {
-        beginOperation(id, Operation::Removing, m_engine->remove(id));
+    const int row = rowOf(id);
+    if (m_engine && row >= 0) {
+        beginOperation(id, Operation::Removing, m_engine->remove(m_rows[row].workbox));
     }
 }
 

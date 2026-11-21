@@ -110,7 +110,7 @@ private Q_SLOTS:
                                       "--userns=keep-id",
                                       "--network=pasta",
                                       "--volume",
-                                      "workbox-c1-home:" + QDir::homePath(),
+                                      "workbox-c1.home:" + QDir::homePath(),
                                       "--label",
                                       "com.brescaos.workbox.color=#3584e4",
                                       "--label",
@@ -118,6 +118,20 @@ private Q_SLOTS:
                                       "registry.fedoraproject.org/fedora-toolbox:44",
                                       "sleep",
                                       "infinity"}}));
+    }
+
+    // At their targets, labeled for every container (z), read-only or not.
+    void createWithVolumes()
+    {
+        const QList<Volume> volumes{{.source = "/home/u/Clients/01", .target = "/home/u/project", .isReadOnly = false},
+                                  {.source = "/home/u/.config/gh", .target = "/home/u/.config/gh", .isReadOnly = true},
+                                  {.source = "", .target = "/home/u/data", .isReadOnly = false},
+                                  {.source = "", .name = "cache", .target = "/home/u/cache", .isReadOnly = true}};
+        QCOMPARE(run(PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .volumes = volumes}, "image")), QString());
+        const QStringList arguments = calls().first();
+        QVERIFY(arguments.join(' ').contains(
+            "--volume /home/u/Clients/01:/home/u/project:z --volume /home/u/.config/gh:/home/u/.config/gh:z,ro --volume /home/u/data "
+            "--volume workbox-c1.cache:/home/u/cache:ro "));
     }
 
     void startAndStop()
@@ -178,7 +192,7 @@ private Q_SLOTS:
         QVERIFY(run(PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image")).startsWith("podman exec"));
         const QList<QStringList> podmanCalls = calls();
         QCOMPARE(podmanCalls.mid(podmanCalls.size() - 2),
-                 (QList<QStringList>{{"rm", "--force", "--time", "0", "c1"}, {"volume", "rm", "workbox-c1-home"}}));
+                 (QList<QStringList>{{"rm", "--force", "--time", "0", "--volumes", "c1"}, {"volume", "rm", "workbox-c1.home"}}));
     }
 
     // When creating it fails, nothing is cleaned up: what has that name
@@ -191,16 +205,24 @@ private Q_SLOTS:
         QCOMPARE(calls().size(), 1);
     }
 
+    // Its named volumes go too; the anonymous ones, with --volumes.
+    void removeRemovesItsVolumes()
+    {
+        QCOMPARE(run(PodmanEngine().remove({.id = "c1", .volumes = {{.name = "cache", .target = "/home/u/cache"}, {.target = "/home/u/data"}}})),
+                 QString());
+        QCOMPARE(calls().last(), (QStringList{"volume", "rm", "workbox-c1.home", "workbox-c1.cache"}));
+    }
+
     void removeRemovesTheContainerAndItsHome()
     {
-        QCOMPARE(run(PodmanEngine().remove("c1")), QString());
-        QCOMPARE(calls(), (QList<QStringList>{{"rm", "--force", "--time", "0", "c1"}, {"volume", "rm", "workbox-c1-home"}}));
+        QCOMPARE(run(PodmanEngine().remove({.id = "c1"})), QString());
+        QCOMPARE(calls(), (QList<QStringList>{{"rm", "--force", "--time", "0", "--volumes", "c1"}, {"volume", "rm", "workbox-c1.home"}}));
     }
 
     void failureIsTheJobsError()
     {
         writeState("fail", "rm\n");
-        QCOMPARE(run(PodmanEngine().remove("c1")), QStringLiteral("podman rm --force --time 0 c1 failed"));
+        QCOMPARE(run(PodmanEngine().remove({.id = "c1"})), QStringLiteral("podman rm --force --time 0 --volumes c1 failed"));
         // The home stays when the container couldn't be removed.
         QCOMPARE(calls().size(), 1);
     }

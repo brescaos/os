@@ -41,6 +41,7 @@ add_library(workbox-core STATIC
             lib/core/commands.cpp
             lib/core/enginejob.h
             lib/core/settings.cpp
+            lib/core/volumes.cpp
             lib/core/terminalcolors.cpp
             lib/core/workbox.cpp)
 target_include_directories(workbox-core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/core)

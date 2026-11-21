@@ -105,10 +105,10 @@ int create(const QStringList &arguments)
 {
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        i18n("Creates a workbox: a container that shares nothing with the host.\n"
+        i18n("Creates a workbox: a container that shares nothing with the host but the folders given with -v.\n"
              "\n"
              "Example:\n"
-             "  workbox create c1 --name \"Client 01\" --color '#3584e4'"));
+             "  workbox create c1 --name \"Client 01\" --color '#3584e4' -v ~/Clients/01:~/project"));
     const QCommandLineOption nameOption(QStringLiteral("name"), i18n("The name it's shown with (default: its id)."), i18nc("value of --name", "name"));
     const QCommandLineOption colorOption(QStringLiteral("color"),
                                          i18n("Its color: #rgb, #rrggbb or r,g,b, each 0-255 (default: the palette's color "
@@ -116,7 +116,15 @@ int create(const QStringList &arguments)
                                          i18nc("value of --color", "color"));
     const QCommandLineOption sudoOption(QStringLiteral("sudo"),
                                         i18n("Let the user use sudo in it, without a password: whatever runs in it can then be its root."));
-    parser.addOptions({nameOption, colorOption, sudoOption});
+    const QCommandLineOption volumeOption({QStringLiteral("v"), QStringLiteral("volume")},
+                                          i18n("A volume, as Podman's -v: folder:target shares a folder of your home at target, "
+                                               "a folder of the workbox's home (absolute or ~/…); name:target gives the workbox a "
+                                               "volume of its own with that name, and target alone an unnamed one, removed with it. "
+                                               "Options: ro or rw. Can be given more than once. Not your whole home, nor a folder "
+                                               "with keys or what the host runs at login; in ~/.config and ~/.local, only "
+                                               "read-only."),
+                                          i18nc("value of --volume", "[folder|name:]target[:options]"));
+    parser.addOptions({nameOption, colorOption, sudoOption, volumeOption});
     const QString id = parseId(parser, QStringLiteral("create"), arguments);
     const auto optionValue = [&parser](const QCommandLineOption &option) {
         return parser.isSet(option) ? std::optional(parser.value(option)) : std::nullopt;
@@ -125,7 +133,13 @@ int create(const QStringList &arguments)
     const Settings settings = readConfiguredSettings();
     const std::unique_ptr<Engine> engine = engineFor(settings);
     const Workbox workbox =
-        runToEnd(new Commands::CreateJob(*engine, id, optionValue(nameOption), optionValue(colorOption), parser.isSet(sudoOption), settings.image))
+        runToEnd(new Commands::CreateJob(*engine,
+                                         id,
+                                         optionValue(nameOption),
+                                         optionValue(colorOption),
+                                         parser.isSet(sudoOption),
+                                         parser.values(volumeOption),
+                                         settings.image))
             ->workbox();
     printLine(stdout, i18n("Created the workbox %1 (\"%2\").", workbox.id, workbox.name));
     return 0;
@@ -160,7 +174,7 @@ int remove(const QStringList &arguments)
         printLine(stdout, i18n("Nothing removed."));
         return 1;
     }
-    runToEnd(engine->remove(id));
+    runToEnd(engine->remove(workbox));
     printLine(stdout, i18n("Removed the workbox %1.", id));
     return 0;
 }
@@ -310,21 +324,32 @@ int info(const QStringList &arguments)
     const QString id = parseId(parser, QStringLiteral("info"), arguments);
     const Workbox workbox = Commands::find(listWorkboxes(*engineFor(readConfiguredSettings())), id);
 
-    const QList<std::pair<QString, QString>> fields{
+    QList<std::pair<QString, QString>> fields{
         {i18nc("field of workbox info", "ID"), paintedId(workbox)},
         {i18nc("field of workbox info", "Name"), workbox.name},
         {i18nc("field of workbox info", "Color"), workbox.color.name()},
         {i18nc("field of workbox info", "Status"), paintedStatus(workbox)},
         {i18nc("field of workbox info", "Image"), workbox.image},
         {i18nc("field of workbox info", "Sudo"), workbox.hasSudo ? i18nc("sudo in workbox info", "yes") : i18nc("sudo in workbox info", "no")},
-        {i18nc("field of workbox info", "Home"), homeVolumeName(workbox.id)},
+        {i18nc("field of workbox info", "Home"), volumeName(workbox.id, homeVolume)},
     };
+    // One line per volume, the first with the label.
+    for (qsizetype index = 0; index < workbox.volumes.size(); ++index) {
+        const Volume &volume = workbox.volumes[index];
+        const QString folders = !volume.name.isEmpty()
+            ? i18nc("a volume of the workbox's own in workbox info", "%1 → %2 (volume)", volume.name, volume.target)
+            : volume.source.isEmpty()       ? i18nc("an unnamed volume of the workbox's own in workbox info", "%1 (its own)", volume.target)
+            : volume.target == volume.source ? volume.source
+                                           : volume.source + QStringLiteral(" → ") + volume.target;
+        fields.append({index == 0 ? i18nc("field of workbox info", "Volumes") : QString(),
+                       volume.isReadOnly ? i18nc("a volume in workbox info", "%1 (read-only)", folders) : folders});
+    }
     qsizetype labelWidth = 0;
     for (const auto &[label, value] : fields) {
         labelWidth = std::max(labelWidth, label.size() + 1);
     }
     for (const auto &[label, value] : fields) {
-        printLine(stdout, (label + QLatin1Char(':')).leftJustified(labelWidth) + QStringLiteral("  ") + value);
+        printLine(stdout, (label.isEmpty() ? QString() : label + QLatin1Char(':')).leftJustified(labelWidth) + QStringLiteral("  ") + value);
     }
     return 0;
 }

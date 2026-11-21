@@ -10,8 +10,10 @@ _comp_cmd_workbox() {
 
     if ((cword == 1)); then
         _comp_compgen -- -W 'create list info start stop enter rm --help'
+    elif [[ ${words[1]} == create && $prev == @(-v|--volume) ]]; then
+        _comp_compgen_filedir -d
     elif [[ ${words[1]} == create && $cur == -* ]]; then
-        _comp_compgen -- -W '--name --color --sudo --help'
+        _comp_compgen -- -W '--name --color --sudo --volume --help'
     elif [[ ${words[1]} == list && $cur == -* ]]; then
         _comp_compgen -- -W '--quiet --help'
     elif [[ ${words[1]} == rm && $cur == -* ]]; then

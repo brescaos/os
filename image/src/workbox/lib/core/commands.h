@@ -13,8 +13,10 @@ namespace Commands
 // Creates the workbox id from image: lists the workboxes, then creates it.
 // Without a name, its name is its id; without a color (#rgb, #rrggbb or
 // r,g,b), the palette's farthest from the others'. With hasSudo, the user can
-// use sudo in it. Fails without creating anything when an argument is wrong
-// or the id is taken. Its output() is the engine's.
+// use sudo in it. volumes are -v's, "[folder|name:]target[:options]"
+// (volumes.h).
+// Fails without creating anything when an argument is wrong or the id is
+// taken. Its output() is the engine's.
 class CreateJob : public EngineJob
 {
     Q_OBJECT
@@ -25,6 +27,7 @@ public:
               const std::optional<QString> &name,
               const std::optional<QString> &color,
               bool hasSudo,
+              const QStringList &volumes,
               const QString &image,
               QObject *parent = nullptr);
 
@@ -48,6 +51,7 @@ private:
     Engine &m_engine;
     std::optional<QString> m_name;
     std::optional<QString> m_color;
+    QStringList m_volumes;
     QString m_image;
     Workbox m_workbox;
     EngineJob *m_step = nullptr;

@@ -28,8 +28,9 @@ public:
 
     virtual EngineJob *stop(const QString &id) = 0;
 
-    // Stops the workbox if it runs, and removes it and its home volume.
-    virtual EngineJob *remove(const QString &id) = 0;
+    // Stops the workbox if it runs, and removes it and its volumes: its home,
+    // its named ones and its anonymous ones.
+    virtual EngineJob *remove(const Workbox &workbox) = 0;
 
     // Runs a login shell in the running workbox, as the user in their home
     // or, with asRoot, as root in /root, on this process's terminal (its
