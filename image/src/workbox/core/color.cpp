@@ -45,16 +45,27 @@ Oklab oklabFromColor(const QColor &color)
             .b = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s};
 }
 
-QColor colorFromOklch(double lightness, double chroma, double hueDegrees)
+struct LinearRgb {
+    double red;
+    double green;
+    double blue;
+
+    bool isInSrgb() const
+    {
+        return std::min({red, green, blue}) >= 0 && std::max({red, green, blue}) <= 1;
+    }
+};
+
+LinearRgb linearRgbFromOklch(double lightness, double chroma, double hueDegrees)
 {
     const double a = chroma * std::cos(hueDegrees * std::numbers::pi / 180);
     const double b = chroma * std::sin(hueDegrees * std::numbers::pi / 180);
     const double l = std::pow(lightness + 0.3963377774 * a + 0.2158037573 * b, 3);
     const double m = std::pow(lightness - 0.1055613458 * a - 0.0638541728 * b, 3);
     const double s = std::pow(lightness - 0.0894841775 * a - 1.2914855480 * b, 3);
-    return QColor::fromRgbF(srgbFromLinear(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
-                            srgbFromLinear(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
-                            srgbFromLinear(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s));
+    return {.red = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+            .green = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+            .blue = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s};
 }
 
 }
@@ -86,9 +97,32 @@ QList<QColor> palette()
 {
     QList<QColor> colors;
     for (int index = 0; index < paletteSize; ++index) {
-        colors.append(colorFromOklch(paletteLightness, paletteChroma, index * 360.0 / paletteSize));
+        colors.append(fromOklch(paletteLightness, paletteChroma, index * 360.0 / paletteSize));
     }
     return colors;
+}
+
+QColor fromOklch(double lightness, double maximumChroma, double hueDegrees)
+{
+    LinearRgb rgb = linearRgbFromOklch(lightness, maximumChroma, hueDegrees);
+    if (!rgb.isInSrgb()) {
+        // The most chroma sRGB has for that lightness and hue, by bisection.
+        double inSrgb = 0;
+        double outOfSrgb = maximumChroma;
+        for (int step = 0; step < 32; ++step) {
+            const double chroma = (inSrgb + outOfSrgb) / 2;
+            (linearRgbFromOklch(lightness, chroma, hueDegrees).isInSrgb() ? inSrgb : outOfSrgb) = chroma;
+        }
+        rgb = linearRgbFromOklch(lightness, inSrgb, hueDegrees);
+    }
+    return QColor::fromRgbF(srgbFromLinear(rgb.red), srgbFromLinear(rgb.green), srgbFromLinear(rgb.blue));
+}
+
+double oklchHue(const QColor &color)
+{
+    const Oklab oklab = oklabFromColor(color);
+    const double hueDegrees = std::atan2(oklab.b, oklab.a) * 180 / std::numbers::pi;
+    return hueDegrees < 0 ? hueDegrees + 360 : hueDegrees;
 }
 
 double distance(const QColor &first, const QColor &second)

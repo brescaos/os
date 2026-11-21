@@ -5,6 +5,8 @@
 #include <QTemporaryDir>
 #include <QTest>
 
+#include <unistd.h>
+
 class PodmanEngineTest : public QObject
 {
     Q_OBJECT
@@ -41,7 +43,7 @@ private Q_SLOTS:
 
     void init()
     {
-        for (const QString &name : {"calls", "ps.json", "fail"}) {
+        for (const QString &name : {"calls", "ps.json", "fail", "exec-status"}) {
             QFile::remove(state.filePath(name));
         }
     }
@@ -90,6 +92,56 @@ private Q_SLOTS:
         engine.start("c1");
         engine.stop("c1");
         QCOMPARE(calls(), (QList<QStringList>{{"start", "c1"}, {"stop", "--time", "0", "c1"}}));
+    }
+
+    // The shell's status is enter's, whatever it is.
+    void enter()
+    {
+        writeState("exec-status", "3");
+        QCOMPARE(PodmanEngine().enter("c1", {{"WORKBOX_NAME", "Cliente 01"}}, false), 3);
+        QCOMPARE(calls(),
+                 (QList<QStringList>{{"exec",
+                                      "--interactive",
+                                      "--workdir",
+                                      QDir::homePath(),
+                                      "--env",
+                                      "TERM",
+                                      "--env",
+                                      "WORKBOX_NAME=Cliente 01",
+                                      "c1",
+                                      "bash",
+                                      "--login"}}));
+    }
+
+    void enterAsRoot()
+    {
+        PodmanEngine().enter("c1", {}, true);
+        QCOMPARE(calls(),
+                 (QList<QStringList>{{"exec", "--interactive", "--user", "root", "--workdir", "/root", "--env", "TERM", "c1", "bash", "--login"}}));
+    }
+
+    // Its root writes the rule, by the user's uid, and it's left stopped.
+    void createWithSudo()
+    {
+        PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image");
+        const QList<QStringList> podmanCalls = calls();
+        QCOMPARE(podmanCalls.size(), 4);
+        QCOMPARE(podmanCalls[0].first(), QStringLiteral("create"));
+        QVERIFY(podmanCalls[0].contains("com.brescaos.workbox.sudo=true"));
+        QCOMPARE(podmanCalls[1], (QStringList{"start", "c1"}));
+        QCOMPARE(podmanCalls[2].mid(0, 4), (QStringList{"exec", "--user", "root", "c1"}));
+        QCOMPARE(podmanCalls[2].last(), QStringLiteral("#%1 ALL=(ALL) NOPASSWD: ALL").arg(getuid()));
+        QCOMPARE(podmanCalls[3], (QStringList{"stop", "--time", "0", "c1"}));
+    }
+
+    // Nothing of it is left when sudo's rule can't be written.
+    void createWithSudoFailing()
+    {
+        writeState("fail", "exec\n");
+        QVERIFY_THROWS_EXCEPTION(WorkboxError, PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image"));
+        const QList<QStringList> podmanCalls = calls();
+        QCOMPARE(podmanCalls.mid(podmanCalls.size() - 2),
+                 (QList<QStringList>{{"rm", "--force", "--time", "0", "c1"}, {"volume", "rm", "workbox-c1-home"}}));
     }
 
     void removeRemovesTheContainerAndItsHome()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:29+0000\n"
+"POT-Creation-Date: 2026-11-21 08:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,12 @@ msgstr ""
 #: cli/main.cpp
 msgctxt "value of --color"
 msgid "color"
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
+"Let the user use sudo in it, without a password: whatever runs in it can "
+"then be its root."
 msgstr ""
 
 #: cli/main.cpp
@@ -127,6 +133,21 @@ msgstr ""
 
 #: cli/main.cpp
 msgid ""
+"Opens a shell in a workbox, starting it first if it's stopped. In a "
+"terminal, the background takes the workbox's hue, and the prompt shows its "
+"name.\n"
+"\n"
+"Example:\n"
+"  workbox enter c1"
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
+"As the workbox's root, in /root: root only inside it, the user outside it."
+msgstr ""
+
+#: cli/main.cpp
+msgid ""
 "Lists the workboxes.\n"
 "\n"
 "Example:\n"
@@ -182,6 +203,7 @@ msgid ""
 "  list    List the workboxes\n"
 "  start   Start a workbox\n"
 "  stop    Stop a workbox\n"
+"  enter   Open a shell in a workbox\n"
 "  rm      Remove a workbox and its home\n"
 "\n"
 "\"workbox <command> --help\" shows a command's options."

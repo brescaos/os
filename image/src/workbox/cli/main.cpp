@@ -3,12 +3,14 @@
 #include "commands.h"
 #include "podmanengine.h"
 #include "settings.h"
+#include "terminalcolors.h"
 
 #include <KLocalizedString>
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QLibraryInfo>
+#include <QScopeGuard>
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QTranslator>
@@ -69,14 +71,17 @@ int create(const QStringList &arguments)
                                          i18n("Its color: #rgb, #rrggbb or r,g,b, each 0-255 (default: the palette's color "
                                               "that looks the most different from the other workboxes')."),
                                          i18nc("value of --color", "color"));
-    parser.addOptions({nameOption, colorOption});
+    const QCommandLineOption sudoOption(QStringLiteral("sudo"),
+                                        i18n("Let the user use sudo in it, without a password: whatever runs in it can then be its root."));
+    parser.addOptions({nameOption, colorOption, sudoOption});
     const QString id = parseId(parser, QStringLiteral("create"), arguments);
     const auto optionValue = [&parser](const QCommandLineOption &option) {
         return parser.isSet(option) ? std::optional(parser.value(option)) : std::nullopt;
     };
 
     const Settings settings = readConfiguredSettings();
-    const Workbox workbox = Commands::create(*engineFor(settings), id, optionValue(nameOption), optionValue(colorOption), settings.image);
+    const Workbox workbox =
+        Commands::create(*engineFor(settings), id, optionValue(nameOption), optionValue(colorOption), parser.isSet(sudoOption), settings.image);
     printLine(stdout, i18n("Created the workbox %1 (\"%2\").", workbox.id, workbox.name));
     return 0;
 }
@@ -151,6 +156,50 @@ int stop(const QStringList &arguments)
     engine->stop(id);
     printLine(stdout, i18n("Stopped the workbox %1.", id));
     return 0;
+}
+
+int enter(const QStringList &arguments)
+{
+    QCommandLineParser parser;
+    parser.setApplicationDescription(
+        i18n("Opens a shell in a workbox, starting it first if it's stopped. In a terminal, the background "
+             "takes the workbox's hue, and the prompt shows its name.\n"
+             "\n"
+             "Example:\n"
+             "  workbox enter c1"));
+    const QCommandLineOption rootOption(QStringLiteral("root"),
+                                        i18n("As the workbox's root, in /root: root only inside it, the user outside it."));
+    parser.addOption(rootOption);
+    const QString id = parseId(parser, QStringLiteral("enter"), arguments);
+
+    const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
+    const Workbox workbox = Commands::find(*engine, id);
+    if (!workbox.isRunning) {
+        engine->start(id);
+    }
+
+    // The terminal's background and text (OSC 11 and 10) while the shell
+    // runs, and its profile's back after it (OSC 111 and 110; Konsole ignores
+    // them without the ";"), whatever ends it.
+    const TerminalColors colors = terminalColorsFor(workbox.color);
+    const bool isTerminal = isatty(STDOUT_FILENO);
+    if (isTerminal) {
+        QTextStream(stdout) << QStringLiteral("\x1b]11;%1\x07\x1b]10;%2\x07").arg(colors.background.name(), colors.text.name()) << Qt::flush;
+    }
+    const auto restoreColors = qScopeGuard([isTerminal] {
+        if (isTerminal) {
+            QTextStream(stdout) << QStringLiteral("\x1b]111;\x07\x1b]110;\x07") << Qt::flush;
+        }
+    });
+
+    // "🧰 name [user@id dir]$ ", the name bold in the label's color. The name
+    // goes in its own variable: bash expands it in the prompt without reading
+    // what's in it as escapes or commands.
+    const QString prompt = QStringLiteral("\\[\\e[1;38;2;%1;%2;%3m\\]\U0001F9F0 ${WORKBOX_NAME}\\[\\e[0m\\] [\\u@\\h \\W]\\$ ")
+                               .arg(colors.label.red())
+                               .arg(colors.label.green())
+                               .arg(colors.label.blue());
+    return engine->enter(id, {{QStringLiteral("PS1"), prompt}, {QStringLiteral("WORKBOX_NAME"), workbox.name}}, parser.isSet(rootOption));
 }
 
 int list(const QStringList &arguments)
@@ -246,6 +295,9 @@ int main(int argc, char **argv)
         if (command == QLatin1String("stop")) {
             return stop(arguments);
         }
+        if (command == QLatin1String("enter")) {
+            return enter(arguments);
+        }
         if (command.isEmpty() || command == QLatin1String("--help") || command == QLatin1String("-h")) {
             printLine(stdout,
                       i18n("Usage: workbox <command> [options]\n"
@@ -257,6 +309,7 @@ int main(int argc, char **argv)
                            "  list    List the workboxes\n"
                            "  start   Start a workbox\n"
                            "  stop    Stop a workbox\n"
+                           "  enter   Open a shell in a workbox\n"
                            "  rm      Remove a workbox and its home\n"
                            "\n"
                            "\"workbox <command> --help\" shows a command's options."));

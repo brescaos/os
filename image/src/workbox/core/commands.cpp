@@ -9,7 +9,12 @@
 namespace Commands
 {
 
-Workbox create(Engine &engine, const QString &id, const std::optional<QString> &name, const std::optional<QString> &color, const QString &image)
+Workbox create(Engine &engine,
+               const QString &id,
+               const std::optional<QString> &name,
+               const std::optional<QString> &color,
+               bool hasSudo,
+               const QString &image)
 {
     if (!isValidId(id)) {
         throw WorkboxError{i18n("invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not starting with a hyphen", id)};
@@ -33,7 +38,10 @@ Workbox create(Engine &engine, const QString &id, const std::optional<QString> &
         colorsInUse.append(workbox.color);
     }
 
-    const Workbox workbox{.id = id, .name = name.value_or(id), .color = givenColor ? *givenColor : WorkboxColor::pickFromPalette(colorsInUse)};
+    const Workbox workbox{.id = id,
+                          .name = name.value_or(id),
+                          .color = givenColor ? *givenColor : WorkboxColor::pickFromPalette(colorsInUse),
+                          .hasSudo = hasSudo};
     engine.create(workbox, image);
     return workbox;
 }

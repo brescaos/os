@@ -49,6 +49,15 @@ private Q_SLOTS:
         QCOMPARE(read.id, workbox.id);
         QCOMPARE(read.name, workbox.name);
         QCOMPARE(read.color, workbox.color);
+        QVERIFY(!read.hasSudo);
+        QVERIFY(!labels.contains("com.brescaos.workbox.sudo"));
+    }
+
+    void labelsKeepSudo()
+    {
+        const Workbox workbox{.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true};
+        QCOMPARE(labelsOf(workbox).value("com.brescaos.workbox.sudo"), QStringLiteral("true"));
+        QVERIFY(workboxFromLabels("c1", labelsOf(workbox)).hasSudo);
     }
 };
 

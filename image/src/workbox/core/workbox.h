@@ -11,6 +11,8 @@ struct Workbox {
     QString id;
     QString name;
     QColor color;
+    // The user can use sudo in it, without a password.
+    bool hasSudo = false;
     bool isRunning = false;
 };
 

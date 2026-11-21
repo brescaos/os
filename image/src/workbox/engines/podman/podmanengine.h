@@ -11,5 +11,6 @@ public:
     void create(const Workbox &workbox, const QString &image) override;
     void start(const QString &id) override;
     void stop(const QString &id) override;
+    int enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot) override;
     void remove(const QString &id) override;
 };

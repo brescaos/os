@@ -16,6 +16,13 @@ std::optional<QColor> parse(const QString &text);
 // 32 hues, evenly spaced in OKLCH from 0, with the same lightness and chroma.
 QList<QColor> palette();
 
+// The color of that OKLCH lightness and hue, with maximumChroma or, where
+// sRGB doesn't have it, the most sRGB has.
+QColor fromOklch(double lightness, double maximumChroma, double hueDegrees);
+
+// color's hue in OKLCH, in degrees from 0 to 360.
+double oklchHue(const QColor &color);
+
 // How different two colors look: their distance in OKLab.
 double distance(const QColor &first, const QColor &second);
 

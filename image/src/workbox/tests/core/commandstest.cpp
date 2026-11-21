@@ -34,6 +34,11 @@ public:
     {
     }
 
+    int enter(const QString &, const QMap<QString, QString> &, bool) override
+    {
+        return 0;
+    }
+
     void remove(const QString &id) override
     {
         workboxes.removeIf([&id](const Workbox &workbox) {
@@ -52,10 +57,11 @@ private Q_SLOTS:
     void createWithNameAndColor()
     {
         FakeEngine engine;
-        const Workbox workbox = Commands::create(engine, "c1", QStringLiteral("Cliente 01"), QStringLiteral("53,132,228"), image);
+        const Workbox workbox = Commands::create(engine, "c1", QStringLiteral("Cliente 01"), QStringLiteral("53,132,228"), true, image);
         QCOMPARE(workbox.id, QStringLiteral("c1"));
         QCOMPARE(workbox.name, QStringLiteral("Cliente 01"));
         QCOMPARE(workbox.color.name(), QStringLiteral("#3584e4"));
+        QVERIFY(engine.workboxes.first().hasSudo);
         QCOMPARE(engine.workboxes.size(), 1);
         QCOMPARE(engine.images, QStringList{image});
     }
@@ -63,11 +69,12 @@ private Q_SLOTS:
     void createDefaultsToItsIdAndThePalette()
     {
         FakeEngine engine;
-        const Workbox first = Commands::create(engine, "c1", std::nullopt, std::nullopt, image);
+        const Workbox first = Commands::create(engine, "c1", std::nullopt, std::nullopt, false, image);
         QCOMPARE(first.name, QStringLiteral("c1"));
         QCOMPARE(first.color, WorkboxColor::palette().first());
+        QVERIFY(!first.hasSudo);
 
-        const Workbox second = Commands::create(engine, "c2", std::nullopt, std::nullopt, image);
+        const Workbox second = Commands::create(engine, "c2", std::nullopt, std::nullopt, false, image);
         QCOMPARE(second.color, WorkboxColor::pickFromPalette({first.color}));
     }
 
@@ -95,7 +102,7 @@ private Q_SLOTS:
         FakeEngine engine;
         engine.workboxes.append({.id = "c0", .name = "c0", .color = Qt::red});
         try {
-            Commands::create(engine, id, name, color, image);
+            Commands::create(engine, id, name, color, false, image);
             QFAIL("created");
         } catch (const WorkboxError &error) {
             QVERIFY2(error.message.startsWith(message), qPrintable(error.message));

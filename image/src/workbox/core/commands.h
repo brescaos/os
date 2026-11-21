@@ -10,8 +10,14 @@ namespace Commands
 {
 
 // Creates the workbox id from image. Without a name, its name is its id;
-// without a color (#rgb, #rrggbb or r,g,b), one from the palette.
-Workbox create(Engine &engine, const QString &id, const std::optional<QString> &name, const std::optional<QString> &color, const QString &image);
+// without a color (#rgb, #rrggbb or r,g,b), one from the palette. With
+// hasSudo, the user can use sudo in it.
+Workbox create(Engine &engine,
+               const QString &id,
+               const std::optional<QString> &name,
+               const std::optional<QString> &color,
+               bool hasSudo,
+               const QString &image);
 
 Workbox find(Engine &engine, const QString &id);
 

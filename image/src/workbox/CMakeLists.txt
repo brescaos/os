@@ -25,7 +25,7 @@ add_compile_definitions(TRANSLATION_DOMAIN="workbox")
 
 # What no engine knows: the model, the settings, the Engine interface and the
 # commands (core/), out of the program so the tests and, later, an app use it.
-add_library(workbox-core STATIC core/color.cpp core/commands.cpp core/settings.cpp core/workbox.cpp)
+add_library(workbox-core STATIC core/color.cpp core/commands.cpp core/settings.cpp core/terminalcolors.cpp core/workbox.cpp)
 target_include_directories(workbox-core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core)
 target_link_libraries(workbox-core PUBLIC Qt6::Core Qt6::Gui PRIVATE KF6::ConfigCore KF6::I18n)
 
