@@ -37,6 +37,27 @@ Settings readConfiguredSettings()
                         QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + QStringLiteral("/workbox/workbox.conf"));
 }
 
+// Runs job to its end, its output on stderr as it comes, and gives it back;
+// throws its error. Waiting is fine here: this is the command line.
+template<typename Job>
+std::unique_ptr<Job> runToEnd(Job *job)
+{
+    std::unique_ptr<Job> ownedJob(job);
+    ownedJob->setAutoDelete(false);
+    QObject::connect(ownedJob.get(), &EngineJob::output, [](const QString &line) {
+        printLine(stderr, line);
+    });
+    if (!ownedJob->exec()) {
+        throw WorkboxError{ownedJob->errorString()};
+    }
+    return ownedJob;
+}
+
+QList<Workbox> listWorkboxes(Engine &engine)
+{
+    return runToEnd(engine.list())->workboxes();
+}
+
 std::unique_ptr<Engine> engineFor(const Settings &settings)
 {
     if (settings.engine != QLatin1String("podman")) {
@@ -80,8 +101,10 @@ int create(const QStringList &arguments)
     };
 
     const Settings settings = readConfiguredSettings();
+    const std::unique_ptr<Engine> engine = engineFor(settings);
     const Workbox workbox =
-        Commands::create(*engineFor(settings), id, optionValue(nameOption), optionValue(colorOption), parser.isSet(sudoOption), settings.image);
+        runToEnd(new Commands::CreateJob(*engine, id, optionValue(nameOption), optionValue(colorOption), parser.isSet(sudoOption), settings.image))
+            ->workbox();
     printLine(stdout, i18n("Created the workbox %1 (\"%2\").", workbox.id, workbox.name));
     return 0;
 }
@@ -110,12 +133,12 @@ int remove(const QStringList &arguments)
     const QString id = parseId(parser, QStringLiteral("rm"), arguments);
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
-    const Workbox workbox = Commands::find(*engine, id);
+    const Workbox workbox = Commands::find(listWorkboxes(*engine), id);
     if (!parser.isSet(yesOption) && !confirmRemoval(workbox)) {
         printLine(stdout, i18n("Nothing removed."));
         return 1;
     }
-    engine->remove(id);
+    runToEnd(engine->remove(id));
     printLine(stdout, i18n("Removed the workbox %1.", id));
     return 0;
 }
@@ -131,11 +154,11 @@ int start(const QStringList &arguments)
     const QString id = parseId(parser, QStringLiteral("start"), arguments);
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
-    if (Commands::find(*engine, id).isRunning) {
+    if (Commands::find(listWorkboxes(*engine), id).isRunning) {
         printLine(stdout, i18n("The workbox %1 is already running.", id));
         return 0;
     }
-    engine->start(id);
+    runToEnd(engine->start(id));
     printLine(stdout, i18n("Started the workbox %1.", id));
     return 0;
 }
@@ -151,11 +174,11 @@ int stop(const QStringList &arguments)
     const QString id = parseId(parser, QStringLiteral("stop"), arguments);
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
-    if (!Commands::find(*engine, id).isRunning) {
+    if (!Commands::find(listWorkboxes(*engine), id).isRunning) {
         printLine(stdout, i18n("The workbox %1 is already stopped.", id));
         return 0;
     }
-    engine->stop(id);
+    runToEnd(engine->stop(id));
     printLine(stdout, i18n("Stopped the workbox %1.", id));
     return 0;
 }
@@ -175,9 +198,9 @@ int enter(const QStringList &arguments)
     const QString id = parseId(parser, QStringLiteral("enter"), arguments);
 
     const std::unique_ptr<Engine> engine = engineFor(readConfiguredSettings());
-    const Workbox workbox = Commands::find(*engine, id);
+    const Workbox workbox = Commands::find(listWorkboxes(*engine), id);
     if (!workbox.isRunning) {
-        engine->start(id);
+        runToEnd(engine->start(id));
     }
 
     // The terminal's background and text (OSC 11 and 10) while the shell
@@ -201,7 +224,8 @@ int enter(const QStringList &arguments)
                                .arg(colors.label.red())
                                .arg(colors.label.green())
                                .arg(colors.label.blue());
-    return engine->enter(id, {{QStringLiteral("PS1"), prompt}, {QStringLiteral("WORKBOX_NAME"), workbox.name}}, parser.isSet(rootOption));
+    return runToEnd(engine->enter(id, {{QStringLiteral("PS1"), prompt}, {QStringLiteral("WORKBOX_NAME"), workbox.name}}, parser.isSet(rootOption)))
+        ->exitStatus();
 }
 
 int list(const QStringList &arguments)
@@ -220,7 +244,7 @@ int list(const QStringList &arguments)
         throw WorkboxError{i18n("workbox list takes no arguments (workbox list --help)")};
     }
 
-    const QList<Workbox> workboxes = Commands::list(*engineFor(readConfiguredSettings()));
+    const QList<Workbox> workboxes = Commands::sortedById(listWorkboxes(*engineFor(readConfiguredSettings())));
     if (parser.isSet(quietOption)) {
         for (const Workbox &workbox : workboxes) {
             printLine(stdout, workbox.id);

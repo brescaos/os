@@ -1,45 +1,21 @@
 #include "podmanengine.h"
 
-#include <KLocalizedString>
+#include "podmanjob.h"
 
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QProcess>
 
 #include <unistd.h>
 
 namespace
 {
 
-// Its standard output; podman's own errors go straight to stderr.
-QString runPodman(const QStringList &arguments)
+QList<Workbox> workboxesFromJson(const QByteArray &json)
 {
-    QProcess podman;
-    podman.setProcessChannelMode(QProcess::ForwardedErrorChannel);
-    podman.start(QStringLiteral("podman"), arguments);
-    if (!podman.waitForFinished(-1) && podman.error() == QProcess::FailedToStart) {
-        throw WorkboxError{i18n("couldn't run podman: %1", podman.errorString())};
-    }
-    if (podman.exitStatus() != QProcess::NormalExit || podman.exitCode() != 0) {
-        throw WorkboxError{i18n("podman %1 failed", arguments.join(QLatin1Char(' ')))};
-    }
-    return QString::fromUtf8(podman.readAllStandardOutput());
-}
-
-}
-
-QList<Workbox> PodmanEngine::list()
-{
-    const QString json = runPodman({QStringLiteral("ps"),
-                                    QStringLiteral("--all"),
-                                    QStringLiteral("--filter"),
-                                    QStringLiteral("label=") + nameLabel,
-                                    QStringLiteral("--format"),
-                                    QStringLiteral("json")});
     QList<Workbox> workboxes;
-    for (const QJsonValue &container : QJsonDocument::fromJson(json.toUtf8()).array()) {
+    for (const QJsonValue &container : QJsonDocument::fromJson(json).array()) {
         const QJsonObject object = container.toObject();
         QMap<QString, QString> labels;
         const QJsonObject labelObject = object[QLatin1String("Labels")].toObject();
@@ -55,7 +31,34 @@ QList<Workbox> PodmanEngine::list()
     return workboxes;
 }
 
-void PodmanEngine::create(const Workbox &workbox, const QString &image)
+// --time 0: sleep, a workbox's first process, ignores SIGTERM, so Podman
+// would wait 10 seconds before killing it anyway.
+QStringList stopCommand(const QString &id)
+{
+    return {QStringLiteral("stop"), QStringLiteral("--time"), QStringLiteral("0"), id};
+}
+
+QList<QStringList> removeCommands(const QString &id)
+{
+    return {{QStringLiteral("rm"), QStringLiteral("--force"), QStringLiteral("--time"), QStringLiteral("0"), id},
+            {QStringLiteral("volume"), QStringLiteral("rm"), homeVolumeName(id)}};
+}
+
+}
+
+ListJob *PodmanEngine::list()
+{
+    auto *job = new PodmanJob({{QStringLiteral("ps"),
+                                QStringLiteral("--all"),
+                                QStringLiteral("--filter"),
+                                QStringLiteral("label=") + nameLabel,
+                                QStringLiteral("--format"),
+                                QStringLiteral("json")}});
+    job->setWorkboxesParser(workboxesFromJson);
+    return job;
+}
+
+EngineJob *PodmanEngine::create(const Workbox &workbox, const QString &image)
 {
     // The same uid inside, so the files in shared folders keep their owner;
     // the home volume at the same path as the user's home, which keep-id
@@ -75,45 +78,46 @@ void PodmanEngine::create(const Workbox &workbox, const QString &image)
     }
     // Keeps it running until it's stopped, for what runs in it.
     arguments << image << QStringLiteral("sleep") << QStringLiteral("infinity");
-    runPodman(arguments);
     if (!workbox.hasSudo) {
-        return;
+        return new PodmanJob({arguments});
     }
 
     // The sudoers rule goes in the container's own files, written by its
     // root: a file mounted from the host wouldn't be owned by its root, and
-    // sudo would refuse it. By uid, as keep-id gives the same inside.
-    try {
-        runPodman({QStringLiteral("start"), workbox.id});
-        runPodman({QStringLiteral("exec"),
-                   QStringLiteral("--user"),
-                   QStringLiteral("root"),
-                   workbox.id,
-                   QStringLiteral("sh"),
-                   QStringLiteral("-c"),
-                   QStringLiteral("printf '%s\\n' \"$1\" >/etc/sudoers.d/workbox && chmod 0440 /etc/sudoers.d/workbox"),
-                   QStringLiteral("sh"),
-                   QStringLiteral("#%1 ALL=(ALL) NOPASSWD: ALL").arg(getuid())});
-        runPodman({QStringLiteral("stop"), QStringLiteral("--time"), QStringLiteral("0"), workbox.id});
-    } catch (const WorkboxError &) {
-        remove(workbox.id);
-        throw;
-    }
+    // sudo would refuse it. By uid, as keep-id gives the same inside. If
+    // that fails, nothing of the workbox stays.
+    auto *job = new PodmanJob({arguments,
+                               {QStringLiteral("start"), workbox.id},
+                               {QStringLiteral("exec"),
+                                QStringLiteral("--user"),
+                                QStringLiteral("root"),
+                                workbox.id,
+                                QStringLiteral("sh"),
+                                QStringLiteral("-c"),
+                                QStringLiteral("printf '%s\\n' \"$1\" >/etc/sudoers.d/workbox && chmod 0440 /etc/sudoers.d/workbox"),
+                                QStringLiteral("sh"),
+                                QStringLiteral("#%1 ALL=(ALL) NOPASSWD: ALL").arg(getuid())},
+                               stopCommand(workbox.id)});
+    job->setCleanupCommands(removeCommands(workbox.id));
+    return job;
 }
 
-void PodmanEngine::start(const QString &id)
+EngineJob *PodmanEngine::start(const QString &id)
 {
-    runPodman({QStringLiteral("start"), id});
+    return new PodmanJob({{QStringLiteral("start"), id}});
 }
 
-// --time 0 here and in remove(): sleep, its first process, ignores SIGTERM,
-// so Podman would wait 10 seconds before killing it anyway.
-void PodmanEngine::stop(const QString &id)
+EngineJob *PodmanEngine::stop(const QString &id)
 {
-    runPodman({QStringLiteral("stop"), QStringLiteral("--time"), QStringLiteral("0"), id});
+    return new PodmanJob({stopCommand(id)});
 }
 
-int PodmanEngine::enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot)
+EngineJob *PodmanEngine::remove(const QString &id)
+{
+    return new PodmanJob(removeCommands(id));
+}
+
+EnterJob *PodmanEngine::enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot)
 {
     // keep-id runs it as the user unless --user says otherwise. --tty only on
     // a terminal: podman refuses it without one. TERM as the terminal's, for
@@ -132,20 +136,5 @@ int PodmanEngine::enter(const QString &id, const QMap<QString, QString> &environ
         arguments << QStringLiteral("--env") << variable.key() + QLatin1Char('=') + variable.value();
     }
     arguments << id << QStringLiteral("bash") << QStringLiteral("--login");
-
-    // On this process's terminal: the shell reads and writes it itself.
-    QProcess podman;
-    podman.setProcessChannelMode(QProcess::ForwardedChannels);
-    podman.setInputChannelMode(QProcess::ForwardedInputChannel);
-    podman.start(QStringLiteral("podman"), arguments);
-    if (!podman.waitForFinished(-1) && podman.error() == QProcess::FailedToStart) {
-        throw WorkboxError{i18n("couldn't run podman: %1", podman.errorString())};
-    }
-    return podman.exitStatus() == QProcess::NormalExit ? podman.exitCode() : 1;
-}
-
-void PodmanEngine::remove(const QString &id)
-{
-    runPodman({QStringLiteral("rm"), QStringLiteral("--force"), QStringLiteral("--time"), QStringLiteral("0"), id});
-    runPodman({QStringLiteral("volume"), QStringLiteral("rm"), homeVolumeName(id)});
+    return new PodmanEnterJob(arguments);
 }

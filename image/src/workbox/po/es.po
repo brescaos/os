@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:47+0000\n"
+"POT-Creation-Date: 2026-11-21 09:08+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -79,7 +79,10 @@ msgstr "Se ha creado el workbox %1 («%2»)."
 msgid ""
 "Removing the workbox %1 (\"%2\") loses everything in it and in its home.\n"
 "Type its id to remove it: "
-msgstr "Al eliminar el workbox %1 («%2») se pierde todo lo que hay en él y en su carpeta personal.\nEscribe su id para eliminarlo: "
+msgstr ""
+"Al eliminar el workbox %1 («%2») se pierde todo lo que hay en él y en su "
+"carpeta personal.\n"
+"Escribe su id para eliminarlo: "
 
 #: cli/main.cpp
 msgid ""
@@ -88,7 +91,12 @@ msgid ""
 "\n"
 "Example:\n"
 "  workbox rm c1"
-msgstr "Elimina un workbox y su carpeta personal, y antes lo detiene si está en marcha: se pierde todo lo que contienen. Antes pide su id, salvo con --yes.\n\nEjemplo:\n  workbox rm c1"
+msgstr ""
+"Elimina un workbox y su carpeta personal, y antes lo detiene si está en "
+"marcha: se pierde todo lo que contienen. Antes pide su id, salvo con --yes.\n"
+"\n"
+"Ejemplo:\n"
+"  workbox rm c1"
 
 #: cli/main.cpp
 msgid "Don't ask before removing it."
@@ -278,10 +286,10 @@ msgstr "no hay ningún workbox con el id «%1»"
 msgid "no %1 in %2 or %3"
 msgstr "no hay %1 en %2 ni en %3"
 
-#: engines/podman/podmanengine.cpp
-msgid "couldn't run podman: %1"
-msgstr "no se ha podido ejecutar podman: %1"
-
-#: engines/podman/podmanengine.cpp
+#: engines/podman/podmanjob.cpp
 msgid "podman %1 failed"
 msgstr "ha fallado podman %1"
+
+#: engines/podman/podmanjob.cpp
+msgid "couldn't run podman: %1"
+msgstr "no se ha podido ejecutar podman: %1"

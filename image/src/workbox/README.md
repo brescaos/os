@@ -26,10 +26,11 @@ their options and the ids `start`, `stop`, `enter` and `rm` take.
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/workbox.mo` |
 | `image/build/system.sh` | `/usr/share/workbox/workbox.conf` |
 
-It's C++ (Qt, KF6 Config and I18n), so a KDE app to manage workboxes can use
+It's C++ (Qt, KF6 Config, CoreAddons and I18n), so a KDE app to manage workboxes can use
 the same code later. `image/Containerfile` compiles it in its own stage,
 `workbox-build`. Building it needs cmake, extra-cmake-modules, gcc-c++,
-qt6-qtbase-devel, kf6-kconfig-devel and kf6-ki18n-devel.
+qt6-qtbase-devel, kf6-kconfig-devel, kf6-kcoreaddons-devel and
+kf6-ki18n-devel.
 
 ## Commands
 
@@ -110,12 +111,24 @@ A new image applies to the workboxes created after it.
 ## How it works
 
 One folder per layer; each is a static library the next one links, so the
-tests (and later a KDE app) use the same code as the command line:
+tests (and later a KDE app) use the same code as the command line.
+
+**Nothing blocks.** Every engine operation is a job, an
+`EngineJob` (`core/enginejob.h`): a `KJob` that runs without waiting and
+says when it's done with its `result()` signal, so an applet or an app can
+use the engine without freezing. On failure, its `errorText()` says why,
+translated. Its `output(line)` signal gives what the engine prints as it
+goes (Podman's standard error: an image's download, its errors), for
+whoever wants to show it. The command line runs each job with `exec()`,
+which waits in an event loop, and prints its output to stderr as it comes.
+`enter`'s job (`EnterJob`) runs the shell on the process's terminal, which
+podman reads and writes itself, and ends when the shell exits, with its
+exit status: the shell failing isn't the job failing.
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `engine.h`: what workbox needs from an engine (list, create, start, stop, enter, remove). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what `create`, `list` and `rm` do, on any engine |
-| `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands. Another engine would go in `engines/<name>/` |
+| `core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
+| `engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), and `PodmanEnterJob`, `podman exec`'s shell on the terminal. Another engine would go in `engines/<name>/` |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name`,
@@ -138,8 +151,8 @@ tests (and later a KDE app) use the same code as the command line:
   terminal), run on workbox's own terminal, so the shell reads and writes
   it; keep-id runs it as the user. `--root` adds `--user root` and
   `--workdir /root`.
-- Podman's own errors go to stderr as they are; workbox adds which command
-  failed.
+- Podman's standard error is the job's output, so on the command line it
+  shows as it did; the job's error says which command failed.
 
 ## Translations
 
@@ -153,8 +166,11 @@ options aren't translated; Qt's own words in the help (`Usage:`,
 - `make check-workbox` (part of `make check`) compiles it with its tests,
   each in `tests/` at its source's path (`tests/core/colortest.cpp` tests
   `core/color.cpp`): the model, the colors and the pick, the terminal's
-  colors and their contrast, the settings, the commands on a fake engine, and `PodmanEngine`'s arguments with the fake
-  `podman` of `tests/fakes/`.
+  colors and their contrast, the settings, the commands on a fake engine,
+  and `PodmanEngine`'s arguments with the fake `podman` of `tests/fakes/`.
+  They also check that nothing blocks: results come after `start()`
+  returns, and the event loop keeps running while podman does; a job's
+  output, and killing it.
 - `make test` (on the host) checks in the image that `workbox` is
   installed and translated, that its settings name Distrobox's image
   and `create` uses it, and that bash completes its commands and `rm`'s

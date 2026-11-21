@@ -3,7 +3,11 @@
 #include <QDir>
 #include <QFile>
 #include <QTemporaryDir>
+#include <QElapsedTimer>
 #include <QTest>
+#include <QTimer>
+
+#include <memory>
 
 #include <unistd.h>
 
@@ -34,6 +38,21 @@ class PodmanEngineTest : public QObject
         return calls;
     }
 
+    // Runs job to its end: its error, if any.
+    template<typename Job>
+    QString run(Job *job, QStringList *output = nullptr)
+    {
+        std::unique_ptr<Job> ownedJob(job);
+        ownedJob->setAutoDelete(false);
+        if (output) {
+            connect(ownedJob.get(), &EngineJob::output, this, [output](const QString &line) {
+                output->append(line);
+            });
+        }
+        ownedJob->exec();
+        return ownedJob->error() ? ownedJob->errorText() : QString();
+    }
+
 private Q_SLOTS:
     void initTestCase()
     {
@@ -43,7 +62,7 @@ private Q_SLOTS:
 
     void init()
     {
-        for (const QString &name : {"calls", "ps.json", "fail", "exec-status"}) {
+        for (const QString &name : {"calls", "ps.json", "fail", "exec-status", "delay", "stderr"}) {
             QFile::remove(state.filePath(name));
         }
     }
@@ -53,7 +72,10 @@ private Q_SLOTS:
         writeState("ps.json",
                    "[{\"Names\": [\"c1\"], \"State\": \"running\", \"Labels\": {\"com.brescaos.workbox.name\": \"Cliente 01\", \"com.brescaos.workbox.color\": \"#3584e4\"}},"
                    " {\"Names\": [\"c2\"], \"State\": \"exited\", \"Labels\": {\"com.brescaos.workbox.name\": \"c2\", \"com.brescaos.workbox.color\": \"#e5a50a\"}}]");
-        const QList<Workbox> workboxes = PodmanEngine().list();
+        std::unique_ptr<ListJob> job(PodmanEngine().list());
+        job->setAutoDelete(false);
+        QVERIFY(job->exec());
+        const QList<Workbox> workboxes = job->workboxes();
         QCOMPARE(workboxes.size(), 2);
         QCOMPARE(workboxes[0].id, QStringLiteral("c1"));
         QCOMPARE(workboxes[0].name, QStringLiteral("Cliente 01"));
@@ -66,7 +88,8 @@ private Q_SLOTS:
 
     void create()
     {
-        PodmanEngine().create({.id = "c1", .name = "Cliente 01", .color = QColor("#3584e4")}, "registry.fedoraproject.org/fedora-toolbox:44");
+        QCOMPARE(run(PodmanEngine().create({.id = "c1", .name = "Cliente 01", .color = QColor("#3584e4")}, "registry.fedoraproject.org/fedora-toolbox:44")),
+                 QString());
         QCOMPARE(calls(),
                  (QList<QStringList>{{"create",
                                       "--name",
@@ -89,8 +112,8 @@ private Q_SLOTS:
     void startAndStop()
     {
         PodmanEngine engine;
-        engine.start("c1");
-        engine.stop("c1");
+        QCOMPARE(run(engine.start("c1")), QString());
+        QCOMPARE(run(engine.stop("c1")), QString());
         QCOMPARE(calls(), (QList<QStringList>{{"start", "c1"}, {"stop", "--time", "0", "c1"}}));
     }
 
@@ -98,7 +121,10 @@ private Q_SLOTS:
     void enter()
     {
         writeState("exec-status", "3");
-        QCOMPARE(PodmanEngine().enter("c1", {{"WORKBOX_NAME", "Cliente 01"}}, false), 3);
+        std::unique_ptr<EnterJob> job(PodmanEngine().enter("c1", {{"WORKBOX_NAME", "Cliente 01"}}, false));
+        job->setAutoDelete(false);
+        QVERIFY(job->exec());
+        QCOMPARE(job->exitStatus(), 3);
         QCOMPARE(calls(),
                  (QList<QStringList>{{"exec",
                                       "--interactive",
@@ -115,7 +141,7 @@ private Q_SLOTS:
 
     void enterAsRoot()
     {
-        PodmanEngine().enter("c1", {}, true);
+        QCOMPARE(run(PodmanEngine().enter("c1", {}, true)), QString());
         QCOMPARE(calls(),
                  (QList<QStringList>{{"exec", "--interactive", "--user", "root", "--workdir", "/root", "--env", "TERM", "c1", "bash", "--login"}}));
     }
@@ -123,7 +149,7 @@ private Q_SLOTS:
     // Its root writes the rule, by the user's uid, and it's left stopped.
     void createWithSudo()
     {
-        PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image");
+        QCOMPARE(run(PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image")), QString());
         const QList<QStringList> podmanCalls = calls();
         QCOMPARE(podmanCalls.size(), 4);
         QCOMPARE(podmanCalls[0].first(), QStringLiteral("create"));
@@ -138,24 +164,91 @@ private Q_SLOTS:
     void createWithSudoFailing()
     {
         writeState("fail", "exec\n");
-        QVERIFY_THROWS_EXCEPTION(WorkboxError, PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image"));
+        QVERIFY(run(PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image")).startsWith("podman exec"));
         const QList<QStringList> podmanCalls = calls();
         QCOMPARE(podmanCalls.mid(podmanCalls.size() - 2),
                  (QList<QStringList>{{"rm", "--force", "--time", "0", "c1"}, {"volume", "rm", "workbox-c1-home"}}));
     }
 
+    // When creating it fails, nothing is cleaned up: what has that name
+    // isn't the job's.
+    void createFailingCleansNothing()
+    {
+        writeState("fail", "create\n");
+        QCOMPARE(run(PodmanEngine().create({.id = "c1", .name = "c1", .color = Qt::red, .hasSudo = true}, "image")).left(14),
+                 QStringLiteral("podman create "));
+        QCOMPARE(calls().size(), 1);
+    }
+
     void removeRemovesTheContainerAndItsHome()
     {
-        PodmanEngine().remove("c1");
+        QCOMPARE(run(PodmanEngine().remove("c1")), QString());
         QCOMPARE(calls(), (QList<QStringList>{{"rm", "--force", "--time", "0", "c1"}, {"volume", "rm", "workbox-c1-home"}}));
     }
 
-    void failureThrows()
+    void failureIsTheJobsError()
     {
         writeState("fail", "rm\n");
-        QVERIFY_THROWS_EXCEPTION(WorkboxError, PodmanEngine().remove("c1"));
+        QCOMPARE(run(PodmanEngine().remove("c1")), QStringLiteral("podman rm --force --time 0 c1 failed"));
         // The home stays when the container couldn't be removed.
         QCOMPARE(calls().size(), 1);
+    }
+
+    // Podman's standard error, line by line as it comes, also its last line
+    // without a newline.
+    void outputIsPodmansStandardError()
+    {
+        writeState("stderr", "Trying to pull image\nCopying blob\nWriting manifest");
+        QStringList output;
+        QCOMPARE(run(PodmanEngine().start("c1"), &output), QString());
+        QCOMPARE(output, (QStringList{"Trying to pull image", "Copying blob", "Writing manifest"}));
+    }
+
+    // The event loop keeps running while podman does: the job never waits.
+    void doesntBlock()
+    {
+        writeState("delay", "0.5");
+        int ticks = 0;
+        QTimer ticker;
+        connect(&ticker, &QTimer::timeout, this, [&ticks] {
+            ++ticks;
+        });
+        ticker.start(20);
+        QCOMPARE(run(PodmanEngine().start("c1")), QString());
+        QVERIFY2(ticks >= 10, QByteArray::number(ticks));
+    }
+
+    // The shell runs while the event loop does.
+    void enterDoesntBlock()
+    {
+        writeState("delay", "0.5");
+        int ticks = 0;
+        QTimer ticker;
+        connect(&ticker, &QTimer::timeout, this, [&ticks] {
+            ++ticks;
+        });
+        ticker.start(20);
+        QCOMPARE(run(PodmanEngine().enter("c1", {}, false)), QString());
+        QVERIFY2(ticks >= 10, QByteArray::number(ticks));
+    }
+
+    // Killed, it stops podman and gives no result.
+    void kill()
+    {
+        writeState("delay", "5");
+        auto *job = PodmanEngine().start("c1");
+        bool hasResult = false;
+        connect(job, &KJob::result, this, [&hasResult] {
+            hasResult = true;
+        });
+        job->start();
+        QTRY_COMPARE(calls().size(), 1);
+        QElapsedTimer elapsed;
+        elapsed.start();
+        QVERIFY(job->kill());
+        QTest::qWait(100);
+        QVERIFY(!hasResult);
+        QVERIFY(elapsed.elapsed() < 1000);
     }
 };
 

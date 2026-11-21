@@ -1,5 +1,5 @@
 // The Engine on rootless Podman (README.md): the only code that knows its
-// commands. It runs `podman` from PATH, and its errors go to stderr.
+// commands. It runs `podman` from PATH, as PodmanJobs.
 #pragma once
 
 #include "engine.h"
@@ -7,10 +7,10 @@
 class PodmanEngine : public Engine
 {
 public:
-    QList<Workbox> list() override;
-    void create(const Workbox &workbox, const QString &image) override;
-    void start(const QString &id) override;
-    void stop(const QString &id) override;
-    int enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot) override;
-    void remove(const QString &id) override;
+    ListJob *list() override;
+    EngineJob *create(const Workbox &workbox, const QString &image) override;
+    EngineJob *start(const QString &id) override;
+    EngineJob *stop(const QString &id) override;
+    EngineJob *remove(const QString &id) override;
+    EnterJob *enter(const QString &id, const QMap<QString, QString> &environment, bool asRoot) override;
 };

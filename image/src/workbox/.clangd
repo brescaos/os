@@ -12,6 +12,7 @@ CompileFlags:
     - -isystem/usr/include/qt6/QtTest
     - -isystem/usr/include/KF6/KConfig
     - -isystem/usr/include/KF6/KConfigCore
+    - -isystem/usr/include/KF6/KCoreAddons
     - -isystem/usr/include/KF6/KI18n
     - -DTRANSLATION_DOMAIN="workbox"
 Diagnostics:

@@ -2,10 +2,13 @@
 # Fake podman for the tests, on $FAKE_STATE (a folder): logs each call in
 # calls, one argument per line and an empty line after it; ps prints ps.json
 # (or no container); exec exits with the status in exec-status (or 0); a
-# command named in the file fail fails.
+# command named in the file fail fails. Before that, it prints stderr's
+# content to its standard error, and waits delay's seconds.
 set -euo pipefail
 
 printf '%s\n' "$@" "" >>"$FAKE_STATE/calls"
+[[ -f $FAKE_STATE/stderr ]] && cat "$FAKE_STATE/stderr" >&2
+[[ -f $FAKE_STATE/delay ]] && sleep "$(cat "$FAKE_STATE/delay")"
 
 if [[ -f $FAKE_STATE/fail ]] && grep -qx "$1" "$FAKE_STATE/fail"; then
     echo "fake podman: $1 failed" >&2

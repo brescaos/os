@@ -3,10 +3,60 @@
 
 #include <QTest>
 
+#include <functional>
+
 namespace
 {
 
 const QString image = QStringLiteral("registry.fedoraproject.org/fedora-toolbox:44");
+
+// A job that does its work after start() returns, as an engine's would, and
+// fails with failure if it's set.
+class FakeJob : public ListJob
+{
+public:
+    FakeJob(const std::function<void()> &work, const QList<Workbox> &workboxes = {}, const QString &failure = {})
+        : m_work(work)
+        , m_failure(failure)
+    {
+        setWorkboxes(workboxes);
+    }
+
+    void start() override
+    {
+        QMetaObject::invokeMethod(
+            this,
+            [this] {
+                Q_EMIT output(QStringLiteral("fake output"));
+                if (!m_failure.isEmpty()) {
+                    fail(m_failure);
+                    return;
+                }
+                m_work();
+                emitResult();
+            },
+            Qt::QueuedConnection);
+    }
+
+private:
+    std::function<void()> m_work;
+    QString m_failure;
+};
+
+// A shell that exits at once.
+class FakeEnterJob : public EnterJob
+{
+public:
+    void start() override
+    {
+        QMetaObject::invokeMethod(
+            this,
+            [this] {
+                emitResult();
+            },
+            Qt::QueuedConnection);
+    }
+};
 
 // The workboxes in memory, and the image each one was created from.
 class FakeEngine : public Engine
@@ -14,38 +64,57 @@ class FakeEngine : public Engine
 public:
     QList<Workbox> workboxes;
     QStringList images;
+    QString createFailure;
 
-    QList<Workbox> list() override
+    ListJob *list() override
     {
-        return workboxes;
+        return new FakeJob([] { }, workboxes);
     }
 
-    void create(const Workbox &workbox, const QString &image) override
+    EngineJob *create(const Workbox &workbox, const QString &image) override
     {
-        workboxes.append(workbox);
-        images.append(image);
+        return new FakeJob(
+            [this, workbox, image] {
+                workboxes.append(workbox);
+                images.append(image);
+            },
+            {},
+            createFailure);
     }
 
-    void start(const QString &) override
+    EngineJob *start(const QString &) override
     {
+        return new FakeJob([] { });
     }
 
-    void stop(const QString &) override
+    EngineJob *stop(const QString &) override
     {
+        return new FakeJob([] { });
     }
 
-    int enter(const QString &, const QMap<QString, QString> &, bool) override
+    EngineJob *remove(const QString &) override
     {
-        return 0;
+        return new FakeJob([] { });
     }
 
-    void remove(const QString &id) override
+    EnterJob *enter(const QString &, const QMap<QString, QString> &, bool) override
     {
-        workboxes.removeIf([&id](const Workbox &workbox) {
-            return workbox.id == id;
-        });
+        return new FakeEnterJob;
     }
 };
+
+// Runs Commands::CreateJob to its end; its workbox, or its error.
+std::pair<Workbox, QString> create(FakeEngine &engine,
+                                   const QString &id,
+                                   const std::optional<QString> &name,
+                                   const std::optional<QString> &color,
+                                   bool hasSudo = false)
+{
+    Commands::CreateJob job(engine, id, name, color, hasSudo, image);
+    job.setAutoDelete(false);
+    job.exec();
+    return {job.workbox(), job.error() ? job.errorText() : QString()};
+}
 
 }
 
@@ -57,7 +126,8 @@ private Q_SLOTS:
     void createWithNameAndColor()
     {
         FakeEngine engine;
-        const Workbox workbox = Commands::create(engine, "c1", QStringLiteral("Cliente 01"), QStringLiteral("53,132,228"), true, image);
+        const auto [workbox, error] = create(engine, "c1", QStringLiteral("Cliente 01"), QStringLiteral("53,132,228"), true);
+        QCOMPARE(error, QString());
         QCOMPARE(workbox.id, QStringLiteral("c1"));
         QCOMPARE(workbox.name, QStringLiteral("Cliente 01"));
         QCOMPARE(workbox.color.name(), QStringLiteral("#3584e4"));
@@ -69,12 +139,12 @@ private Q_SLOTS:
     void createDefaultsToItsIdAndThePalette()
     {
         FakeEngine engine;
-        const Workbox first = Commands::create(engine, "c1", std::nullopt, std::nullopt, false, image);
+        const Workbox first = create(engine, "c1", std::nullopt, std::nullopt).first;
         QCOMPARE(first.name, QStringLiteral("c1"));
         QCOMPARE(first.color, WorkboxColor::palette().first());
         QVERIFY(!first.hasSudo);
 
-        const Workbox second = Commands::create(engine, "c2", std::nullopt, std::nullopt, false, image);
+        const Workbox second = create(engine, "c2", std::nullopt, std::nullopt).first;
         QCOMPARE(second.color, WorkboxColor::pickFromPalette({first.color}));
     }
 
@@ -101,31 +171,56 @@ private Q_SLOTS:
 
         FakeEngine engine;
         engine.workboxes.append({.id = "c0", .name = "c0", .color = Qt::red});
-        try {
-            Commands::create(engine, id, name, color, false, image);
-            QFAIL("created");
-        } catch (const WorkboxError &error) {
-            QVERIFY2(error.message.startsWith(message), qPrintable(error.message));
-        }
+        const QString error = create(engine, id, name, color).second;
+        QVERIFY2(error.startsWith(message), qPrintable(error));
         QCOMPARE(engine.workboxes.size(), 1);
+    }
+
+    // The engine's output and error are the job's.
+    void createPassesOnTheEngine()
+    {
+        FakeEngine engine;
+        engine.createFailure = QStringLiteral("podman create failed");
+        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, image);
+        job.setAutoDelete(false);
+        QStringList output;
+        connect(&job, &EngineJob::output, this, [&output](const QString &line) {
+            output.append(line);
+        });
+        QVERIFY(!job.exec());
+        QCOMPARE(job.errorText(), engine.createFailure);
+        QCOMPARE(output, (QStringList{"fake output", "fake output"}));
+    }
+
+    // Its result comes after start() returns, from the event loop.
+    void createDoesntBlock()
+    {
+        FakeEngine engine;
+        auto *job = new Commands::CreateJob(engine, "c1", std::nullopt, std::nullopt, false, image);
+        bool hasFinished = false;
+        connect(job, &KJob::result, this, [&hasFinished] {
+            hasFinished = true;
+        });
+        job->start();
+        QVERIFY(!hasFinished);
+        QTRY_VERIFY(hasFinished);
     }
 
     void find()
     {
-        FakeEngine engine;
-        engine.workboxes.append({.id = "c1", .name = "Cliente 01", .color = Qt::red});
-        QCOMPARE(Commands::find(engine, "c1").name, QStringLiteral("Cliente 01"));
-        QVERIFY_THROWS_EXCEPTION(WorkboxError, Commands::find(engine, "c2"));
+        const QList<Workbox> workboxes{{.id = "c1", .name = "Cliente 01", .color = Qt::red}};
+        QCOMPARE(Commands::find(workboxes, "c1").name, QStringLiteral("Cliente 01"));
+        QVERIFY_THROWS_EXCEPTION(WorkboxError, Commands::find(workboxes, "c2"));
     }
 
-    void listIsById()
+    void sortedById()
     {
-        FakeEngine engine;
+        QList<Workbox> workboxes;
         for (const QString id : {"c2", "a1", "c10"}) {
-            engine.workboxes.append({.id = id, .name = id, .color = Qt::red});
+            workboxes.append({.id = id, .name = id, .color = Qt::red});
         }
         QStringList ids;
-        for (const Workbox &workbox : Commands::list(engine)) {
+        for (const Workbox &workbox : Commands::sortedById(workboxes)) {
             ids.append(workbox.id);
         }
         QCOMPARE(ids, (QStringList{"a1", "c10", "c2"}));

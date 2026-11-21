@@ -19,18 +19,18 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 
 find_package(Qt6 6.6 REQUIRED COMPONENTS Core Gui)
-find_package(KF6 6.0 REQUIRED COMPONENTS Config I18n)
+find_package(KF6 6.0 REQUIRED COMPONENTS Config CoreAddons I18n)
 
 add_compile_definitions(TRANSLATION_DOMAIN="workbox")
 
 # What no engine knows: the model, the settings, the Engine interface and the
 # commands (core/), out of the program so the tests and, later, an app use it.
-add_library(workbox-core STATIC core/color.cpp core/commands.cpp core/settings.cpp core/terminalcolors.cpp core/workbox.cpp)
+add_library(workbox-core STATIC core/color.cpp core/commands.cpp core/enginejob.h core/settings.cpp core/terminalcolors.cpp core/workbox.cpp)
 target_include_directories(workbox-core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core)
-target_link_libraries(workbox-core PUBLIC Qt6::Core Qt6::Gui PRIVATE KF6::ConfigCore KF6::I18n)
+target_link_libraries(workbox-core PUBLIC Qt6::Core Qt6::Gui KF6::CoreAddons PRIVATE KF6::ConfigCore KF6::I18n)
 
 # The Engine on Podman (engines/podman/).
-add_library(workbox-podman STATIC engines/podman/podmanengine.cpp)
+add_library(workbox-podman STATIC engines/podman/podmanengine.cpp engines/podman/podmanjob.cpp)
 target_include_directories(workbox-podman PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/engines/podman)
 target_link_libraries(workbox-podman PUBLIC workbox-core PRIVATE KF6::I18n)
 

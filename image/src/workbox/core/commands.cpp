@@ -9,46 +9,93 @@
 namespace Commands
 {
 
-Workbox create(Engine &engine,
-               const QString &id,
-               const std::optional<QString> &name,
-               const std::optional<QString> &color,
-               bool hasSudo,
-               const QString &image)
+CreateJob::CreateJob(Engine &engine,
+                     const QString &id,
+                     const std::optional<QString> &name,
+                     const std::optional<QString> &color,
+                     bool hasSudo,
+                     const QString &image,
+                     QObject *parent)
+    : EngineJob(parent)
+    , m_engine(engine)
+    , m_name(name)
+    , m_color(color)
+    , m_image(image)
+    , m_workbox{.id = id, .name = name.value_or(id), .hasSudo = hasSudo}
 {
-    if (!isValidId(id)) {
-        throw WorkboxError{i18n("invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not starting with a hyphen", id)};
-    }
-    if (name && name->trimmed().isEmpty()) {
-        throw WorkboxError{i18n("the name can't be empty")};
-    }
-    std::optional<QColor> givenColor;
-    if (color) {
-        givenColor = WorkboxColor::parse(*color);
-        if (!givenColor) {
-            throw WorkboxError{i18n("invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)", *color)};
-        }
-    }
+}
 
+void CreateJob::start()
+{
+    // After start() returns, as a KJob's result always comes.
+    QMetaObject::invokeMethod(
+        this,
+        [this] {
+            if (!isValidId(m_workbox.id)) {
+                fail(i18n("invalid id \"%1\": up to 32 lowercase letters (a-z), digits and hyphens, not starting with a hyphen", m_workbox.id));
+                return;
+            }
+            if (m_name && m_name->trimmed().isEmpty()) {
+                fail(i18n("the name can't be empty"));
+                return;
+            }
+            if (m_color) {
+                const std::optional<QColor> givenColor = WorkboxColor::parse(*m_color);
+                if (!givenColor) {
+                    fail(i18n("invalid color \"%1\": use #rgb, #rrggbb or r,g,b (each 0-255)", *m_color));
+                    return;
+                }
+                m_workbox.color = *givenColor;
+            }
+            ListJob *listJob = m_engine.list();
+            runStep(listJob, [this, listJob] {
+                createFrom(listJob->workboxes());
+            });
+        },
+        Qt::QueuedConnection);
+}
+
+void CreateJob::createFrom(const QList<Workbox> &workboxes)
+{
     QList<QColor> colorsInUse;
-    for (const Workbox &workbox : engine.list()) {
-        if (workbox.id == id) {
-            throw WorkboxError{i18n("a workbox with the id \"%1\" already exists", id)};
+    for (const Workbox &workbox : workboxes) {
+        if (workbox.id == m_workbox.id) {
+            fail(i18n("a workbox with the id \"%1\" already exists", m_workbox.id));
+            return;
         }
         colorsInUse.append(workbox.color);
     }
-
-    const Workbox workbox{.id = id,
-                          .name = name.value_or(id),
-                          .color = givenColor ? *givenColor : WorkboxColor::pickFromPalette(colorsInUse),
-                          .hasSudo = hasSudo};
-    engine.create(workbox, image);
-    return workbox;
+    if (!m_color) {
+        m_workbox.color = WorkboxColor::pickFromPalette(colorsInUse);
+    }
+    runStep(m_engine.create(m_workbox, m_image), [this] {
+        emitResult();
+    });
 }
 
-Workbox find(Engine &engine, const QString &id)
+void CreateJob::runStep(EngineJob *job, const std::function<void()> &then)
 {
-    for (const Workbox &workbox : engine.list()) {
+    m_step = job;
+    connect(job, &EngineJob::output, this, &EngineJob::output);
+    connect(job, &KJob::result, this, [this, job, then] {
+        m_step = nullptr;
+        if (job->error()) {
+            fail(job->errorText());
+            return;
+        }
+        then();
+    });
+    job->start();
+}
+
+bool CreateJob::doKill()
+{
+    return !m_step || m_step->kill();
+}
+
+Workbox find(const QList<Workbox> &workboxes, const QString &id)
+{
+    for (const Workbox &workbox : workboxes) {
         if (workbox.id == id) {
             return workbox;
         }
@@ -56,9 +103,8 @@ Workbox find(Engine &engine, const QString &id)
     throw WorkboxError{i18n("there's no workbox with the id \"%1\"", id)};
 }
 
-QList<Workbox> list(Engine &engine)
+QList<Workbox> sortedById(QList<Workbox> workboxes)
 {
-    QList<Workbox> workboxes = engine.list();
     std::ranges::sort(workboxes, {}, &Workbox::id);
     return workboxes;
 }
