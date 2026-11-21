@@ -27,6 +27,34 @@ void printLine(FILE *stream, const QString &line)
     QTextStream(stream) << line << Qt::endl;
 }
 
+// In a terminal with 24-bit color (COLORTERM, as Konsole sets it) and
+// without NO_COLOR (no-color.org): list and info show a workbox's id in its
+// color, and its status in the terminal's green or red.
+bool isColoredTerminal()
+{
+    const QString colorTerm = qEnvironmentVariable("COLORTERM");
+    return isatty(STDOUT_FILENO) && qEnvironmentVariableIsEmpty("NO_COLOR")
+        && (colorTerm == QLatin1String("truecolor") || colorTerm == QLatin1String("24bit"));
+}
+
+QString paint(const QString &text, const QString &sgrCode)
+{
+    static const bool isColored = isColoredTerminal();
+    return isColored ? QStringLiteral("\x1b[%1m%2\x1b[0m").arg(sgrCode, text) : text;
+}
+
+QString paintedId(const Workbox &workbox)
+{
+    const QColor &color = workbox.color;
+    return paint(workbox.id, QStringLiteral("38;2;%1;%2;%3").arg(color.red()).arg(color.green()).arg(color.blue()));
+}
+
+QString paintedStatus(const Workbox &workbox)
+{
+    return workbox.isRunning ? paint(i18nc("status in workbox list", "running"), QStringLiteral("32"))
+                             : paint(i18nc("status in workbox list", "stopped"), QStringLiteral("31"));
+}
+
 Settings readConfiguredSettings()
 {
     return readSettings(settingsFiles());
@@ -253,8 +281,6 @@ int list(const QStringList &arguments)
     const QString idHeader = i18nc("column of workbox list", "ID");
     const QString nameHeader = i18nc("column of workbox list", "NAME");
     const QString statusHeader = i18nc("column of workbox list", "STATUS");
-    const QString running = i18nc("status in workbox list", "running");
-    const QString stopped = i18nc("status in workbox list", "stopped");
     qsizetype idWidth = idHeader.size();
     qsizetype nameWidth = nameHeader.size();
     for (const Workbox &workbox : workboxes) {
@@ -264,23 +290,41 @@ int list(const QStringList &arguments)
     const auto row = [idWidth, nameWidth](const QString &id, const QString &name, const QString &status) {
         return id.leftJustified(idWidth) + QStringLiteral("  ") + name.leftJustified(nameWidth) + QStringLiteral("  ") + status;
     };
-    // In a terminal with 24-bit color (COLORTERM, as Konsole sets it) and
-    // without NO_COLOR (no-color.org): the id in the workbox's color, and the
-    // status in the terminal's green or red.
-    const QString colorTerm = qEnvironmentVariable("COLORTERM");
-    const bool isColored = isatty(STDOUT_FILENO) && qEnvironmentVariableIsEmpty("NO_COLOR")
-        && (colorTerm == QLatin1String("truecolor") || colorTerm == QLatin1String("24bit"));
-    const auto paint = [isColored](const QString &text, const QString &sgrCode) {
-        return isColored ? QStringLiteral("\x1b[%1m%2\x1b[0m").arg(sgrCode, text) : text;
-    };
     printLine(stdout, row(idHeader, nameHeader, statusHeader));
     for (const Workbox &workbox : workboxes) {
-        const QColor &color = workbox.color;
         // Padded outside the color's codes, which take no room.
-        const QString id = paint(workbox.id, QStringLiteral("38;2;%1;%2;%3").arg(color.red()).arg(color.green()).arg(color.blue()))
-            + QString(idWidth - workbox.id.size(), QLatin1Char(' '));
-        const QString status = workbox.isRunning ? paint(running, QStringLiteral("32")) : paint(stopped, QStringLiteral("31"));
-        printLine(stdout, row(id, workbox.name, status));
+        const QString id = paintedId(workbox) + QString(idWidth - workbox.id.size(), QLatin1Char(' '));
+        printLine(stdout, row(id, workbox.name, paintedStatus(workbox)));
+    }
+    return 0;
+}
+
+int info(const QStringList &arguments)
+{
+    QCommandLineParser parser;
+    parser.setApplicationDescription(
+        i18n("Shows a workbox: its name, color, status, image and settings.\n"
+             "\n"
+             "Example:\n"
+             "  workbox info c1"));
+    const QString id = parseId(parser, QStringLiteral("info"), arguments);
+    const Workbox workbox = Commands::find(listWorkboxes(*engineFor(readConfiguredSettings())), id);
+
+    const QList<std::pair<QString, QString>> fields{
+        {i18nc("field of workbox info", "ID"), paintedId(workbox)},
+        {i18nc("field of workbox info", "Name"), workbox.name},
+        {i18nc("field of workbox info", "Color"), workbox.color.name()},
+        {i18nc("field of workbox info", "Status"), paintedStatus(workbox)},
+        {i18nc("field of workbox info", "Image"), workbox.image},
+        {i18nc("field of workbox info", "Sudo"), workbox.hasSudo ? i18nc("sudo in workbox info", "yes") : i18nc("sudo in workbox info", "no")},
+        {i18nc("field of workbox info", "Home"), homeVolumeName(workbox.id)},
+    };
+    qsizetype labelWidth = 0;
+    for (const auto &[label, value] : fields) {
+        labelWidth = std::max(labelWidth, label.size() + 1);
+    }
+    for (const auto &[label, value] : fields) {
+        printLine(stdout, (label + QLatin1Char(':')).leftJustified(labelWidth) + QStringLiteral("  ") + value);
     }
     return 0;
 }
@@ -319,6 +363,9 @@ int main(int argc, char **argv)
         if (command == QLatin1String("enter")) {
             return enter(arguments);
         }
+        if (command == QLatin1String("info")) {
+            return info(arguments);
+        }
         if (command == QLatin1String("--version")) {
             printLine(stdout, QStringLiteral("workbox " WORKBOX_VERSION));
             return 0;
@@ -332,6 +379,7 @@ int main(int argc, char **argv)
                            "Commands:\n"
                            "  create  Create a workbox\n"
                            "  list    List the workboxes\n"
+                           "  info    Show a workbox\n"
                            "  start   Start a workbox\n"
                            "  stop    Stop a workbox\n"
                            "  enter   Open a shell in a workbox\n"

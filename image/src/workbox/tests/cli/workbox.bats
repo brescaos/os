@@ -39,6 +39,19 @@ setup() {
         "$plasmoid/metadata.json"
 }
 
+@test "info shows a workbox's settings" {
+    printf '%s' '[{"Names": ["c1"], "State": "running", "Image": "example.org/image:1", "Labels": {"com.brescaos.workbox.name": "Cliente 01", "com.brescaos.workbox.color": "#3584e4", "com.brescaos.workbox.sudo": "true"}}]' \
+        >"$FAKE_STATE/ps.json"
+    run workbox info c1
+    [[ $status -eq 0 ]]
+    [[ $output == *"Name:    Cliente 01"* ]]
+    [[ $output == *"Color:   #3584e4"* ]]
+    [[ $output == *"Status:  running"* ]]
+    [[ $output == *"Image:   example.org/image:1"* ]]
+    [[ $output == *"Sudo:    yes"* ]]
+    [[ $output == *"Home:    workbox-c1-home"* ]]
+}
+
 @test "workbox --version is VERSION.txt's" {
     run workbox --version
     [[ $output =~ ^workbox\ [0-9]+\.[0-9]+\.[0-9]+$ ]]

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:57+0000\n"
+"POT-Creation-Date: 2026-11-21 11:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,6 +87,11 @@ msgid ""
 msgstr ""
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Color"
+msgstr ""
+
+#: cli/main.cpp
 msgid "Created the workbox %1 (\"%2\")."
 msgstr ""
 
@@ -103,8 +108,23 @@ msgid "Don't ask before removing it."
 msgstr ""
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Home"
+msgstr ""
+
+#: cli/main.cpp
 msgctxt "column of workbox list"
 msgid "ID"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "ID"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Image"
 msgstr ""
 
 #: cli/main.cpp
@@ -130,6 +150,11 @@ msgstr ""
 #: cli/main.cpp
 msgctxt "column of workbox list"
 msgid "NAME"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Name"
 msgstr ""
 
 #: cli/main.cpp
@@ -179,6 +204,14 @@ msgid "STATUS"
 msgstr ""
 
 #: cli/main.cpp
+msgid ""
+"Shows a workbox: its name, color, status, image and settings.\n"
+"\n"
+"Example:\n"
+"  workbox info c1"
+msgstr ""
+
+#: cli/main.cpp
 msgid "Started the workbox %1."
 msgstr ""
 
@@ -191,6 +224,11 @@ msgid ""
 msgstr ""
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Status"
+msgstr ""
+
+#: cli/main.cpp
 msgid "Stopped the workbox %1."
 msgstr ""
 
@@ -200,6 +238,11 @@ msgid ""
 "\n"
 "Example:\n"
 "  workbox stop c1"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Sudo"
 msgstr ""
 
 #: cli/main.cpp
@@ -228,6 +271,7 @@ msgid ""
 "Commands:\n"
 "  create  Create a workbox\n"
 "  list    List the workboxes\n"
+"  info    Show a workbox\n"
 "  start   Start a workbox\n"
 "  stop    Stop a workbox\n"
 "  enter   Open a shell in a workbox\n"
@@ -245,6 +289,11 @@ msgstr ""
 #: cli/main.cpp
 msgctxt "value of --name"
 msgid "name"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "sudo in workbox info"
+msgid "no"
 msgstr ""
 
 #: cli/main.cpp
@@ -267,6 +316,11 @@ msgstr ""
 
 #: cli/main.cpp
 msgid "workbox list takes no arguments (workbox list --help)"
+msgstr ""
+
+#: cli/main.cpp
+msgctxt "sudo in workbox info"
+msgid "yes"
 msgstr ""
 
 #: lib/core/commands.cpp

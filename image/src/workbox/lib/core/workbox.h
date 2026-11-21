@@ -1,6 +1,6 @@
 // A workbox in workbox's own terms (README.md), the same with any engine: its
 // id, name and color, the labels that keep them and its home volume's name,
-// and whether it's running, which only the engine knows.
+// and what only the engine knows: whether it's running, and its image.
 #pragma once
 
 #include <QColor>
@@ -14,6 +14,7 @@ struct Workbox {
     // The user can use sudo in it, without a password.
     bool hasSudo = false;
     bool isRunning = false;
+    QString image;
 };
 
 // What every command fails with: its message is for the user, translated.

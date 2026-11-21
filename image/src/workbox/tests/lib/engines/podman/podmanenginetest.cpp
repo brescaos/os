@@ -80,7 +80,7 @@ private Q_SLOTS:
     void listReadsTheLabels()
     {
         writeState("ps.json",
-                   "[{\"Names\": [\"c1\"], \"State\": \"running\", \"Labels\": {\"com.brescaos.workbox.name\": \"Cliente 01\", \"com.brescaos.workbox.color\": \"#3584e4\"}},"
+                   "[{\"Names\": [\"c1\"], \"State\": \"running\", \"Image\": \"registry.fedoraproject.org/fedora-toolbox:44\", \"Labels\": {\"com.brescaos.workbox.name\": \"Cliente 01\", \"com.brescaos.workbox.color\": \"#3584e4\"}},"
                    " {\"Names\": [\"c2\"], \"State\": \"exited\", \"Labels\": {\"com.brescaos.workbox.name\": \"c2\", \"com.brescaos.workbox.color\": \"#e5a50a\"}}]");
         std::unique_ptr<ListJob> job(PodmanEngine().list());
         job->setAutoDelete(false);
@@ -91,6 +91,7 @@ private Q_SLOTS:
         QCOMPARE(workboxes[0].name, QStringLiteral("Cliente 01"));
         QCOMPARE(workboxes[0].color, QColor("#3584e4"));
         QVERIFY(workboxes[0].isRunning);
+        QCOMPARE(workboxes[0].image, QStringLiteral("registry.fedoraproject.org/fedora-toolbox:44"));
         QCOMPARE(workboxes[1].id, QStringLiteral("c2"));
         QVERIFY(!workboxes[1].isRunning);
         QCOMPARE(calls(), (QList<QStringList>{{"ps", "--all", "--filter", "label=com.brescaos.workbox.name", "--format", "json"}}));

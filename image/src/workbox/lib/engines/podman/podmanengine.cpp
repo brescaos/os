@@ -26,6 +26,7 @@ QList<Workbox> workboxesFromJson(const QByteArray &json)
         // Podman's other states (created, exited, paused…) are all stopped
         // for workbox.
         workbox.isRunning = object[QLatin1String("State")].toString() == QLatin1String("running");
+        workbox.image = object[QLatin1String("Image")].toString();
         workboxes.append(workbox);
     }
     return workboxes;

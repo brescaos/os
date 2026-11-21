@@ -9,6 +9,7 @@ its tray applet; the options that share something with the host come next.
 ```bash
 workbox create c1 --name "Cliente 01" --color '#3584e4'
 workbox list
+workbox info c1
 workbox start c1
 workbox enter c1
 workbox stop c1
@@ -17,7 +18,7 @@ workbox rm c1
 
 `workbox --help` lists the commands, and `workbox <command> --help` shows
 that command's options, with an example. Bash completes the commands,
-their options and the ids `start`, `stop`, `enter` and `rm` take.
+their options and the ids `info`, `start`, `stop`, `enter` and `rm` take.
 
 | Source | Installed as |
 | --- | --- |
@@ -56,6 +57,9 @@ cmake --install build
   whatever runs in it as the user can then be its root.
 - `workbox list [--quiet]` shows every workbox by id, with its name
   and its status.
+- `workbox info <id>` shows it: id, name, color, status, image, whether
+  it has `--sudo`, and its home volume. In a terminal, the id in its color
+  and the status in green or red, as `list`.
 - `workbox start <id>` and `workbox stop <id>` start and stop it, and say
   so when it already is (not an error). Stopping it stops everything in it.
 - `workbox enter <id> [--root]` opens a login bash in it, in the user's
@@ -189,7 +193,7 @@ before the first `list()`, so no change between them is missed.
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and whether it's running, which only the engine knows), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
+| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and what only the engine knows: whether it's running, its image), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
 | `lib/engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `lib/engines/<name>/` |
 | `applet/` | `workbox-applet-model`, the QML module `com.brescaos.workbox` | `WorkboxModel`, the applet's list on the library (out of the QML module so the tests link it), and the plasmoid (`package/`, `metadata.json.in`) |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages, `--version`. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |

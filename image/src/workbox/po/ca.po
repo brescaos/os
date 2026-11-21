@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:57+0000\n"
+"POT-Creation-Date: 2026-11-21 11:35+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -70,7 +70,9 @@ msgstr "Elimina"
 
 #: applet/package/contents/ui/main.qml
 msgid "Remove the workbox “%1”? Everything in it and in its home will be lost."
-msgstr "Vols eliminar el workbox «%1»? Es perdrà tot el que hi ha a dins i a la seva carpeta personal."
+msgstr ""
+"Vols eliminar el workbox «%1»? Es perdrà tot el que hi ha a dins i a la seva "
+"carpeta personal."
 
 #: applet/package/contents/ui/main.qml
 msgid "Start"
@@ -84,6 +86,11 @@ msgstr "Atura"
 msgid ""
 "As the workbox's root, in /root: root only inside it, the user outside it."
 msgstr "Com el root del workbox, a /root: root només a dins; a fora, l'usuari."
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Color"
+msgstr "Color"
 
 #: cli/main.cpp
 msgid "Created the workbox %1 (\"%2\")."
@@ -106,9 +113,24 @@ msgid "Don't ask before removing it."
 msgstr "No preguntar abans d'eliminar-lo."
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Home"
+msgstr "Carpeta personal"
+
+#: cli/main.cpp
 msgctxt "column of workbox list"
 msgid "ID"
 msgstr "ID"
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "ID"
+msgstr "ID"
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Image"
+msgstr "Imatge"
 
 #: cli/main.cpp
 msgid ""
@@ -142,6 +164,11 @@ msgstr ""
 msgctxt "column of workbox list"
 msgid "NAME"
 msgstr "NOM"
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Name"
+msgstr "Nom"
 
 #: cli/main.cpp
 msgid "No workboxes yet: workbox create <id> creates one."
@@ -205,6 +232,14 @@ msgid "STATUS"
 msgstr "ESTAT"
 
 #: cli/main.cpp
+msgid ""
+"Shows a workbox: its name, color, status, image and settings.\n"
+"\n"
+"Example:\n"
+"  workbox info c1"
+msgstr "Mostra un workbox: el seu nom, color, estat, imatge i ajustos.\n\nExemple:\n  workbox info c1"
+
+#: cli/main.cpp
 msgid "Started the workbox %1."
 msgstr "S'ha engegat el workbox %1."
 
@@ -221,6 +256,11 @@ msgstr ""
 "  workbox start c1"
 
 #: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Status"
+msgstr "Estat"
+
+#: cli/main.cpp
 msgid "Stopped the workbox %1."
 msgstr "S'ha aturat el workbox %1."
 
@@ -235,6 +275,11 @@ msgstr ""
 "\n"
 "Exemple:\n"
 "  workbox stop c1"
+
+#: cli/main.cpp
+msgctxt "field of workbox info"
+msgid "Sudo"
+msgstr "Sudo"
 
 #: cli/main.cpp
 msgid "The name it's shown with (default: its id)."
@@ -262,6 +307,7 @@ msgid ""
 "Commands:\n"
 "  create  Create a workbox\n"
 "  list    List the workboxes\n"
+"  info    Show a workbox\n"
 "  start   Start a workbox\n"
 "  stop    Stop a workbox\n"
 "  enter   Open a shell in a workbox\n"
@@ -269,22 +315,7 @@ msgid ""
 "\n"
 "\"workbox <command> --help\" shows a command's options; \"workbox --"
 "version\", its version."
-msgstr ""
-"Ús: workbox <ordre> [opcions]\n"
-"\n"
-"Executa contenidors, cadascun un lloc de treball a part, que no comparteixen "
-"res amb el sistema.\n"
-"\n"
-"Ordres:\n"
-"  create  Crea un workbox\n"
-"  list    Llista els workboxes\n"
-"  start   Engega un workbox\n"
-"  stop    Atura un workbox\n"
-"  enter   Obre un shell en un workbox\n"
-"  rm      Elimina un workbox i la seva carpeta personal\n"
-"\n"
-"«workbox <ordre> --help» mostra les opcions d'una ordre; «workbox --"
-"version», la seva versió."
+msgstr "Ús: workbox <ordre> [opcions]\n\nExecuta contenidors, cadascun un lloc de treball a part, que no comparteixen res amb el sistema.\n\nOrdres:\n  create  Crea un workbox\n  list    Llista els workboxes\n  info    Mostra un workbox\n  start   Engega un workbox\n  stop    Atura un workbox\n  enter   Obre un shell en un workbox\n  rm      Elimina un workbox i la seva carpeta personal\n\n«workbox <ordre> --help» mostra les opcions d'una ordre; «workbox --version», la seva versió."
 
 #: cli/main.cpp
 msgctxt "value of --color"
@@ -295,6 +326,11 @@ msgstr "color"
 msgctxt "value of --name"
 msgid "name"
 msgstr "nom"
+
+#: cli/main.cpp
+msgctxt "sudo in workbox info"
+msgid "no"
+msgstr "no"
 
 #: cli/main.cpp
 msgctxt "status in workbox list"
@@ -317,6 +353,11 @@ msgstr "workbox %1 necessita un id (workbox %1 --help)"
 #: cli/main.cpp
 msgid "workbox list takes no arguments (workbox list --help)"
 msgstr "workbox list no admet arguments (workbox list --help)"
+
+#: cli/main.cpp
+msgctxt "sudo in workbox info"
+msgid "yes"
+msgstr "sí"
 
 #: lib/core/commands.cpp
 msgid "a workbox with the id \"%1\" already exists"
