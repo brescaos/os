@@ -214,6 +214,22 @@ private Q_SLOTS:
         QCOMPARE(output, (QStringList{"Trying to pull image", "Copying blob", "Writing manifest"}));
     }
 
+    // On a terminal, podman writes its standard error itself, as it would on
+    // its own (its progress bars): nothing goes to output().
+    void outputToTerminal()
+    {
+        writeState("stderr", "Copying blob\n");
+        std::unique_ptr<EngineJob> job(PodmanEngine().start("c1"));
+        job->setAutoDelete(false);
+        job->setOutputToTerminal(true);
+        QStringList output;
+        connect(job.get(), &EngineJob::output, this, [&output](const QString &line) {
+            output.append(line);
+        });
+        QVERIFY(job->exec());
+        QCOMPARE(output, QStringList());
+    }
+
     // The event loop keeps running while podman does: the job never waits.
     void doesntBlock()
     {

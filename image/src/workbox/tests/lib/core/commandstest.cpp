@@ -27,7 +27,9 @@ public:
         QMetaObject::invokeMethod(
             this,
             [this] {
-                Q_EMIT output(QStringLiteral("fake output"));
+                if (!isOutputToTerminal()) {
+                    Q_EMIT output(QStringLiteral("fake output"));
+                }
                 if (!m_failure.isEmpty()) {
                     fail(m_failure);
                     return;
@@ -204,6 +206,21 @@ private Q_SLOTS:
         QVERIFY(!job.exec());
         QCOMPARE(job.errorText(), engine.createFailure);
         QCOMPARE(output, (QStringList{"fake output", "fake output"}));
+    }
+
+    // On a terminal, its steps' output goes there too, not to output().
+    void createOutputToTerminal()
+    {
+        FakeEngine engine;
+        Commands::CreateJob job(engine, "c1", std::nullopt, std::nullopt, false, image);
+        job.setAutoDelete(false);
+        job.setOutputToTerminal(true);
+        QStringList output;
+        connect(&job, &EngineJob::output, this, [&output](const QString &line) {
+            output.append(line);
+        });
+        QVERIFY(job.exec());
+        QCOMPARE(output, QStringList());
     }
 
     // Its result comes after start() returns, from the event loop.

@@ -32,13 +32,15 @@ Settings readConfiguredSettings()
     return readSettings(settingsFiles());
 }
 
-// Runs job to its end, its output on stderr as it comes, and gives it back;
-// throws its error. Waiting is fine here: this is the command line.
+// Runs job to its end, its output on stderr as it comes (on a terminal, as the
+// engine writes it: Podman's progress bars), and gives it back; throws its
+// error. Waiting is fine here: this is the command line.
 template<typename Job>
 std::unique_ptr<Job> runToEnd(Job *job)
 {
     std::unique_ptr<Job> ownedJob(job);
     ownedJob->setAutoDelete(false);
+    ownedJob->setOutputToTerminal(isatty(STDERR_FILENO));
     QObject::connect(ownedJob.get(), &EngineJob::output, [](const QString &line) {
         printLine(stderr, line);
     });

@@ -18,6 +18,19 @@ class EngineJob : public KJob
 public:
     using KJob::KJob;
 
+    // Lets the engine write what it prints straight to this process's
+    // standard error, as it would on its own (Podman's progress bars, on a
+    // terminal), instead of giving it to output(). Before start().
+    void setOutputToTerminal(bool isOutputToTerminal)
+    {
+        m_isOutputToTerminal = isOutputToTerminal;
+    }
+
+    bool isOutputToTerminal() const
+    {
+        return m_isOutputToTerminal;
+    }
+
 Q_SIGNALS:
     void output(const QString &line);
 
@@ -29,6 +42,9 @@ protected:
         setErrorText(message);
         emitResult();
     }
+
+private:
+    bool m_isOutputToTerminal = false;
 };
 
 // Engine::enter()'s job: the shell's exit status, once it has ended. The

@@ -57,10 +57,14 @@ void PodmanJob::runNextCommand()
 
     const QStringList arguments = m_pendingCommands.takeFirst();
     m_process = new QProcess(this);
-    connect(m_process, &QProcess::readyReadStandardError, this, [this] {
-        m_errorOutput += m_process->readAllStandardError();
-        emitCompleteLines(false);
-    });
+    if (isOutputToTerminal()) {
+        m_process->setProcessChannelMode(QProcess::ForwardedErrorChannel);
+    } else {
+        connect(m_process, &QProcess::readyReadStandardError, this, [this] {
+            m_errorOutput += m_process->readAllStandardError();
+            emitCompleteLines(false);
+        });
+    }
     connect(m_process, &QProcess::finished, this, [this, arguments](int exitCode, QProcess::ExitStatus exitStatus) {
         finishCommand(exitStatus == QProcess::NormalExit && exitCode == 0, i18n("podman %1 failed", arguments.join(QLatin1Char(' '))));
     });

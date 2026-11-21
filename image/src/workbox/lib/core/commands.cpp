@@ -76,6 +76,7 @@ void CreateJob::createFrom(const QList<Workbox> &workboxes)
 void CreateJob::runStep(EngineJob *job, const std::function<void()> &then)
 {
     m_step = job;
+    job->setOutputToTerminal(isOutputToTerminal());
     connect(job, &EngineJob::output, this, &EngineJob::output);
     connect(job, &KJob::result, this, [this, job, then] {
         m_step = nullptr;

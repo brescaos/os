@@ -1,6 +1,7 @@
 // Podman's commands as an EngineJob (README.md): run one after another with
 // QProcess's signals, never waiting. Each one's standard error goes to
-// output() line by line as it comes (an image's download, Podman's errors).
+// output() line by line as it comes (an image's download, Podman's errors),
+// or straight to this process's with setOutputToTerminal().
 // It fails at the first command that fails, after its cleanup commands, if
 // any, whose own failures are ignored. The cleanup undoes what the commands
 // before did, so it doesn't run when the first one fails: there's nothing to

@@ -170,8 +170,12 @@ says when it's done with its `result()` signal, so an applet or an app can
 use the engine without freezing. On failure, its `errorText()` says why,
 translated. Its `output(line)` signal gives what the engine prints as it
 goes (Podman's standard error: an image's download, its errors), for
-whoever wants to show it. The command line runs each job with `exec()`,
-which waits in an event loop, and prints its output to stderr as it comes.
+whoever wants to show it, or, with `setOutputToTerminal(true)`, goes
+straight to the process's standard error, as the engine writes it on its
+own. The command line runs each job with `exec()`, which waits in an event
+loop: on a terminal, with `setOutputToTerminal(true)`, so Podman draws its
+progress bars; elsewhere (a pipe, a file), printing its output to stderr
+line by line.
 `enter`'s job (`EnterJob`) runs the shell on the process's terminal, which
 podman reads and writes itself, and ends when the shell exits, with its
 exit status: the shell failing isn't the job failing.
