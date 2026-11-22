@@ -157,4 +157,21 @@ QColor pickFromPalette(const QList<QColor> &colorsInUse)
     });
 }
 
+QList<QColor> suggestions(const QList<QColor> &colorsInUse, int count)
+{
+    QList<QColor> inUse = colorsInUse;
+    QList<QColor> suggested;
+    // With every color in use, the least used can be one already suggested
+    // (a tie goes to the palette's order): it's in use once more, until
+    // another is the least used.
+    while (suggested.size() < count) {
+        const QColor picked = pickFromPalette(inUse);
+        inUse.append(picked);
+        if (!suggested.contains(picked)) {
+            suggested.append(picked);
+        }
+    }
+    return suggested;
+}
+
 }

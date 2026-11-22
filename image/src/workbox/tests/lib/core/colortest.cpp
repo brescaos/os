@@ -106,6 +106,33 @@ private Q_SLOTS:
         colorsInUse.append(palette().at(0));
         QCOMPARE(pickFromPalette(colorsInUse), palette().at(1));
     }
+
+    // Each what pickFromPalette() would pick with the ones before in use.
+    void suggestsPicksInARow()
+    {
+        const QList<QColor> colorsInUse{palette().at(3), palette().at(20)};
+        const QList<QColor> suggested = suggestions(colorsInUse, 5);
+        QCOMPARE(suggested.size(), 5);
+        QList<QColor> inUse = colorsInUse;
+        for (const QColor &color : suggested) {
+            QCOMPARE(color, pickFromPalette(inUse));
+            inUse.append(color);
+        }
+    }
+
+    // All in use but one: the free one, then different ones of the least
+    // used.
+    void suggestsDifferentColors()
+    {
+        QList<QColor> colorsInUse = palette();
+        colorsInUse.removeAt(7);
+        const QList<QColor> suggested = suggestions(colorsInUse, 5);
+        QCOMPARE(suggested.first(), palette().at(7));
+        QCOMPARE(suggested.size(), 5);
+        for (const QColor &color : suggested) {
+            QCOMPARE(suggested.count(color), 1);
+        }
+    }
 };
 
 QTEST_GUILESS_MAIN(ColorTest)

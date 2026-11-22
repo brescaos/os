@@ -6,6 +6,8 @@
 
 // The toolbox on the workbox's color, in rect.
 void paintSwatch(QPainter *painter, const QRect &rect, const QColor &workboxColor);
+// The same, size pixels wide, for a label.
+QPixmap swatchPixmap(const QColor &workboxColor, int size, qreal pixelRatio);
 
 // Running or stopped, or the operation going on (WorkboxModel's roles of
 // index), translated.

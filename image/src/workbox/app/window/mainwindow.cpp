@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "dialogs/workbox/create.h"
 #include "terminals.h"
 #include "volumes.h"
 #include "workboxdelegate.h"
@@ -54,15 +55,6 @@ QPushButton *createButton(const QString &iconName, const QString &text, const QS
 {
     auto *button = new QPushButton(QIcon::fromTheme(iconName), text);
     button->setObjectName(objectName);
-    return button;
-}
-
-// The create button, there until creating has a form.
-QPushButton *createCreateButton(const QString &text, const QString &objectName)
-{
-    QPushButton *button = createButton(QStringLiteral("list-add"), text, objectName);
-    button->setEnabled(false);
-    button->setToolTip(i18nc("@info:tooltip", "Not available yet"));
     return button;
 }
 
@@ -162,6 +154,7 @@ MainWindow::MainWindow(WorkboxModel &model, QWidget *parent)
     connect(&m_model, &QAbstractItemModel::rowsRemoved, this, &MainWindow::keepASelection);
     connect(&m_model, &QAbstractItemModel::dataChanged, this, &MainWindow::showSelected);
     connect(&m_model, &WorkboxModel::problemChanged, this, &MainWindow::showSelected);
+    connect(&m_model, &WorkboxModel::problemChanged, this, &MainWindow::enableCreating);
     connect(m_list->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex &current) {
         if (current.isValid()) {
             m_selectedId = current.data(WorkboxModel::IdRole).toString();
@@ -171,6 +164,15 @@ MainWindow::MainWindow(WorkboxModel &model, QWidget *parent)
     });
     updateCount();
     showSelected();
+    enableCreating();
+}
+
+QPushButton *MainWindow::createCreateButton(const QString &text, const QString &objectName)
+{
+    QPushButton *button = createButton(QStringLiteral("list-add"), text, objectName);
+    connect(button, &QPushButton::clicked, this, &MainWindow::openCreateDialog);
+    m_createButtons.append(button);
+    return button;
 }
 
 QWidget *MainWindow::createSidebar()
@@ -363,14 +365,7 @@ void MainWindow::showSelected()
         m_shouldOpenShell.remove(workbox.id);
     }
 
-    const qreal pixelRatio = devicePixelRatioF();
-    QPixmap swatch(QSize(headerSwatchSize, headerSwatchSize) * pixelRatio);
-    swatch.setDevicePixelRatio(pixelRatio);
-    swatch.fill(Qt::transparent);
-    QPainter painter(&swatch);
-    paintSwatch(&painter, QRect(0, 0, headerSwatchSize, headerSwatchSize), workbox.color);
-    painter.end();
-    m_swatch->setPixmap(swatch);
+    m_swatch->setPixmap(swatchPixmap(workbox.color, headerSwatchSize, devicePixelRatioF()));
     m_nameLabel->setText(workbox.name);
     m_detailLabel->setText(i18nc("@info a workbox's id and status", "%1 · %2", workbox.id, statusText(index)));
 
@@ -449,7 +444,7 @@ void MainWindow::showInformation(const Workbox &workbox)
     m_volumesLabel->setText(volumes.isEmpty() ? i18nc("@info a workbox's volumes", "None") : volumes.join(QLatin1Char('\n')));
 }
 
-void MainWindow::openTerminal(const QString &id)
+void MainWindow::select(const QString &id)
 {
     m_selectedId = id;
     m_shellError.clear();
@@ -457,6 +452,12 @@ void MainWindow::openTerminal(const QString &id)
     if (shown.isValid()) {
         m_list->setCurrentIndex(shown);
     }
+    showSelected();
+}
+
+void MainWindow::openTerminal(const QString &id)
+{
+    select(id);
     m_tabs->setCurrentWidget(m_terminalStack);
     if (!selectedIndex().data(WorkboxModel::RunningRole).toBool()) {
         startSelected();
@@ -480,6 +481,23 @@ void MainWindow::openSelectedInKonsole()
     if (!QProcess::startDetached(QStringLiteral("konsole"), QStringList{QStringLiteral("-e")} + commandLine)) {
         showError(i18n("Konsole couldn't be started."));
     }
+}
+
+void MainWindow::enableCreating()
+{
+    for (QPushButton *button : std::as_const(m_createButtons)) {
+        button->setEnabled(m_model.problem().isEmpty());
+    }
+}
+
+void MainWindow::openCreateDialog()
+{
+    auto *dialog = new CreateWorkboxDialog(m_model, this);
+    dialog->setObjectName(QStringLiteral("createDialog"));
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialog, &CreateWorkboxDialog::created, this, &MainWindow::select);
+    connect(dialog, &CreateWorkboxDialog::terminalRequested, this, &MainWindow::openTerminal);
+    dialog->open();
 }
 
 void MainWindow::confirmRemoval(const Workbox &workbox)

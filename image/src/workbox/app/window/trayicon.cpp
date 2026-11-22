@@ -14,36 +14,6 @@
 namespace
 {
 
-// The number of running workboxes ("9+" from ten on) in a pill of the
-// palette's highlight, with a ring of its window color that sets it apart
-// from the toolbox's lines. The tray draws it on the icon's corner.
-QIcon runningCountBadge(int runningCount, const QPalette &palette)
-{
-    const QString text = runningCount > 9 ? QStringLiteral("9+") : QString::number(runningCount);
-    QIcon badge;
-    for (const int size : {16, 22, 32, 44}) {
-        QPixmap pixmap(size, size);
-        pixmap.fill(Qt::transparent);
-        QPainter painter(&pixmap);
-        painter.setRenderHint(QPainter::Antialiasing);
-        QFont font = QApplication::font();
-        font.setPixelSize(qRound(size * 0.55));
-        font.setWeight(QFont::DemiBold);
-        painter.setFont(font);
-        const int height = qRound(size * 0.8);
-        const int width = qMin(size, qMax(height, painter.fontMetrics().horizontalAdvance(text) + height / 2));
-        const QRectF pill(size - width + 0.5, size - height + 0.5, width - 1, height - 1);
-        painter.setPen(QPen(palette.color(QPalette::Window), 1));
-        painter.setBrush(palette.color(QPalette::Highlight));
-        painter.drawRoundedRect(pill, pill.height() / 2, pill.height() / 2);
-        painter.setPen(palette.color(QPalette::HighlightedText));
-        painter.drawText(pill, Qt::AlignCenter, text);
-        painter.end();
-        badge.addPixmap(pixmap);
-    }
-    return badge;
-}
-
 QIcon swatchIcon(const QColor &workboxColor)
 {
     QPixmap pixmap(32, 32);
@@ -65,7 +35,6 @@ TrayIcon::TrayIcon(WorkboxModel &model, MainWindow &window, QObject *parent)
     m_item->setCategory(KStatusNotifierItem::ApplicationStatus);
     m_item->setStatus(KStatusNotifierItem::Active);
     m_item->setTitle(i18nc("@title the app's name", "Workbox"));
-    m_item->setIconByName(QStringLiteral("com.brescaos.workbox-symbolic"));
     m_item->setToolTipIconByName(QStringLiteral("com.brescaos.workbox"));
     m_item->setToolTipTitle(i18nc("@title the app's name", "Workbox"));
     // Its own Quit, at the end of its menu, which it fills itself.
@@ -80,24 +49,14 @@ TrayIcon::TrayIcon(WorkboxModel &model, MainWindow &window, QObject *parent)
     }
     connect(&m_model, &QAbstractItemModel::dataChanged, this, &TrayIcon::updateMenu, Qt::QueuedConnection);
     connect(&m_model, &WorkboxModel::problemChanged, this, &TrayIcon::updateMenu, Qt::QueuedConnection);
-    qApp->installEventFilter(this);
-
     updateRunningCount();
     updateMenu();
-}
-
-bool TrayIcon::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == qApp && event->type() == QEvent::ApplicationPaletteChange) {
-        updateRunningCount();
-    }
-    return QObject::eventFilter(watched, event);
 }
 
 void TrayIcon::updateRunningCount()
 {
     const int runningCount = m_model.runningCount();
-    m_item->setOverlayIconByPixmap(runningCount > 0 ? runningCountBadge(runningCount, QApplication::palette()) : QIcon());
+    m_item->setIconByName(runningCount > 0 ? QStringLiteral("com.brescaos.workbox-running-symbolic") : QStringLiteral("com.brescaos.workbox-symbolic"));
     m_item->setToolTipSubTitle(i18np("%1 workbox running", "%1 workboxes running", runningCount));
 }
 

@@ -1,6 +1,5 @@
 #include "workboxmodel.h"
 
-#include "commands.h"
 #include "engines.h"
 #include "settings.h"
 #include "terminalcolors.h"
@@ -11,7 +10,9 @@ WorkboxModel::WorkboxModel(QObject *parent)
     : QAbstractListModel(parent)
 {
     try {
-        m_engine = engineNamed(readSettings(settingsFiles()).engine);
+        const Settings settings = readSettings(settingsFiles());
+        m_engine = engineNamed(settings.engine);
+        m_image = settings.image;
     } catch (const WorkboxError &error) {
         setProblem(error.message);
         return;
@@ -74,6 +75,11 @@ QString WorkboxModel::problem() const
     return m_problem;
 }
 
+QString WorkboxModel::image() const
+{
+    return m_image;
+}
+
 void WorkboxModel::start(const QString &id)
 {
     if (m_engine) {
@@ -94,6 +100,29 @@ void WorkboxModel::remove(const QString &id)
     if (m_engine && row >= 0) {
         beginOperation(id, Operation::Removing, m_engine->remove(m_rows[row].workbox));
     }
+}
+
+// Its row at once, not after the engine's events: the window can select it.
+Commands::CreateJob *WorkboxModel::create(const QString &id, const Commands::CreateOptions &options)
+{
+    auto *job = new Commands::CreateJob(*m_engine, id, options, m_image);
+    connect(job, &KJob::result, this, [this, job] {
+        Workbox created = job->workbox();
+        if (job->error() || rowOf(created.id) >= 0) {
+            return;
+        }
+        created.image = m_image;
+        const auto next = std::ranges::upper_bound(m_rows, created.id, {}, [](const Row &row) {
+            return row.workbox.id;
+        });
+        const int row = static_cast<int>(next - m_rows.begin());
+        beginInsertRows(QModelIndex(), row, row);
+        m_rows.insert(row, {.workbox = created});
+        endInsertRows();
+        updateRunningCount();
+    });
+    job->start();
+    return job;
 }
 
 QStringList WorkboxModel::shellCommandLine(const QString &id) const

@@ -87,7 +87,7 @@ private Q_SLOTS:
         auto *colorLabel = child<QLabel>(window, "colorLabel");
         QVERIFY(!colorLabel->pixmap().isNull());
         QCOMPARE(colorLabel->toolTip(), QStringLiteral("#3584e4"));
-        QVERIFY(!child<QPushButton>(window, "createButton")->isEnabled());
+        QVERIFY(child<QPushButton>(window, "createButton")->isEnabled());
     }
 
     // Starting it from its stopped page starts it, and the page goes.
@@ -168,7 +168,7 @@ private Q_SLOTS:
         QCOMPARE(list->model()->index(0, 0).data(WorkboxModel::IdRole).toString(), QStringLiteral("c1"));
     }
 
-    // No workboxes: how to create one, not yet available.
+    // No workboxes: how to create one.
     void empty()
     {
         writeState("ps.json", "[]");
@@ -176,7 +176,8 @@ private Q_SLOTS:
         MainWindow window(model);
         window.show();
         QTRY_VERIFY(child<QWidget>(window, "emptyPage")->isVisible());
-        QVERIFY(!child<QPushButton>(window, "emptyCreateButton")->isEnabled());
+        child<QPushButton>(window, "emptyCreateButton")->click();
+        QVERIFY(child<QDialog>(window, "createDialog"));
     }
 
     // Without settings, why.
@@ -188,6 +189,7 @@ private Q_SLOTS:
         window.show();
         QVERIFY(child<QLabel>(window, "problemLabel")->isVisible());
         QVERIFY(child<QLabel>(window, "problemLabel")->text().startsWith("no engine in "));
+        QVERIFY(!child<QPushButton>(window, "createButton")->isEnabled());
     }
 
     // sh sets the colors, then runs the command line as it is.

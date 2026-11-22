@@ -1,11 +1,11 @@
 // The app's list (README.md), its window's and its tray icon's: every
 // workbox, running or not, by id. It follows the engine's watch() and lists
 // again on every change, wherever it changed, and it starts, stops and removes
-// workboxes, one operation at a time per workbox. Nothing blocks: each is an
-// engine's job.
+// workboxes, one operation at a time per workbox, and creates them. Nothing
+// blocks: each is an engine's job.
 #pragma once
 
-#include "engine.h"
+#include "commands.h"
 
 #include <QAbstractListModel>
 
@@ -51,12 +51,18 @@ public:
 
     int runningCount() const;
     QString problem() const;
+    // The image a new workbox is created from: workbox.conf's.
+    QString image() const;
 
     // Each one does nothing while the workbox has an operation going on.
     void start(const QString &id);
     void stop(const QString &id);
     // Without asking: the window asks first.
     void remove(const QString &id);
+    // Creates the workbox id from image(), as `workbox create`; its row is
+    // there as soon as the job succeeds. The job is started, and deletes
+    // itself after its result. Only without a problem from the settings.
+    Commands::CreateJob *create(const QString &id, const Commands::CreateOptions &options);
 
     // For a terminal emulator: the program and its arguments that open a
     // login shell in the running workbox, with its prompt
@@ -88,6 +94,7 @@ private:
     void setProblem(const QString &problem);
 
     std::unique_ptr<Engine> m_engine;
+    QString m_image;
     WatchJob *m_watch = nullptr;
     QList<Row> m_rows;
     int m_runningCount = 0;

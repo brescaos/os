@@ -164,6 +164,13 @@ Volume parseVolume(const QString &argument, const QString &home)
             .isReadOnly = isReadOnly};
 }
 
+QString volumeArgument(const Volume &volume)
+{
+    const QString source = volume.source.isEmpty() ? volume.name : volume.source;
+    const QString argument = source.isEmpty() ? volume.target : source + QLatin1Char(':') + volume.target;
+    return volume.isReadOnly ? argument + QStringLiteral(":ro") : argument;
+}
+
 QString volumeDescription(const Volume &volume)
 {
     const QString folders = !volume.name.isEmpty()

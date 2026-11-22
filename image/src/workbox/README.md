@@ -31,6 +31,7 @@ their options and the ids `info`, `start`, `stop`, `enter` and `rm` take.
 | `app/com.brescaos.workbox.desktop.in` (translated) | `/usr/share/applications/com.brescaos.workbox.desktop` |
 | `app/icons/com.brescaos.workbox.svg` | `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox.svg`, the app's icon (its `.desktop`, its window, no workboxes) |
 | `app/icons/workbox-symbolic.svg` | `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox-symbolic.svg`, the toolbox of the tray icon and of each workbox's color in the window |
+| `app/icons/workbox-running-symbolic.svg` | `/usr/share/icons/hicolor/scalable/apps/com.brescaos.workbox-running-symbolic.svg`, the tray icon while any workbox runs: the toolbox with a dot |
 | `po/<lang>.po` | `/usr/share/locale/<lang>/LC_MESSAGES/workbox.mo` |
 
 Its version is in `VERSION.txt`; `workbox --version` shows it.
@@ -156,9 +157,27 @@ name or id; the first one is selected. On the right, the selected one:
 - **Information**: its image, home, color, sudo, Wayland and volumes, as
   `workbox info`.
 
-**Create** is there, disabled, until creating has a form. With no workboxes,
-it says what one is; when workbox can't run (its settings, its engine),
-why.
+**Create** opens its dialog, as `workbox create`: its name, and its id,
+which follows the name (lowercase, without accents) until one is typed and
+says when it's invalid or taken; the image `workbox.conf` names; its color,
+at first the one `create` would pick, **Change…** for any other, and under
+it five suggestions, smaller, to click: that one and what `create` would
+pick after it, each with the ones before in use too
+(`WorkboxColor::suggestions()`); its
+volumes, a row each (where it is from and in the workbox, its type, and
+buttons to edit and remove it), and **Add Volume…**, which opens a dialog
+of its own (`dialogs/volume/add.h`, also to edit one): its type, a shared
+volume (a folder of the home, typed with `~` for the home or chosen, and
+read-only), a labeled one (a named volume of its own) or a volume of its
+own without a name; then where, its source → the folder in the workbox,
+which a shared folder fills in with its own place in the home while it's
+empty; `-v`'s error in place of its hint, and Add only once it can be; and
+Wayland and sudo. Create is enabled only once it can be. Then its progress,
+with the engine's last line (an image's download) and Cancel; a failure goes
+back to the form with why. Once created, it's selected, and the dialog offers
+**Open a Terminal** in it. With no workboxes, the window says what one is;
+when workbox can't run (its settings, its engine), why, and Create is
+disabled.
 
 The terminal is Konsole's part, which runs `sh` to set the colors (OSC 11
 and 10, as `workbox enter` does) and then `Engine::shellCommandLine()`'s
@@ -170,12 +189,14 @@ command, `podman exec --tty … bash --login`, with its prompt in `PS1` and
 ### Tray icon
 
 While the app runs, and only then, the system tray shows its icon: the
-toolbox (`com.brescaos.workbox-symbolic`, which the tray colors as its other
-symbols), with the number of running workboxes in a badge on its corner
-("9+" from ten on), none while none runs; its tooltip says how many run. It
+toolbox (`com.brescaos.workbox-symbolic`) or, while any workbox runs, the
+toolbox with a dot on its corner (`com.brescaos.workbox-running-symbolic`,
+the dot in the color scheme's highlight); its tooltip says how many run. It
 goes when the app quits, with its window. It's a StatusNotifierItem
-(`KStatusNotifierItem`, `app/window/trayicon.h`), its badge an overlay the
-app draws in the palette's highlight.
+(`KStatusNotifierItem`, `app/window/trayicon.h`). Both icons go by name and
+follow the color scheme, so the tray colors them as its other symbols: a
+pixmap, or an overlay (which Plasma draws onto the icon), it would draw in
+their fallback colors instead, dark on a dark panel.
 
 - A click shows the window, and raises it.
 - Its menu has a submenu per workbox, by id, with its color and its status
@@ -337,9 +358,9 @@ before the first `list()`, so no change between them is missed.
 
 | Folder | Library | What it is |
 | --- | --- | --- |
-| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and what only the engine knows: whether it's running, its image), its labels and its volume's name. `color.h`: `--color`'s formats, the palette and the pick. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox, what sets them, and the prompt. `volumes.h`: `-v`, the folders that can be shared, and how a volume is shown. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
+| `lib/core/` | `workbox-core` | What no engine knows. `workbox.h`: the model, a workbox (id, name, color, and what only the engine knows: whether it's running, its image), its labels and its volume's name. `color.h`: `--color`'s formats, the palette, the pick and the suggestions after it. `settings.h`: `workbox.conf`. `enginejob.h`: an engine's job. `engine.h`: what workbox needs from an engine (list, watch, create, start, stop, enter, remove, each a job). `terminalcolors.h`: the terminal's colors for a workbox, what sets them, and the prompt. `volumes.h`: `-v` both ways, the folders that can be shared, and how a volume is shown. `commands.h`: what the commands do on any engine: `CreateJob` (lists, checks the id, picks the color, creates), `find` and `sortedById` |
 | `lib/engines/podman/` | `workbox-podman` | `PodmanEngine`, the only code that knows Podman's commands, and `PodmanJob`, which runs them one after another with `QProcess`'s signals (with cleanup commands to undo the earlier ones when one fails, never when the first one does), `PodmanEnterJob`, `podman exec`'s shell on the terminal, and `PodmanWatchJob`, `podman events`. Another engine would go in `lib/engines/<name>/` |
-| `app/` | `workbox-model`, `workbox-window` | `workboxmodel.h`: `WorkboxModel`, the list of the window and the tray icon on the library. `window/`: the window (`mainwindow.h`), its rows and swatch (`workboxdelegate.h`), its terminals, Konsole's part (`terminals.h`), and the tray icon (`trayicon.h`), out of the program (`main.cpp`) so the tests link them. `icons/`: the app's icon and the toolbox. `com.brescaos.workbox.desktop.in`: the app's `.desktop` |
+| `app/` | `workbox-model`, `workbox-window` | `workboxmodel.h`: `WorkboxModel`, the list of the window and the tray icon on the library. `window/`: the window (`mainwindow.h`), its rows and swatch (`workboxdelegate.h`), its dialogs (`dialogs/`: creating a workbox, `dialogs/workbox/create.h`, adding a volume to it, `dialogs/volume/add.h`, and the parts of their forms, `dialogs/formparts.h`), its terminals, Konsole's part (`terminals.h`), and the tray icon (`trayicon.h`), out of the program (`main.cpp`) so the tests link them. `icons/`: the app's icon and the toolbox. `com.brescaos.workbox.desktop.in`: the app's `.desktop` |
 | `cli/` | (the program) | `main.cpp`, the command line: arguments, help, messages, `--version`. `completion.bash`, its bash completion: keep it in sync with the commands and options; the ids come from `workbox list --quiet` |
 
 - A workbox is a container with the labels `com.brescaos.workbox.name`,
@@ -402,7 +423,11 @@ options aren't translated; Qt's own words in the help (`Usage:`,
   window, offscreen (`tests/app/window/`): the list, its search, start,
   stop, remove only once the id is typed, opening a terminal from the tray,
   no workboxes, the problem, and the command line that sets the terminal's
-  colors; and its tray icon: how many run, its badge and its menu. Konsole's
+  colors; its create dialog: the id from the name, a taken id, the color, from
+  the suggestions and the color dialog, its volumes
+  through their dialog, edited and removed; the volume dialog: its types,
+  the folder in the workbox filled in, a blocked folder, editing one; what it creates with and its row at once, and a failure;
+  and its tray icon: how many run, its icon with and without the dot, and its menu. Konsole's
   part and Plasma's tray themselves aren't tested.
   They also check that nothing blocks: results come after `start()`
   returns, and the event loop keeps running while podman does; a job's

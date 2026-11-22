@@ -19,13 +19,16 @@ target_compile_definitions(podmanenginetest PRIVATE FAKES_DIR="${CMAKE_CURRENT_S
 ecm_add_test(app/workboxmodeltest.cpp LINK_LIBRARIES workbox-model Qt6::Test)
 target_compile_definitions(workboxmodeltest PRIVATE FAKES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fakes")
 
-# The app's window and its tray icon, with the fake podman, offscreen.
-ecm_add_tests(app/window/mainwindowtest.cpp app/window/trayicontest.cpp
+# The app's window, its dialogs and its tray icon, with the fake podman,
+# offscreen.
+ecm_add_tests(app/window/mainwindowtest.cpp app/window/trayicontest.cpp app/window/dialogs/workbox/createtest.cpp
+              app/window/dialogs/volume/addtest.cpp
               LINK_LIBRARIES workbox-window KF6::StatusNotifierItem Qt6::Test)
 target_compile_definitions(mainwindowtest PRIVATE FAKES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fakes")
 target_compile_definitions(trayicontest PRIVATE FAKES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fakes")
+target_compile_definitions(createtest PRIVATE FAKES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fakes")
 
 # English strings, whatever the developer's locale.
 set_tests_properties(workboxtest colortest settingstest volumestest commandstest terminalcolorstest podmanenginetest workboxmodeltest
                      PROPERTIES ENVIRONMENT "LANGUAGE=en")
-set_tests_properties(mainwindowtest trayicontest PROPERTIES ENVIRONMENT "LANGUAGE=en;QT_QPA_PLATFORM=offscreen")
+set_tests_properties(mainwindowtest trayicontest createtest addtest PROPERTIES ENVIRONMENT "LANGUAGE=en;QT_QPA_PLATFORM=offscreen")

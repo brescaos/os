@@ -31,4 +31,9 @@ double distance(const QColor &first, const QColor &second);
 // palette's order on a tie.
 QColor pickFromPalette(const QList<QColor> &colorsInUse);
 
+// count different colors of the palette (up to 32), the first
+// pickFromPalette()'s, each next one what it would pick with the ones before
+// in use too: far from the colors in use and from each other.
+QList<QColor> suggestions(const QList<QColor> &colorsInUse, int count);
+
 }

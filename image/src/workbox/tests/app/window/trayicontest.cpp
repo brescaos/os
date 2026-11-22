@@ -79,18 +79,21 @@ private Q_SLOTS:
         writeState("ps.json", "[" + container("c2", "Cliente 02", true) + ", " + container("c1", "Cliente 01", false) + "]");
     }
 
-    // How many run: in the tooltip, and as a badge while any does.
+    // How many run in the tooltip; while any does, the icon with the dot,
+    // by name, with no overlay.
     void runningCount()
     {
         WorkboxModel model;
         MainWindow window(model);
         TrayIcon trayIcon(model, window);
         QTRY_COMPARE(trayIcon.item()->toolTipSubTitle(), QStringLiteral("1 workbox running"));
-        QVERIFY(!trayIcon.item()->overlayIconPixmap().isNull());
+        QCOMPARE(trayIcon.item()->iconName(), QStringLiteral("com.brescaos.workbox-running-symbolic"));
+        QVERIFY(trayIcon.item()->overlayIconName().isEmpty());
+        QVERIFY(trayIcon.item()->overlayIconPixmap().isNull());
 
         model.stop("c2");
         QTRY_COMPARE(trayIcon.item()->toolTipSubTitle(), QStringLiteral("0 workboxes running"));
-        QVERIFY(trayIcon.item()->overlayIconPixmap().isNull());
+        QCOMPARE(trayIcon.item()->iconName(), QStringLiteral("com.brescaos.workbox-symbolic"));
     }
 
     // A submenu per workbox, by id, and Quit; its Start starts it.

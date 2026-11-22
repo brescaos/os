@@ -1,5 +1,5 @@
 // The app's icon in the system tray (README.md), there while the app runs: the
-// toolbox, with how many workboxes run in a badge on its corner, and a menu to
+// toolbox, with a dot on its corner while any workbox runs, and a menu to
 // start, stop and open a terminal in each. A click shows the window.
 #pragma once
 
@@ -21,11 +21,8 @@ public:
         return m_item;
     }
 
-protected:
-    // The badge again in the new palette's colors.
-    bool eventFilter(QObject *watched, QEvent *event) override;
-
 private:
+    // By name, never a pixmap, so the tray colors it as its other symbols.
     void updateRunningCount();
     void updateMenu();
     void showWindow();

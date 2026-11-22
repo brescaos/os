@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 17:25+0000\n"
+"POT-Creation-Date: 2026-11-22 09:09+0000\n"
 "PO-Revision-Date: 2026-11-21 07:42+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -32,6 +32,375 @@ msgstr "Engega, atura, elimina i obre terminals als teus workboxes"
 #: app/com.brescaos.workbox.desktop.in
 msgid "workbox;container;podman;terminal;"
 msgstr "workbox;contenidor;podman;terminal;"
+
+#: app/window/dialogs/volume/add.cpp
+msgid ""
+"A folder of its own, with a name. Its data stays with the workbox, outside "
+"your home."
+msgstr ""
+"Una carpeta pròpia, amb nom. Les seves dades es queden amb el workbox, fora "
+"de la teva carpeta personal."
+
+#: app/window/dialogs/volume/add.cpp
+msgid ""
+"A folder of your home. The workbox sees your files there, and can change "
+"them unless it's read-only."
+msgstr ""
+"Una carpeta de la teva carpeta personal. El workbox hi veu els teus fitxers "
+"i els pot canviar, tret que sigui de només lectura."
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@action:button a volume"
+msgid "Add"
+msgstr "Afegeix"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@title:window"
+msgid "Add Volume"
+msgstr "Afegeix un volum"
+
+#: app/window/dialogs/volume/add.cpp
+msgid "An empty folder at the folder on the right, removed with the workbox."
+msgstr ""
+"Una carpeta buida a la carpeta de la dreta, que s'elimina amb el workbox."
+
+#: app/window/dialogs/volume/add.cpp
+msgid "An empty folder of its own, without a name."
+msgstr "Una carpeta buida pròpia, sense nom."
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@title:window"
+msgid "Choose a Folder to Share"
+msgstr "Tria una carpeta per compartir"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@info:tooltip"
+msgid "Choose a folder…"
+msgstr "Tria una carpeta…"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@title:window"
+msgid "Edit Volume"
+msgstr "Edita el volum"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@info a volume's source"
+msgid "Empty, of its own"
+msgstr "Buida, pròpia"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label:textbox"
+msgid "Folder in the workbox"
+msgstr "Carpeta al workbox"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label:textbox"
+msgid "Folder to share"
+msgstr "Carpeta per compartir"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label:textbox a volume's folder"
+msgid "In the workbox"
+msgstr "Al workbox"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label:textbox a volume's source"
+msgid "In your home"
+msgstr "A la teva carpeta personal"
+
+#: app/window/dialogs/volume/add.cpp
+msgid "Kept as a volume of the workbox's own, removed with it."
+msgstr "Es desa com un volum propi del workbox, que s'elimina amb ell."
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@option:radio a volume's type"
+msgid "Labeled Volume"
+msgstr "Volum amb etiqueta"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label:textbox a volume's source"
+msgid "Name"
+msgstr "Nom"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@option:check a shared volume"
+msgid "Read-only"
+msgstr "Només lectura"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@action:button a volume"
+msgid "Save"
+msgstr "Desa"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@option:radio a volume's type"
+msgid "Shared Volume"
+msgstr "Volum compartit"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label a volume's source"
+msgid "Source"
+msgstr "Origen"
+
+#: app/window/dialogs/volume/add.cpp
+msgid "The workbox can read your files, but not change them."
+msgstr "El workbox pot llegir els teus fitxers, però no canviar-los."
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@title a volume's"
+msgid "Type"
+msgstr "Tipus"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@option:radio a volume's type"
+msgid "Volume"
+msgstr "Volum"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@label:textbox"
+msgid "Volume's name"
+msgstr "Nom del volum"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@title a volume's"
+msgid "Where"
+msgstr "On"
+
+#: app/window/dialogs/volume/add.cpp
+msgid "Your folder appears in the workbox at the folder on the right."
+msgstr "La teva carpeta apareix al workbox a la carpeta de la dreta."
+
+#: app/window/dialogs/volume/add.cpp lib/core/volumes.cpp
+msgid ""
+"invalid volume name %1: up to 32 lowercase letters (a-z), digits and "
+"hyphens, not starting with a hyphen, and not home"
+msgstr ""
+"nom de volum %1 no vàlid: fins a 32 lletres minúscules (a-z), dígits i "
+"guions, sense començar per un guió, i que no sigui home"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@info:placeholder a volume's name"
+msgid "name"
+msgstr "nom"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@info:placeholder a folder of the home"
+msgid "~/folder"
+msgstr "~/carpeta"
+
+#: app/window/dialogs/volume/add.cpp
+msgctxt "@info:placeholder a folder of the workbox's home"
+msgid "~/folder"
+msgstr "~/carpeta"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info a volume's source and its folder in the workbox"
+msgid "%1 → %2"
+msgstr "%1 → %2"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@action:button"
+msgid "Add Volume…"
+msgstr "Afegeix un volum…"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@option:check"
+msgid "Allow sudo in the workbox"
+msgstr "Permet sudo dins del workbox"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@action:button a workbox's color"
+msgid "Change…"
+msgstr "Canvia…"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "Check its id."
+msgstr "Revisa l'identificador."
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@title:window"
+msgid "Choose a Color"
+msgstr "Tria un color"
+
+#: app/window/dialogs/workbox/create.cpp app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Color:"
+msgstr "Color:"
+
+#: app/window/dialogs/workbox/create.cpp app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Create Workbox"
+msgstr "Crea un workbox"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@title:window"
+msgid "Create Workbox"
+msgstr "Crea un workbox"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info"
+msgid "Creating “%1”…"
+msgstr "S'està creant «%1»…"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info:tooltip a volume"
+msgid "Edit…"
+msgstr "Edita…"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "For commands, and its home, the volume %1. It can't be changed later."
+msgstr ""
+"Per a les ordres, i la seva carpeta personal, el volum %1. No es pot canviar "
+"després."
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info:placeholder a workbox's name"
+msgid "For example, Client 02"
+msgstr "Per exemple, Client 02"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "Give it an id."
+msgstr "Dona-li un identificador."
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@label:textbox a workbox's"
+msgid "Id:"
+msgstr "Identificador:"
+
+#: app/window/dialogs/workbox/create.cpp app/window/mainwindow.cpp
+msgctxt "@label a workbox's"
+msgid "Image:"
+msgstr "Imatge:"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "It needs a name."
+msgstr "Falta el nom."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "It shares 1 folder with your system."
+msgid_plural "It shares %1 folders with your system."
+msgstr[0] "Comparteix 1 carpeta amb el teu sistema."
+msgstr[1] "Comparteix %1 carpetes amb el teu sistema."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "It shares no folder with your system."
+msgstr "No comparteix cap carpeta amb el teu sistema."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "Its home is the volume %1."
+msgstr "La seva carpeta personal és el volum %1."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid ""
+"Its own network, always: it reaches the internet, but nothing reaches it."
+msgstr "Sempre una xarxa pròpia: surt a internet, però res no hi arriba."
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info a volume's type"
+msgid "Labeled volume"
+msgstr "Volum amb etiqueta"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@label:textbox a workbox's"
+msgid "Name:"
+msgstr "Nom:"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@title"
+msgid "New Workbox"
+msgstr "Workbox nou"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "No volumes: it has only its home."
+msgstr "Sense volums: només té la seva carpeta personal."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid ""
+"Only lowercase letters (a-z), digits and hyphens, up to 32, not starting "
+"with a hyphen."
+msgstr ""
+"Només minúscules (a-z), xifres i guionets, fins a 32, sense començar amb un "
+"guionet."
+
+#: app/window/dialogs/workbox/create.cpp app/window/mainwindow.cpp
+msgctxt "@action:button"
+msgid "Open a Terminal"
+msgstr "Obre un terminal"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@option:check"
+msgid "Open graphical apps"
+msgstr "Obre aplicacions gràfiques"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info:tooltip a volume"
+msgid "Remove"
+msgstr "Treu"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info a volume's type"
+msgid "Shared volume"
+msgstr "Volum compartit"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info a volume's type"
+msgid "Shared volume · Read-only"
+msgstr "Volum compartit · Només lectura"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "Shares your Wayland session, so its apps can show windows."
+msgstr ""
+"Comparteix la teva sessió Wayland perquè les seves aplicacions puguin "
+"mostrar finestres."
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@label a workbox's colors"
+msgid "Suggestions:"
+msgstr "Suggeriments:"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@title"
+msgid "System Access"
+msgstr "Accés al sistema"
+
+#: app/window/dialogs/workbox/create.cpp
+msgid ""
+"The workbox sees only the folders of your home shared with it. Its other "
+"volumes keep their data in folders of its own, without sharing anything."
+msgstr ""
+"El workbox només veu les carpetes de la teva carpeta personal que "
+"comparteixes amb ell. Els seus altres volums desen les dades en carpetes "
+"pròpies, sense compartir res."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "There's already a workbox with this id."
+msgstr "Ja hi ha un workbox amb aquest identificador."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid "These can't be changed later without creating the workbox again."
+msgstr "No es poden canviar després sense tornar a crear el workbox."
+
+#: app/window/dialogs/workbox/create.cpp
+msgid ""
+"To install packages in it. It gives no administrator rights on your system."
+msgstr ""
+"Per instal·lar-hi paquets. No dona permisos d'administrador sobre el teu "
+"sistema."
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@info a volume's type"
+msgid "Volume"
+msgstr "Volum"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@title"
+msgid "Volumes"
+msgstr "Volums"
+
+#: app/window/dialogs/workbox/create.cpp
+msgctxt "@title"
+msgid "“%1” is ready"
+msgstr "«%1» està llest"
 
 #: app/window/main.cpp app/window/trayicon.cpp
 msgctxt "@title the app's name"
@@ -62,29 +431,14 @@ msgstr ""
 "ni la resta del sistema, només el que hi comparteixis."
 
 #: app/window/mainwindow.cpp
-msgctxt "@label a workbox's"
-msgid "Color:"
-msgstr "Color:"
-
-#: app/window/mainwindow.cpp
 msgctxt "@action:button"
 msgid "Create"
 msgstr "Crea"
 
 #: app/window/mainwindow.cpp
-msgctxt "@action:button"
-msgid "Create Workbox"
-msgstr "Crea un workbox"
-
-#: app/window/mainwindow.cpp
 msgctxt "@label a workbox's"
 msgid "Home:"
 msgstr "Carpeta personal:"
-
-#: app/window/mainwindow.cpp
-msgctxt "@label a workbox's"
-msgid "Image:"
-msgstr "Imatge:"
 
 #: app/window/mainwindow.cpp
 msgctxt "@title:tab"
@@ -130,16 +484,6 @@ msgstr "Encara no hi ha cap workbox"
 msgctxt "@info a workbox's volumes"
 msgid "None"
 msgstr "Cap"
-
-#: app/window/mainwindow.cpp
-msgctxt "@info:tooltip"
-msgid "Not available yet"
-msgstr "Encara no està disponible"
-
-#: app/window/mainwindow.cpp
-msgctxt "@action:button"
-msgid "Open a Terminal"
-msgstr "Obre un terminal"
 
 #: app/window/mainwindow.cpp
 msgctxt "@info:tooltip"
@@ -832,14 +1176,6 @@ msgstr "no es pot compartir a %1: el seu camí té «:» o «,»"
 #: lib/core/volumes.cpp
 msgid "invalid volume %1: use [folder|name:]target[:options]"
 msgstr "volum %1 no vàlid: fes servir [carpeta|nom:]destí[:opcions]"
-
-#: lib/core/volumes.cpp
-msgid ""
-"invalid volume name %1: up to 32 lowercase letters (a-z), digits and "
-"hyphens, not starting with a hyphen, and not home"
-msgstr ""
-"nom de volum %1 no vàlid: fins a 32 lletres minúscules (a-z), dígits i "
-"guions, sense començar per un guió, i que no sigui home"
 
 #: lib/core/volumes.cpp
 msgid "the volume option %1 isn't supported: only ro and rw"

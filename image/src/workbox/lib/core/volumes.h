@@ -18,6 +18,9 @@
 // or an option workbox doesn't allow (Z, U, the others).
 Volume parseVolume(const QString &argument, const QString &home);
 
+// The other way round: volume as -v takes it, which parseVolume() gives back.
+QString volumeArgument(const Volume &volume);
+
 // What the workbox sees and where, for the user, translated: "<folder> →
 // <target>", "<name> → <target> (volume)" or "<target> (its own)", and
 // "(read-only)".

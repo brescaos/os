@@ -1,6 +1,6 @@
 // The app's window (README.md): the workboxes on the left; on the right, the
 // selected one with its buttons (start, stop, open in Konsole, remove), its
-// terminals and its information. Nothing blocks: everything goes through
+// terminals and its information; Create opens its dialog. Nothing blocks: everything goes through
 // WorkboxModel's jobs. The list is the app's, which the tray icon shares.
 #pragma once
 
@@ -35,11 +35,14 @@ private:
     QWidget *createWorkboxPage();
     QWidget *createTerminalTab();
     QWidget *createInformationTab();
+    // A Create button, enabled while workbox can run (no problem).
+    QPushButton *createCreateButton(const QString &text, const QString &objectName);
 
     // The selected workbox's row; invalid when there's none.
     QModelIndex selectedIndex() const;
     // The first row when the selected one has gone.
     void keepASelection();
+    void select(const QString &id);
     void showSelected();
     void showTerminals(const Workbox &workbox);
     void showInformation(const Workbox &workbox);
@@ -47,6 +50,8 @@ private:
     // Starts it, and opens a shell once it runs.
     void startSelected();
     void openSelectedInKonsole();
+    void enableCreating();
+    void openCreateDialog();
     // Asks to type its id first.
     void confirmRemoval(const Workbox &workbox);
     // Konsole's failure, over the selected workbox.
@@ -56,6 +61,7 @@ private:
     QSortFilterProxyModel *m_filter;
     QListView *m_list;
     QLabel *m_countLabel;
+    QList<QPushButton *> m_createButtons;
     QString m_selectedId;
     // Why Konsole couldn't open a terminal, until another workbox is
     // selected.

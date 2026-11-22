@@ -74,7 +74,8 @@ target_include_directories(workbox-model PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app)
 target_link_libraries(workbox-model PUBLIC workbox-engines)
 
 add_library(workbox-window STATIC app/window/mainwindow.cpp app/window/terminals.cpp app/window/trayicon.cpp
-                                  app/window/workboxdelegate.cpp)
+                                  app/window/workboxdelegate.cpp app/window/dialogs/formparts.cpp
+                                  app/window/dialogs/workbox/create.cpp app/window/dialogs/volume/add.cpp)
 target_include_directories(workbox-window PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app/window)
 target_link_libraries(workbox-window
                       PUBLIC workbox-model Qt6::Widgets
@@ -88,6 +89,9 @@ install(FILES app/icons/com.brescaos.workbox.svg DESTINATION ${KDE_INSTALL_ICOND
 install(FILES app/icons/workbox-symbolic.svg
         DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps
         RENAME com.brescaos.workbox-symbolic.svg)
+install(FILES app/icons/workbox-running-symbolic.svg
+        DESTINATION ${KDE_INSTALL_ICONDIR}/hicolor/scalable/apps
+        RENAME com.brescaos.workbox-running-symbolic.svg)
 
 if(BUILD_TESTING)
     add_subdirectory(tests)

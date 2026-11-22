@@ -61,7 +61,10 @@ private Q_SLOTS:
         QFETCH(QString, name);
         QFETCH(QString, target);
         QFETCH(bool, isReadOnly);
-        QCOMPARE(parseVolume(argument, home), (Volume{.source = source, .name = name, .target = target, .isReadOnly = isReadOnly}));
+        const Volume volume = parseVolume(argument, home);
+        QCOMPARE(volume, (Volume{.source = source, .name = name, .target = target, .isReadOnly = isReadOnly}));
+        // And back, to the same.
+        QCOMPARE(parseVolume(volumeArgument(volume), home), volume);
     }
 
     void refuses_data()

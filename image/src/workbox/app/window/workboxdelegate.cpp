@@ -33,6 +33,16 @@ void paintSwatch(QPainter *painter, const QRect &rect, const QColor &workboxColo
     painter->restore();
 }
 
+QPixmap swatchPixmap(const QColor &workboxColor, int size, qreal pixelRatio)
+{
+    QPixmap swatch(QSize(size, size) * pixelRatio);
+    swatch.setDevicePixelRatio(pixelRatio);
+    swatch.fill(Qt::transparent);
+    QPainter painter(&swatch);
+    paintSwatch(&painter, QRect(0, 0, size, size), workboxColor);
+    return swatch;
+}
+
 QString statusText(const QModelIndex &index)
 {
     switch (static_cast<WorkboxModel::Operation>(index.data(WorkboxModel::OperationRole).toInt())) {
