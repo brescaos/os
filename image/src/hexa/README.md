@@ -103,7 +103,7 @@ tells it:
 | `desktoptheme/hexa/widgets/` | `/usr/share/plasma/desktoptheme/hexa/widgets/` |
 | `desktoptheme/hexa/metadata.json.in`, translated | `/usr/share/plasma/desktoptheme/hexa/metadata.json` |
 | `icons/hexa-light/`, `icons/hexa-dark/` | `/usr/share/icons/hexa-light/`, `/usr/share/icons/hexa-dark/` |
-| `icons/actions/`, `icons/status/`, for both | `/usr/share/icons/<theme>/actions/`, `/usr/share/icons/<theme>/status/` |
+| `icons/actions/` (with `16/`, drawn again for 16 px), `icons/status/`, for both | `/usr/share/icons/<theme>/actions/`, `/usr/share/icons/<theme>/status/` |
 | `plasmoids/com.brescaos.hexa.topbar/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/contents/` |
 | `plasmoids/com.brescaos.hexa.topbar/metadata.json.in`, translated | `/usr/share/plasma/plasmoids/com.brescaos.hexa.topbar/metadata.json` |
 | `plasmoids/com.brescaos.hexa.clock/contents/` | `/usr/share/plasma/plasmoids/com.brescaos.hexa.clock/contents/` |

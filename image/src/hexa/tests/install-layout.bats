@@ -32,9 +32,15 @@ THEMES="com.brescaos.hexa.light.desktop com.brescaos.hexa.dark.desktop"
             }
         done
         for icon in media-playback-{start,stop}{,-symbolic} edit-{delete,copy,paste,find}{,-symbolic} window-pin{,-symbolic} \
-            tab-new{,-symbolic} view-split-{left-right,top-bottom}{,-symbolic}; do
+            tab-new{,-symbolic} view-split-{left-right,top-bottom}{,-symbolic} view-refresh{,-symbolic}; do
             [[ -f /usr/share/icons/hexa-$variant/actions/$icon.svg ]] || {
                 echo "missing the icon: hexa-$variant, $icon"
+                return 1
+            }
+        done
+        for icon in view-refresh{,-symbolic}; do
+            [[ -f /usr/share/icons/hexa-$variant/actions/16/$icon.svg ]] || {
+                echo "missing the icon: hexa-$variant, 16 px $icon"
                 return 1
             }
         done

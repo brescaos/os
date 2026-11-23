@@ -1,11 +1,17 @@
-# Hexa Light's icons: Hexa's own (../actions/, ../status/),
+# Hexa Light's icons: Hexa's own (../actions/, ../actions/16/, ../status/),
 # and breeze's for every other one.
 [Icon Theme]
 Name=Hexa Light
 Inherits=breeze,hicolor
 Example=klipper-symbolic
 FollowsColorScheme=true
-Directories=actions,status
+Directories=actions/16,actions,status
+
+# Drawn again for 16 px; listed first, so it wins over actions' at that size.
+[actions/16]
+Size=16
+Context=Actions
+Type=Fixed
 
 [actions]
 Size=22
