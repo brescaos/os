@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Runs inside the image build (see Containerfile).
 # Applies the version-independent setup, cached across versions.
-# Arguments: <fedora-version>
 
 set -euo pipefail
 
@@ -9,8 +8,6 @@ die() {
     echo "build/system.sh: $*" >&2
     exit 1
 }
-
-fedora_version=$1
 
 # --- Kernel arguments --------------------------------------------------------------
 # quiet: without it, the kernel's messages on the console are too noisy.
@@ -75,11 +72,3 @@ policies=$(cd /usr/lib/firewalld/policies && ls)
 firewall-offline-cmd --check-config \
     || die "firewalld's configuration doesn't load (firewall-offline-cmd --check-config)"
 systemctl enable firewalld.service
-
-# --- Distrobox -------------------------------------------------------------------------
-# Distrobox's default image is Fedora's toolbox image at :latest: use this
-# system's Fedora release instead. In /usr, so it follows the image; Distrobox
-# reads /etc/distrobox/distrobox.conf and the user's after it.
-mkdir -p /usr/share/distrobox
-printf 'container_image_default="registry.fedoraproject.org/fedora-toolbox:%s"\n' "$fedora_version" \
-    >/usr/share/distrobox/distrobox.conf

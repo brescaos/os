@@ -52,17 +52,6 @@ extract_strings() {
             extract_metadata_strings applet/metadata.json.in "$pot"
             extract_metadata_strings script/metadata.json.in "$pot"
             ;;
-        distrobox)
-            # The applet's QML: Plasma gives it its domain (i18n); the KRunner
-            # plugin's C++ names it (TRANSLATION_DOMAIN).
-            find applet -name '*.qml' | sort \
-                | xargs xgettext $XGETTEXT_OPTIONS -L JavaScript --keyword= \
-                    --keyword=i18n:1 --keyword=i18np:1,2 -o "$pot"
-            xgettext $XGETTEXT_OPTIONS -L C++ -j --keyword= --keyword=i18n:1 -o "$pot" krunner/runner.cpp
-            xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" krunner/com.brescaos.distrobox.desktop.in
-            extract_metadata_strings applet/metadata.json.in "$pot"
-            extract_metadata_strings krunner/krunner_distrobox.json.in "$pot"
-            ;;
         bresca-krunner)
             xgettext $XGETTEXT_OPTIONS -L C++ --keyword= --keyword=i18n:1 --keyword=kli18n:1 -o "$pot" runner.cpp
             xgettext $XGETTEXT_OPTIONS -L Desktop -j -o "$pot" com.brescaos.bresca-krunner.desktop.in

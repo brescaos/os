@@ -15,9 +15,8 @@ FROM quay.io/fedora/fedora:${FEDORA_VERSION} AS build-base
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True \
         gettext jq cmake extra-cmake-modules gcc-c++ qt6-qtbase-devel qt6-qtdeclarative-devel \
-        kf6-kcmutils-devel kf6-kcolorscheme-devel kf6-kconfig-devel kf6-kcoreaddons-devel \
-        kf6-ki18n-devel kf6-kjobwidgets-devel kf6-krunner-devel kf6-kwidgetsaddons-devel \
-        libplasma-devel kdecoration-devel
+        kf6-kcmutils-devel kf6-kconfig-devel kf6-kcoreaddons-devel kf6-ki18n-devel \
+        kf6-krunner-devel libplasma-devel kdecoration-devel
 
 # The translations of src/ (docs/translations.md), compiled with gettext:
 # /out for the image, /metadata for the builds below.
@@ -51,16 +50,6 @@ RUN --mount=type=bind,source=src/autotile,target=/tmp/src \
 FROM build-base AS welcome-build
 RUN --mount=type=bind,source=src/welcome,target=/tmp/src \
     cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
-    && cmake --build /tmp/build --parallel "$(nproc)" \
-    && DESTDIR=/out cmake --install /tmp/build
-
-# The distroboxes' terminal colors (bresca-distrobox-colors), the tray
-# applet's QML module and the KRunner plugin.
-FROM build-base AS distrobox-build
-RUN --mount=type=bind,source=src/distrobox,target=/tmp/src \
-    --mount=type=bind,from=translations,source=/metadata/distrobox,target=/tmp/metadata \
-    cmake -S /tmp/src -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
-        -DTRANSLATED_METADATA_DIR=/tmp/metadata \
     && cmake --build /tmp/build --parallel "$(nproc)" \
     && DESTDIR=/out cmake --install /tmp/build
 
@@ -107,17 +96,6 @@ COPY src/autotile/applet/package/ /usr/share/plasma/plasmoids/com.brescaos.autot
 # Bresca Welcome (src/welcome/README.md); its .desktop files come with the
 # translations.
 COPY --from=welcome-build /out/ /
-# Each distrobox's terminal colors and prompt, the Distrobox tray applet
-# with its QML module and the KRunner plugin (src/distrobox/README.md); the
-# applet's metadata.json and the plugin's .desktop file come with the
-# translations.
-COPY --from=distrobox-build /out/ /
-COPY src/distrobox/distrobox.conf /usr/share/defaults/distrobox/distrobox.conf
-COPY src/distrobox/profile.sh /usr/libexec/bresca/distrobox/profile.sh
-COPY src/distrobox/applet/package/ /usr/share/plasma/plasmoids/com.brescaos.distrobox/
-# The applet's symbol as a theme icon, for its metadata: About and the tray's
-# settings show only an icon name, not a path.
-COPY src/distrobox/applet/package/contents/icons/distrobox-symbolic.svg /usr/share/icons/hicolor/scalable/apps/com.brescaos.distrobox.svg
 # KRunner plugin for BrescaOS (src/bresca-krunner/README.md).
 COPY --from=bresca-krunner-build /out/ /
 # Hexa, the desktop theme (src/hexa/README.md); its metadata.json come
@@ -156,8 +134,8 @@ COPY assets/desktop/hexa-qtquick-style.conf /usr/lib/environment.d/60-hexa-qtqui
 # only from there).
 COPY assets/desktop/dolphinrc /etc/xdg/dolphinrc
 COPY assets/desktop/dolphin-view-properties /etc/skel/.local/share/dolphin/view_properties/global/.directory
-# KRunner's favorite plugins, BrescaOS's and Distrobox's results first, for
-# every user unless they change them.
+# KRunner's favorite plugins, BrescaOS's results first, for every user unless
+# they change them.
 COPY assets/desktop/krunnerrc /etc/xdg/krunnerrc
 # The BrescaOS logo (TRADEMARKS.md): os-release's LOGO names it, and the
 # About This System page needs its path.
@@ -180,7 +158,6 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_VERSION}
 ARG FEDORA_VERSION
 
 # Fedora packages used by BrescaOS.
-# podman: named so dnf doesn't pick docker for distrobox's "podman or docker".
 # libglvnd-gles: KWin draws with OpenGL ES through libepoxy, which dlopens
 # libGLESv2 (so no package requires it) and aborts without it.
 # TODO: boot.automount: systemd-gpt-auto-generator stacks a boot.automount on top of
@@ -209,7 +186,6 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
         qt6-qttranslations qt6-qtimageformats \
         inotify-tools \
         plasma-milou \
-        distrobox podman \
     && { [ "$(rpm -q kernel-core | wc -l)" -eq 1 ] \
         || dnf -y remove --oldinstallonly --limit=1 --setopt=keepcache=True; } \
     && set -- /usr/lib/modules/* \
@@ -224,7 +200,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 # mounted, not copied: a COPY would be a layer of its own, and the script
 # would stay in it.
 RUN --mount=type=bind,source=build/system.sh,target=/tmp/brescaos-build-system.sh \
-    bash /tmp/brescaos-build-system.sh "${FEDORA_VERSION}"
+    bash /tmp/brescaos-build-system.sh
 
 # BrescaOS's own files (the files stage).
 COPY --from=files / /

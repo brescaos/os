@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Distrobox
-Comment=Shows the progress of creating, stopping and removing distroboxes
-Exec=distrobox
-Icon=com.brescaos.distrobox
-NoDisplay=true

@@ -57,7 +57,6 @@ To try the image in a QEMU virtual machine, see [Development VM](vm.md).
 make test            # builds the image as 0.0.0 and runs every component's tests in it
 make check-welcome   # compiles Welcome and runs its unit and QML tests, without the image (part of make check)
 make check-autotile  # compiles autotiling and runs the tests of its KWin script and its state, without the image (part of make check)
-make check-distrobox # compiles the distroboxes' terminal colors, applet and KRunner plugin and runs their tests, without the image (part of make check)
 make check-bresca-krunner # compiles the KRunner plugin and runs its tests, without the image (part of make check)
 make check-hexa      # compiles Hexa's QML module and runs its tests, without the image (part of make check)
 ```
