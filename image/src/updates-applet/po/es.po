@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 17:59+0000\n"
+"POT-Creation-Date: 2026-11-23 17:52+0000\n"
 "PO-Revision-Date: 2026-11-09 17:10+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -76,6 +76,10 @@ msgstr "BrescaOS %1 está descargada"
 #: package/contents/ui/main.qml
 msgid "BrescaOS %1 is installed"
 msgstr "BrescaOS %1 está instalada"
+
+#: package/contents/ui/main.qml
+msgid "Download size: %1. Install it from System Settings."
+msgstr "Tamaño de la descarga: %1. Instálala desde Preferencias del sistema."
 
 #: package/contents/ui/main.qml
 msgid "Install"

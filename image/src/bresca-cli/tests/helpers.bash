@@ -11,7 +11,7 @@ IMAGE=registry.brescaos.com/brescaos/brescaos:0.1.0-x86_64
 setup() {
     export BOOTC_STATE=$BATS_TEST_TMPDIR/bootc-state.json
     export SYSTEMCTL_LOG=$BATS_TEST_TMPDIR/systemctl.log
-    unset BOOTC_REGISTRY_VERSION BOOTC_FAILS
+    unset BOOTC_REGISTRY_VERSION BOOTC_FAILS BOOTC_ADDED_SIZE
     : >"$SYSTEMCTL_LOG"
     rm -rf /run/bresca/updates /etc/containers/registries.conf.d/50-tests.conf
     boot_version 0.1.0

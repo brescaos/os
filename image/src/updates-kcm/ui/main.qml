@@ -21,6 +21,10 @@ KCM.SimpleKCM {
     readonly property var downloadProgress: results["download-progress"] ?? null
     readonly property bool hasTls: status?.registry?.tls ?? true
     readonly property string newVersion: check?.update_available ? check.available_version : ""
+    // What it downloads, as the user's locale writes it; empty when the check
+    // didn't say.
+    readonly property string downloadSize: check?.update_available && check.download_size
+                                           ? Qt.locale().formattedDataSize(check.download_size, 1, Locale.DataSizeSIFormat) : ""
 
     // What the page shows: the first that applies.
     readonly property string view: {
@@ -346,7 +350,7 @@ KCM.SimpleKCM {
                     case "unknown":
                         return page.check?.checked_at ? i18n("Last checked %1.", page.formatTime(page.check.checked_at)) : i18n("Not checked for updates yet.");
                     case "available":
-                        return i18n("It downloads in the background while you keep working, and starts the next time you restart.");
+                        return page.downloadSize ? i18n("Download size: %1", page.downloadSize) : "";
                     case "downloaded":
                         return i18n("Install it before restarting: restarting discards the download.");
                     case "installed":
@@ -387,6 +391,14 @@ KCM.SimpleKCM {
                         }
                     }
                 }
+            }
+            QQC2.Label {
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+                visible: page.view === "available"
+                opacity: 0.7
+                text: i18n("It downloads in the background while you keep working, and starts the next time you restart.")
             }
             QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter

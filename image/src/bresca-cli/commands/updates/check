@@ -14,7 +14,8 @@ or changing anything.
 
 Options:
   --format=json  Print {checked_at, update_available, current_version,
-                 available_version}, or {checked_at, error}
+                 available_version, download_size}, or {checked_at, error};
+                 download_size is in bytes, null when unknown
   -h, --help     Show this help"
 }
 
@@ -64,8 +65,14 @@ if [[ $format == json ]]; then
 elif [[ -z $check_error ]]; then
     current_version=$(jq -r '.current_version' <<<"$check_result")
     if [[ $(jq -r '.update_available' <<<"$check_result") == true ]]; then
-        print_message $"BrescaOS %s is available (running %s)." \
-            "$(jq -r '.available_version' <<<"$check_result")" "$current_version"
+        available_version=$(jq -r '.available_version' <<<"$check_result")
+        download_size=$(jq -r '.download_size // empty' <<<"$check_result")
+        if [[ -n $download_size ]]; then
+            print_message $"BrescaOS %s is available (running %s): %s to download." "$available_version" "$current_version" \
+                "$(numfmt --to=si --round=nearest --format='%.1f' --unit-separator=' ' --suffix=B "$download_size")"
+        else
+            print_message $"BrescaOS %s is available (running %s)." "$available_version" "$current_version"
+        fi
     else
         print_message $"BrescaOS is up to date (%s)." "$current_version"
     fi

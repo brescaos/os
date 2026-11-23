@@ -31,6 +31,9 @@ PlasmoidItem {
     readonly property string promptRestartCommand: "gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptReboot"
     // The version the last check found, empty when there's none.
     property string availableVersion: ""
+    // What it downloads, as the user's locale writes it; empty when the check
+    // didn't say.
+    property string availableDownloadSize: ""
     // The executable engine keeps a finished command's output and hands it
     // back at once when the same command is connected again (stale, and in a
     // loop for the watcher): each run gets its number as a shell comment, so
@@ -157,7 +160,8 @@ PlasmoidItem {
         eventId: "updateAvailable"
         iconName: "system-software-update"
         title: i18n("BrescaOS %1 is available", root.availableVersion)
-        text: i18n("Install it from System Settings.")
+        text: root.availableDownloadSize ? i18n("Download size: %1. Install it from System Settings.", root.availableDownloadSize)
+                                         : i18n("Install it from System Settings.")
         flags: Notification.Persistent
         actions: [
             NotificationAction {
@@ -240,6 +244,8 @@ PlasmoidItem {
             return;
         }
         availableVersion = checkResult.update_available ? checkResult.available_version : "";
+        availableDownloadSize = checkResult.update_available && checkResult.download_size
+                                ? Qt.locale().formattedDataSize(checkResult.download_size, 1, Locale.DataSizeSIFormat) : "";
         if (availableVersion && availableVersion !== notifiedVersion) {
             notifiedVersion = availableVersion;
             updateNotification.sendEvent();

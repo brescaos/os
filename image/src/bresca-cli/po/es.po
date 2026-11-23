@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 19:09+0000\n"
+"POT-Creation-Date: 2026-11-23 17:51+0000\n"
 "PO-Revision-Date: 2026-11-09 17:08+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -87,7 +87,8 @@ msgid ""
 "\n"
 "Options:\n"
 "  --format=json  Print {checked_at, update_available, current_version,\n"
-"                 available_version}, or {checked_at, error}\n"
+"                 available_version, download_size}, or {checked_at, error};\n"
+"                 download_size is in bytes, null when unknown\n"
 "  -h, --help     Show this help"
 msgstr ""
 "Uso: sudo bresca updates check [--format=json|text]\n"
@@ -98,7 +99,8 @@ msgstr ""
 "\n"
 "Opciones:\n"
 "  --format=json  Muestra {checked_at, update_available, current_version,\n"
-"                 available_version}, o {checked_at, error}\n"
+"                 available_version, download_size}, o {checked_at, error};\n"
+"                 download_size en bytes, null si no se sabe\n"
 "  -h, --help     Muestra esta ayuda"
 
 #: commands/updates/check commands/updates/download commands/updates/install
@@ -122,6 +124,11 @@ msgstr "Buscando actualizaciones..."
 msgid "the check didn't finish: see journalctl -u bresca-updates@check"
 msgstr ""
 "la comprobación no terminó: consulta journalctl -u bresca-updates@check"
+
+#: commands/updates/check
+#, sh-printf-format
+msgid "BrescaOS %s is available (running %s): %s to download."
+msgstr "BrescaOS %s está disponible (en uso: %s): %s para descargar."
 
 #: commands/updates/check
 #, sh-printf-format

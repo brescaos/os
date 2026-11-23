@@ -3,6 +3,9 @@
 # --format=json's shape (helpers.bash writes it), and each command changes it
 # as bootc would. The registry has BOOTC_REGISTRY_VERSION, if set.
 # BOOTC_FAILS=<check|download|install|rollback> makes that command fail.
+# BOOTC_ADDED_SIZE is the size upgrade --check prints for the layers to
+# download (288.2 MB if unset, with a no-break space as GLib's g_format_size
+# writes it); empty, it prints no layers, as an older bootc.
 set -euo pipefail
 
 state=${BOOTC_STATE:?}
@@ -41,6 +44,13 @@ case "$*" in
         if [[ -n $registry_version ]]; then
             update_state --arg version "$registry_version" ".status.booted.cachedUpdate = $registry_image"
             echo "Update available for: $registry_version"
+            no_break_space=$'\xc2\xa0'
+            added_size=${BOOTC_ADDED_SIZE-"288.2${no_break_space}MB"}
+            if [[ -n $added_size ]]; then
+                echo "Total new layers: 78    Size: 1.9${no_break_space}GB"
+                echo "Removed layers:   10    Size: 288.2${no_break_space}MB"
+                echo "Added layers:     10    Size: $added_size"
+            fi
         else
             echo "No changes in: the booted image"
         fi

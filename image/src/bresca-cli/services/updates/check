@@ -15,7 +15,8 @@ write_result() {
 # No result while checking: if this fails unexpectedly, there's no stale one.
 rm -f "$result_file"
 
-if ! bootc_output=$(bootc upgrade --check 2>&1); then
+# C locale: its sizes untranslated, as download_size below reads them.
+if ! bootc_output=$(LC_ALL=C bootc upgrade --check 2>&1); then
     printf '%s\n' "$bootc_output" >&2
     jq -cn --arg checked_at "$checked_at" --arg error "$bootc_output" \
         '{checked_at: $checked_at, error: $error}' | write_result
@@ -23,11 +24,22 @@ if ! bootc_output=$(bootc upgrade --check 2>&1); then
 fi
 printf '%s\n' "$bootc_output"
 
+# What the update downloads: the size of the layers the booted image doesn't
+# have, from the line "Added layers:     10    Size: 288.2 MB" (SI units,
+# GLib's g_format_size: a no-break space before the unit). Missing if bootc
+# prints no such line.
+added_size=$(sed -n 's/^Added layers: *[0-9]* *Size: *//p' <<<"$bootc_output")
+
 # bootc upgrade --check keeps what it found in the booted entry's cachedUpdate.
-bootc status --format=json | jq -c --arg checked_at "$checked_at" '
+bootc status --format=json | jq -c --arg checked_at "$checked_at" --arg added_size "$added_size" '
     .status.booted as $booted
     | $booted.cachedUpdate as $update
+    | ($update != null and $update.imageDigest != $booted.image.imageDigest) as $update_available
     | {checked_at: $checked_at,
-       update_available: ($update != null and $update.imageDigest != $booted.image.imageDigest),
+       update_available: $update_available,
        current_version: ($booted.image.version // "unknown"),
-       available_version: (($update // $booted.image).version // "unknown")}' | write_result
+       available_version: (($update // $booted.image).version // "unknown"),
+       download_size: (if $update_available then
+           ($added_size | capture("^(?<number>[0-9.]+)[ \u00a0](?<unit>bytes?|kB|MB|GB|TB)$")
+            | (.number | tonumber) * {byte: 1, bytes: 1, kB: 1e3, MB: 1e6, GB: 1e9, TB: 1e12}[.unit] | round) // null
+           else null end)}' | write_result

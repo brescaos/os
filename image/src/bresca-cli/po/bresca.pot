@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BrescaOS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 19:09+0000\n"
+"POT-Creation-Date: 2026-11-23 17:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,8 @@ msgid ""
 "\n"
 "Options:\n"
 "  --format=json  Print {checked_at, update_available, current_version,\n"
-"                 available_version}, or {checked_at, error}\n"
+"                 available_version, download_size}, or {checked_at, error};\n"
+"                 download_size is in bytes, null when unknown\n"
 "  -h, --help     Show this help"
 msgstr ""
 
@@ -83,6 +84,11 @@ msgstr ""
 
 #: commands/updates/check
 msgid "the check didn't finish: see journalctl -u bresca-updates@check"
+msgstr ""
+
+#: commands/updates/check
+#, sh-printf-format
+msgid "BrescaOS %s is available (running %s): %s to download."
 msgstr ""
 
 #: commands/updates/check
