@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Run as root by userdel (USERDEL_CMD in /etc/login.defs, set by
+# build/system.sh) before it removes the user $1: removes their Homebrew
+# (/usr/bin/brew), so that a new user who gets the same uid doesn't find it
+# as their own.
+set -euo pipefail
+
+uid=$(id -u -- "$1" 2>/dev/null) || exit 0
+# Only a regular user's: /var/opt has other programs' folders.
+[[ $uid =~ ^[0-9]+$ ]] && ((uid >= 1000)) || exit 0
+# one-file-system: Never into a file system the user mounted in it (FUSE).
+rm -rf --one-file-system -- "/var/opt/$uid"

@@ -1,0 +1,17 @@
+# check=skip=InvalidDefaultArgInFrom;error=true
+
+# Tests of Homebrew on demand (scripts/test.sh, make test): bats, run in the
+# BrescaOS image, so brew is where image/Containerfile installs it. tester is
+# a user who isn't root: brew refuses to run as root.
+
+# The BrescaOS image to test. Required, no default: scripts/test.sh passes it.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    dnf -y install --setopt=install_weak_deps=False --setopt=keepcache=True bats \
+    && useradd --create-home tester
+
+COPY *.bats /usr/lib/homebrew-tests/
+
+CMD ["bats", "--print-output-on-failure", "/usr/lib/homebrew-tests"]

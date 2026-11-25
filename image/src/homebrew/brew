@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# brew: Homebrew on demand. BrescaOS doesn't ship Homebrew: the first time a
+# user runs brew, this installs it for them with Homebrew's official
+# installer. From then on it only runs their brew.
+set -euo pipefail
+# bresca-cli's messages (print_message, print_error): they need it.
+# shellcheck source=SCRIPTDIR/../bresca-cli/lib/messages.sh
+. /usr/libexec/bresca/lib/messages.sh
+# This script's strings, from homebrew's domain. messages.sh's own (error:)
+# stay in bresca's: bash translates a $"..." when it reads it.
+# shellcheck disable=SC2034 # bash reads it to translate $"..."
+TEXTDOMAIN=homebrew
+
+user_folder=/var/opt/$UID
+prefix=$user_folder/.linuxbrew
+brew=$prefix/bin/brew
+installer_url=https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+# How many of the log's last lines show under a running step.
+shown_log_lines=5
+
+if can_show_unicode_symbols; then
+    done_symbol='✓' failed_symbol='✗' spinner_frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+else
+    done_symbol='[ok]' failed_symbol='[x]' spinner_frames=('|' '/' '-' '\')
+fi
+green='' red='' muted='' reset=''
+if [[ -t 1 ]]; then
+    green=$'\e[1;32m' red=$'\e[1;31m' muted=$'\e[90m' reset=$'\e[0m'
+fi
+
+# Whether the user answers yes, in their language, to the question $1 (a
+# printf format, its arguments after it).
+confirm() {
+    local format=$1 answer
+    shift
+    # shellcheck disable=SC2059 # the format is a translated message
+    printf "$format " "$@"
+    read -r answer
+    [[ $answer =~ $(locale yesexpr) ]]
+}
+
+# The seconds since $1 ($SECONDS then), as m:ss.
+format_elapsed() {
+    local seconds=$((SECONDS - $1))
+    printf '%d:%02d' $((seconds / 60)) $((seconds % 60))
+}
+
+# Draws the step $1 with a spinner and its time, and under it the last lines
+# the log has after its byte $2, until it gets SIGTERM; then it clears them.
+# Run in the background, on a terminal.
+show_progress() {
+    local text=$1 log_start=$2 started=$SECONDS frame=0 drawn_lines=0 screen screen_lines line
+    # Every line within the terminal's width: one that wraps would take two
+    # rows, and redrawing would leave one behind. The step's leaves room for
+    # the spinner and the time; the log's, for their indent.
+    local text_width=$((terminal_columns - 13)) line_width=$((terminal_columns - 5))
+    ((text_width >= 10)) || text_width=10
+    ((line_width >= 10)) || line_width=10
+    ((${#text} <= text_width)) || text=${text:0:text_width-3}...
+    # Not the script's: that one is for when the script ends.
+    trap - EXIT
+    trap '((drawn_lines == 0)) || printf "\r\e[%dA\e[J" "$drawn_lines"; exit 0' TERM
+    while true; do
+        screen=''
+        ((drawn_lines == 0)) || screen+=$'\r\e['"${drawn_lines}A"
+        screen+=$'\r\e[K'"  ${spinner_frames[frame++ % ${#spinner_frames[@]}]} $text $(format_elapsed "$started")"$'\n'
+        screen_lines=1
+        while IFS= read -r line; do
+            # What a progress bar redraws, and no colors.
+            line=${line##*$'\r'}
+            line=${line//$'\e'/}
+            screen+=$'\r\e[K'"$muted    ${line:0:line_width}$reset"$'\n'
+            screen_lines=$((screen_lines + 1))
+        done < <(tail -c +$((log_start + 1)) "$log" 2>/dev/null | tail -n "$shown_log_lines" 2>/dev/null)
+        printf '%s\e[J' "$screen"
+        # Only once it's on the screen: what the TERM trap clears.
+        drawn_lines=$screen_lines
+        sleep 0.1
+    done
+}
+
+# Runs the command $3... with its output in the log: on a terminal, showing
+# the step $1 and the log as it grows meanwhile; then $2 when it's done.
+run_step() {
+    local running_text=$1 done_text=$2 started=$SECONDS status=0
+    shift 2
+    if [[ -t 1 ]]; then
+        show_progress "$running_text" "$(stat -c %s "$log")" &
+        progress_pid=$!
+    fi
+    # In the foreground, so Ctrl+C stops it.
+    "$@" >>"$log" 2>&1 || status=$?
+    if [[ -n $progress_pid ]]; then
+        kill "$progress_pid"
+        wait "$progress_pid" || true
+        progress_pid=''
+    fi
+    if ((status != 0)); then
+        printf '  %s%s%s %s\n' "$red" "$failed_symbol" "$reset" "$running_text"
+        return 1
+    fi
+    printf '  %s%s%s %s (%s)\n' "$green" "$done_symbol" "$reset" "$done_text" "$(format_elapsed "$started")"
+}
+
+if [[ $UID -eq 0 ]]; then
+    print_error $"Homebrew doesn't run as root: run brew as your user."
+    exit 1
+fi
+
+if [[ -x $brew ]]; then
+    exec "$brew" "$@"
+fi
+
+if [[ ! -t 0 ]]; then
+    print_error $"Homebrew isn't installed: run brew in a terminal to install it."
+    exit 1
+fi
+
+print_message $"Homebrew isn't installed yet."
+if ! confirm $"Install Homebrew? [y/N]"; then
+    exit 1
+fi
+
+if [[ ! -w $user_folder ]]; then
+    sudo install -d -m 0700 -o "$UID" -g "$(id -g)" "$user_folder"
+fi
+printf '  %s%s%s ' "$green" "$done_symbol" "$reset"
+print_message $"Folder created: %s" "$prefix"
+
+read -r _ terminal_columns < <(stty size 2>/dev/null) || terminal_columns=0
+# 0 when the terminal doesn't say.
+((terminal_columns > 0)) || terminal_columns=80
+log=$(mktemp --tmpdir --suffix=.log homebrew-install-XXXXXXXX)
+installer=$(mktemp --tmpdir homebrew-install-XXXXXXXX.sh)
+progress_pid=''
+trap 'rm -f "$installer"; [[ -z $progress_pid ]] || { kill "$progress_pid"; wait "$progress_pid"; } 2>/dev/null' EXIT
+# The installer's own output says analytics are on and gives next steps
+# that don't fit here (brew shellenv in ~/.bashrc, dnf): it goes only to the
+# log. With its bin in PATH, it doesn't warn that it isn't.
+# shellcheck disable=SC2059 # the formats are translated messages
+printf -v downloading_text $"Downloading the installer from %s..." "$installer_url"
+# shellcheck disable=SC2059
+printf -v downloaded_text $"Installer downloaded from %s" "$installer_url"
+if ! run_step "$downloading_text" "$downloaded_text" \
+    curl --proto '=https' --tlsv1.2 -fsSL -o "$installer" "$installer_url" \
+    || ! run_step $"Installing Homebrew..." $"Homebrew installed" \
+        env PATH="$PATH:$prefix/bin" NONINTERACTIVE=1 HOMEBREW_NO_SUDO=1 HOMEBREW_NO_ANALYTICS=1 \
+        bash "$installer" --path="$prefix"; then
+    echo >&2
+    tail -n 20 "$log" >&2
+    echo >&2
+    print_error $"Homebrew couldn't be installed. Its whole log: %s" "$log"
+    exit 1
+fi
+
+# Off before brew does anything else.
+"$brew" analytics off >>"$log" 2>&1
+echo
+if confirm $"Share anonymous usage data with Homebrew (%s)? [y/N]" https://docs.brew.sh/Analytics; then
+    "$brew" analytics on >>"$log" 2>&1
+fi
+print_message $"Run 'brew help' to get started. Its documentation: %s" https://docs.brew.sh
+print_message $"Installation log: %s" "$log"
+echo
+# The color ends before the newline: a line the newline scrolls in would
+# take it, and the cursor with it.
+printf '%s%s%s\n' "$green" "$(print_message $"Homebrew is ready. Open a new terminal to start using brew.")" "$reset"

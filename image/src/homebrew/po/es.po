@@ -1,0 +1,82 @@
+# Spanish translations for BrescaOS package.
+# Copyright (C) 2026 THE BrescaOS'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the BrescaOS package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: BrescaOS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-25 18:43+0000\n"
+"PO-Revision-Date: 2026-11-25 18:43+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: brew
+msgid "Homebrew doesn't run as root: run brew as your user."
+msgstr "Homebrew no se ejecuta como root: ejecuta brew como tu usuario."
+
+#: brew
+msgid "Homebrew isn't installed: run brew in a terminal to install it."
+msgstr ""
+"Homebrew no está instalado: ejecuta brew en un terminal para instalarlo."
+
+#: brew
+msgid "Homebrew isn't installed yet."
+msgstr "Homebrew aún no está instalado."
+
+#: brew
+msgid "Install Homebrew? [y/N]"
+msgstr "¿Instalar Homebrew? [s/N]"
+
+#: brew
+#, sh-printf-format
+msgid "Folder created: %s"
+msgstr "Carpeta creada: %s"
+
+#: brew
+#, sh-printf-format
+msgid "Downloading the installer from %s..."
+msgstr "Descargando el instalador de %s..."
+
+#: brew
+#, sh-printf-format
+msgid "Installer downloaded from %s"
+msgstr "Instalador descargado de %s"
+
+#: brew
+msgid "Homebrew installed"
+msgstr "Homebrew instalado"
+
+#: brew
+msgid "Installing Homebrew..."
+msgstr "Instalando Homebrew..."
+
+#: brew
+#, sh-printf-format
+msgid "Homebrew couldn't be installed. Its whole log: %s"
+msgstr "no se pudo instalar Homebrew. Su registro completo: %s"
+
+#: brew
+#, sh-printf-format
+msgid "Share anonymous usage data with Homebrew (%s)? [y/N]"
+msgstr "¿Compartir datos de uso anónimos con Homebrew (%s)? [s/N]"
+
+#: brew
+#, sh-printf-format
+msgid "Run 'brew help' to get started. Its documentation: %s"
+msgstr "Ejecuta 'brew help' para empezar. Su documentación: %s"
+
+#: brew
+#, sh-printf-format
+msgid "Installation log: %s"
+msgstr "Registro de la instalación: %s"
+
+#: brew
+msgid "Homebrew is ready. Open a new terminal to start using brew."
+msgstr "Homebrew está listo. Abre un terminal nuevo para empezar a usar brew."

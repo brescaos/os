@@ -33,6 +33,13 @@ printf 'disable %s\n' $disabled_units >/usr/lib/systemd/system-preset/10-brescao
 mkdir -p /usr/lib/systemd/resolved.conf.d
 printf '[Resolve]\nLLMNR=no\n' >/usr/lib/systemd/resolved.conf.d/50-brescaos.conf
 
+# --- Users -------------------------------------------------------------------------
+# userdel removes a user's Homebrew too (/usr/libexec/bresca/homebrew/userdel):
+# a new user who got the same uid would find it as their own.
+sed -i 's|^#USERDEL_CMD.*|USERDEL_CMD /usr/libexec/bresca/homebrew/userdel|' /etc/login.defs
+grep -qx 'USERDEL_CMD /usr/libexec/bresca/homebrew/userdel' /etc/login.defs \
+    || die "USERDEL_CMD isn't set in /etc/login.defs, check its commented-out line"
+
 # --- Firewall ------------------------------------------------------------------------
 # default (shown as "BrescaOS default" among Fedora's zones), BrescaOS's own
 # zone and firewalld's default one. A NetworkManager connection without a

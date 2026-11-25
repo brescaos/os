@@ -65,6 +65,11 @@ extract_strings() {
                 | xargs xgettext $XGETTEXT_OPTIONS -L Shell -o "$pot" 2>&1 \
                 | { grep -v 'the syntax \$"\.\.\." is deprecated' || true; } >&2
             ;;
+        homebrew)
+            # The same warning as bresca-cli's.
+            xgettext $XGETTEXT_OPTIONS -L Shell -o "$pot" brew 2>&1 \
+                | { grep -v 'the syntax \$"\.\.\." is deprecated' || true; } >&2
+            ;;
         hexa)
             # The clock's QML names the domain (i18ndc).
             find plasmoids/com.brescaos.hexa.clock -name '*.qml' | sort \
